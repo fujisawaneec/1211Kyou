@@ -16,10 +16,10 @@
 
 void MyGame::Initialize()
 {
+  winApp_->SetWindowSize(1920, 1080);
 
   TakoFramework::Initialize();
 
-  winApp_->SetWindowSize(1280, 720);
   winApp_->SetWindowTitle(L"TakoEngine Sample Game");
 
 #pragma region 汎用機能初期化-------------------------------------------------------------------------------------------------------------------
@@ -129,7 +129,7 @@ void MyGame::Draw()
   /// ============================================= ///
   /// ---------最終結果をスワップチェーンに描画---------///
   /// ============================================= ///
-  PostEffectManager::GetInstance()->DrawFinalResult();
+  PostEffectManager::GetInstance()->DrawFinalResult(!GameViewportWindowVisible);
 
 
   /// ========================================= ///
@@ -139,42 +139,14 @@ void MyGame::Draw()
 
   imguiManager_->Begin();
 
+  TakoFramework::Draw();
+
   SceneManager::GetInstance()->DrawImGui();
 
   Draw2D::GetInstance()->ImGui();
 
   // GlobalVariablesの更新
   GlobalVariables::GetInstance()->Update();
-
-  ImGui::Begin("Option");
-  // buttonでFPSの表示を切り替え
-  if (ImGui::Button("Display FPS"))
-  {
-    FPSWindowVisible = !FPSWindowVisible;
-  }
-  ImGui::SameLine();
-  if (ImGui::Button("PostEffect Option"))
-  {
-    PostEffectWindowVisible = !PostEffectWindowVisible;
-  }
-
-  ImGui::End();
-
-  // fpsの表示
-  if (FPSWindowVisible)
-  {
-    ImGui::Begin("FPS", &FPSWindowVisible);
-    ImGui::ProgressBar(FrameTimer::GetInstance()->GetFPS() / 60.0f, ImVec2(0.0f, 0.0f), "");
-    ImGui::SameLine();
-    ImGui::Text("FPS : %.0f", FrameTimer::GetInstance()->GetFPS());
-    ImGui::End();
-  }
-
-
-  // PostEffectのパラメータ調整
-  if (PostEffectWindowVisible) {
-    PostEffectManager::GetInstance()->DrawImgui();
-  }
 
   imguiManager_->End();
 
