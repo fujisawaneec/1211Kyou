@@ -14,7 +14,7 @@ void FollowCamera::Initialize(Camera* camera) {
 
   camera_ = camera;
 
-  destinationAngleX_ = DirectX::XMConvertToRadians(15.0f);
+  destinationAngleX_ = DirectX::XMConvertToRadians(8.0f);
 }
 
 void FollowCamera::Finalize()

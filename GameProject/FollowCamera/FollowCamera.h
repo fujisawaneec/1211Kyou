@@ -91,7 +91,7 @@ private: // メンバ変数
   float t_ = 0.18f;
 
   float destinationAngleY_ = 0.0f;
-  float destinationAngleX_ = 15.0f;
+  float destinationAngleX_ = 8.0f;
   float destinationAngleZ_ = 0.0f;
 
   bool isRotating_ = false;
