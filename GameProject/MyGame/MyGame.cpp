@@ -34,11 +34,23 @@ void MyGame::Initialize()
   // シーンの初期化
   sceneFactory_ = new SceneFactory();
   SceneManager::GetInstance()->SetSceneFactory(sceneFactory_);
-  SceneManager::GetInstance()->ChangeScene("game", 0.0f);
+  SceneManager::GetInstance()->ChangeScene("title", 0.0f);
 
   TextureManager::GetInstance()->LoadTexture("white.png");
+  TextureManager::GetInstance()->LoadTexture("black.png");
   TextureManager::GetInstance()->LoadTexture("circle.png");
   TextureManager::GetInstance()->LoadTexture("my_skybox.dds");
+  TextureManager::GetInstance()->LoadTexture("title_text/title_text_1.png");
+  TextureManager::GetInstance()->LoadTexture("title_text/title_text_2.png");
+  TextureManager::GetInstance()->LoadTexture("title_text/title_text_3.png");
+  TextureManager::GetInstance()->LoadTexture("title_text/title_text_4.png");
+  TextureManager::GetInstance()->LoadTexture("title_text/title_text_5.png");
+  TextureManager::GetInstance()->LoadTexture("title_text/title_text_6.png");
+  TextureManager::GetInstance()->LoadTexture("title_text/title_text_7.png");
+  TextureManager::GetInstance()->LoadTexture("title_text/title_text_8.png");
+  TextureManager::GetInstance()->LoadTexture("title_text/title_text_9.png");
+  TextureManager::GetInstance()->LoadTexture("title_text/title_text_10.png");
+  TextureManager::GetInstance()->LoadTexture("title_button.png");
 
   spriteBasicOnresizeId = winApp_->RegisterOnResizeFunc(std::bind(&SpriteBasic::OnResize, SpriteBasic::GetInstance(), std::placeholders::_1));
 
@@ -129,7 +141,13 @@ void MyGame::Draw()
   /// ============================================= ///
   /// ---------最終結果をスワップチェーンに描画---------///
   /// ============================================= ///
-  PostEffectManager::GetInstance()->DrawFinalResult(!DebugUIManager::GetInstance()->IsWindowVisible("GameViewport"));
+  bool isDrawToSwapChain = true;
+
+#ifdef _DEBUG
+  isDrawToSwapChain = !DebugUIManager::GetInstance()->IsWindowVisible("GameViewport");
+#endif
+
+  PostEffectManager::GetInstance()->DrawFinalResult(isDrawToSwapChain);
 
 
   /// ========================================= ///

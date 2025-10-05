@@ -5,6 +5,7 @@
 #include <vector>
 #include <memory>
 #include "AABB.h"
+#include "EmitterManager.h"
 
 class TitleScene : public BaseScene
 {
@@ -38,5 +39,14 @@ public: // メンバ関数
 
 private: // メンバ変数
 
+  std::unique_ptr<EmitterManager> emitterManager_;
 
+  //背景画像
+  std::unique_ptr<Sprite> titleBG_;
+
+  // タイトル画像
+  std::unique_ptr<Sprite> titleText_;
+
+  // スタートボタン画像
+  std::unique_ptr<Sprite> startButtonText_;
 };

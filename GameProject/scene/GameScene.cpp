@@ -48,9 +48,12 @@ void GameScene::Initialize()
     [this]() { if (boss_) boss_->DrawImGui(); });
   DebugUIManager::GetInstance()->RegisterGameObject("FollowCamera",
     [this]() { if (followCamera_) followCamera_->DrawImGui(); });
+
+  emitterManager_ = std::make_unique<EmitterManager>(GPUParticle::GetInstance());
+  DebugUIManager::GetInstance()->SetEmitterManager(emitterManager_.get());
 #endif
   /// ================================== ///
-  ///              初期化処理              ///
+  ///              初期化処理             ///
   /// ================================== ///
 
   // SkyBoxの初期化
@@ -95,9 +98,6 @@ void GameScene::Initialize()
     static_cast<uint32_t>(CollisionTypeId::kEnemyAttack),
     true
   );
-
-  emitterManager_ = std::make_unique<EmitterManager>(GPUParticle::GetInstance());
-  DebugUIManager::GetInstance()->SetEmitterManager(emitterManager_.get());
 }
 
 void GameScene::Finalize()
