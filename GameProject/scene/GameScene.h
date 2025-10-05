@@ -54,6 +54,9 @@ private: // メンバ変数
 
   std::unique_ptr<EmitterManager> emitterManager_;
 
+  // タイトルボタンテキスト
+  std::unique_ptr<Sprite> toTitleText_;
+
   bool isDebug_ = false;
 
 };

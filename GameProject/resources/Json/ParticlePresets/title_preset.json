@@ -1,5 +1,129 @@
 {
   "emitters": {
+    "border1": {
+      "boxRotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "boxSize": [
+        0.0,
+        30.0,
+        0.0
+      ],
+      "endColor": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "frequency": 0.01600000075995922,
+      "frequencyTime": 0.003188773989677429,
+      "isActive": true,
+      "isEmitting": true,
+      "isNormalize": false,
+      "isRandomRotateZ": false,
+      "isTemporary": false,
+      "lifeTimeRange": [
+        1.0,
+        1.0
+      ],
+      "particleCount": 2,
+      "position": [
+        -15.0,
+        0.0,
+        0.0
+      ],
+      "scaleRangeX": [
+        6.0,
+        6.0
+      ],
+      "scaleRangeY": [
+        0.07999999821186066,
+        0.07999999821186066
+      ],
+      "startColor": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "type": 1,
+      "velRangeX": [
+        0.05000000074505806,
+        0.05000000074505806
+      ],
+      "velRangeY": [
+        0.009999999776482582,
+        0.009999999776482582
+      ],
+      "velRangeZ": [
+        0.0,
+        0.0
+      ]
+    },
+    "border2": {
+      "boxRotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "boxSize": [
+        0.0,
+        30.0,
+        0.0
+      ],
+      "endColor": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "frequency": 0.01600000075995922,
+      "frequencyTime": 0.01502891443669796,
+      "isActive": true,
+      "isEmitting": true,
+      "isNormalize": false,
+      "isRandomRotateZ": false,
+      "isTemporary": false,
+      "lifeTimeRange": [
+        1.0,
+        1.0
+      ],
+      "particleCount": 2,
+      "position": [
+        15.0,
+        0.0,
+        0.0
+      ],
+      "scaleRangeX": [
+        6.0,
+        6.0
+      ],
+      "scaleRangeY": [
+        0.07999999821186066,
+        0.07999999821186066
+      ],
+      "startColor": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "type": 1,
+      "velRangeX": [
+        -0.05000000074505806,
+        -0.05000000074505806
+      ],
+      "velRangeY": [
+        0.009999999776482582,
+        0.009999999776482582
+      ],
+      "velRangeZ": [
+        0.0,
+        0.0
+      ]
+    },
     "slash": {
       "boxRotation": [
         0.0,
@@ -7,8 +131,8 @@
         0.0
       ],
       "boxSize": [
-        40.20000076293945,
-        20.0,
+        40.0,
+        25.0,
         0.0
       ],
       "endColor": [
@@ -18,7 +142,7 @@
         1.0
       ],
       "frequency": 1.0,
-      "frequencyTime": 0.019079850986599922,
+      "frequencyTime": 0.09072194248437881,
       "isActive": true,
       "isEmitting": false,
       "isNormalize": false,
@@ -31,16 +155,16 @@
       "particleCount": 1,
       "position": [
         0.0,
-        1.100000023841858,
-        4.0
+        -3.0,
+        14.0
       ],
       "scaleRangeX": [
         20.0,
         20.0
       ],
       "scaleRangeY": [
-        0.25,
-        0.25
+        0.5,
+        0.5
       ],
       "startColor": [
         1.0,

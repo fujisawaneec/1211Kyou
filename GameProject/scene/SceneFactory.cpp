@@ -15,7 +15,9 @@ BaseScene* SceneFactory::CreateScene(const std::string& sceneName)
   } else if (sceneName == "game") {
     newScene = new GameScene();
   } else {
+#ifdef _DEBUG
     DebugUIManager::GetInstance()->AddLog("Unknown scene name: " + sceneName, DebugUIManager::LogType::Error);
+#endif
   }
 
   return newScene;

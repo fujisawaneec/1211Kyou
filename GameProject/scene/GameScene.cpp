@@ -56,6 +56,11 @@ void GameScene::Initialize()
   ///              初期化処理             ///
   /// ================================== ///
 
+  // タイトルボタンテキストの初期化
+  toTitleText_ = std::make_unique<Sprite>();
+  toTitleText_->Initialize("game_button_text.png");
+  toTitleText_->SetPos(Vector2(WinApp::clientWidth / 2.f - toTitleText_->GetSize().x / 2.f, 200.f));
+
   // SkyBoxの初期化
   skyBox_ = std::make_unique<SkyBox>();
   skyBox_->Initialize("my_skybox.dds");
@@ -134,7 +139,8 @@ void GameScene::Update()
   player_->Update();
   boss_->Update();
   followCamera_->Update();
-  emitterManager_->Update();
+  //emitterManager_->Update();
+  toTitleText_->Update();
   
   // 衝突判定の実行
   CollisionManager::GetInstance()->CheckAllCollisions();
@@ -211,6 +217,7 @@ void GameScene::DrawWithoutEffect()
   // スプライト共通描画設定
   SpriteBasic::GetInstance()->SetCommonRenderSetting();
 
+  toTitleText_->Draw();
 }
 
 void GameScene::DrawImGui()

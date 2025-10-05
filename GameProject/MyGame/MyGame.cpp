@@ -18,7 +18,7 @@ void MyGame::Initialize()
 {
   winApp_->SetWindowSize(1920, 1080);
 
-  winApp_->SetWindowTitle(L"TakoEngine Sample Game");
+  winApp_->SetWindowTitle(L"Slash");
 
   TakoFramework::Initialize();
 
@@ -51,6 +51,7 @@ void MyGame::Initialize()
   TextureManager::GetInstance()->LoadTexture("title_text/title_text_9.png");
   TextureManager::GetInstance()->LoadTexture("title_text/title_text_10.png");
   TextureManager::GetInstance()->LoadTexture("title_button.png");
+  TextureManager::GetInstance()->LoadTexture("game_button_text.png");
 
   spriteBasicOnresizeId = winApp_->RegisterOnResizeFunc(std::bind(&SpriteBasic::OnResize, SpriteBasic::GetInstance(), std::placeholders::_1));
 
@@ -159,7 +160,7 @@ void MyGame::Draw()
 
   TakoFramework::Draw();
 
-  SceneManager::GetInstance()->DrawImGui();
+  //SceneManager::GetInstance()->DrawImGui();
 
   Draw2D::GetInstance()->ImGui();
 
