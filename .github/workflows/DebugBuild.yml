@@ -13,8 +13,12 @@ jobs:
   runs-on: windows-2022
 
   steps:
-   - name: Checkout
+   - name: Checkout with Submodules
      uses: actions/checkout@v4
+     with:                                                                            
+       submodules: recursive
+       token: ${{ secrets.GITHUB_TOKEN }}
+       fetch-depth: 0 
 
    - name: Add MSBuild to PATH
      uses: microsoft/setup-msbuild@v2
