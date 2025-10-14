@@ -53,6 +53,67 @@ public: // メンバ関数
 	/// </summary>
 	void ResetTitleAnimation();
 
+private: // メンバ関数
+
+	// === 初期化系関数 === //
+
+	/// <summary>
+	/// デバッグUIの初期化
+	/// </summary>
+	void InitializeDebugUI();
+
+	/// <summary>
+	/// カメラの初期化
+	/// </summary>
+	void InitializeCamera();
+
+	/// <summary>
+	/// ポストエフェクトの初期化
+	/// </summary>
+	void InitializePostEffects();
+
+	/// <summary>
+	/// スプライトの初期化
+	/// </summary>
+	void InitializeSprites();
+
+	/// <summary>
+	/// パーティクルの初期化
+	/// </summary>
+	void InitializeParticles();
+
+	// === 更新系関数 === //
+
+	/// <summary>
+	/// ウィンドウリサイズ処理
+	/// </summary>
+	void UpdateWindowResize();
+
+	/// <summary>
+	/// スタートボタンの点滅アニメーション更新
+	/// </summary>
+	void UpdateStartButtonBlink();
+
+	/// <summary>
+	/// タイトルテキストアニメーション更新
+	/// </summary>
+	void UpdateTitleTextAnimation();
+
+	/// <summary>
+	/// slashパーティクルアニメーション更新
+	/// </summary>
+	void UpdateSlashParticleAnimation();
+
+	/// <summary>
+	/// タイトルエフェクトアニメーション更新
+	/// </summary>
+	void UpdateTitleEffectAnimation();
+
+	/// <summary>
+	/// 入力処理
+	/// </summary>
+	void UpdateInput();
+
 private: // メンバ変数
 
   std::unique_ptr<EmitterManager> emitterManager_;
@@ -144,7 +205,7 @@ private: // メンバ変数
   float slashEmitterAnimTimer_ = 0.0f;
 
   // アニメーション持続時間（タイトルテキストと同期）
-  float slashEmitterAnimDuration_ = 3.5f;  // 10フレーム * animationSpeed / 60fps
+  float slashEmitterAnimDuration_ = 2.5f;  // 10フレーム * animationSpeed / 60fps
 
   // Count値のアニメーション
   uint32_t slashEmitterStartCount_ = 1;    // 初期値

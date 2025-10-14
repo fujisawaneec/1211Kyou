@@ -5,8 +5,8 @@
     0.0
   ],
   "boxSize": [
-    40.20000076293945,
-    20.0,
+    40.0,
+    25.0,
     0.0
   ],
   "endColor": [
@@ -16,7 +16,7 @@
     1.0
   ],
   "frequency": 1.0,
-  "frequencyTime": 0.08236906677484512,
+  "frequencyTime": 0.3808974325656891,
   "isActive": true,
   "isEmitting": false,
   "isNormalize": false,
@@ -29,16 +29,16 @@
   "particleCount": 1,
   "position": [
     0.0,
-    1.100000023841858,
-    4.0
+    -1003.0,
+    14.0
   ],
   "scaleRangeX": [
     20.0,
     20.0
   ],
   "scaleRangeY": [
-    0.25,
-    0.25
+    0.5,
+    0.5
   ],
   "startColor": [
     1.0,
