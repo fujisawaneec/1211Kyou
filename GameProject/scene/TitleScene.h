@@ -74,6 +74,8 @@ private: // メンバ変数
   //Vignette Parameter
   VignetteParam vignetteParam_{};
 
+  float offsetY = -1000.0f;
+
   // === タイトルテキストアニメーション制御用変数 === //
   // 現在表示中のフレーム番号（0〜9）
   int currentFrame_ = 0;

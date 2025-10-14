@@ -50,7 +50,7 @@ void TitleScene::Initialize()
 	/// ================================== ///
 
   (*Object3dBasic::GetInstance()->GetCamera())->SetRotate(Vector3(0.2f, 0.0f, 0.0f));
-  (*Object3dBasic::GetInstance()->GetCamera())->SetTranslate(Vector3(0.0f, 9.0f, -34.0f));
+  (*Object3dBasic::GetInstance()->GetCamera())->SetTranslate(Vector3(0.0f, 9.0f + offsetY, -34.0f));
 
   rgbSplitParam_.redOffset = Vector2(-0.01f, 0.f);
   rgbSplitParam_.greenOffset = Vector2(0.01f, 0.f);
@@ -86,7 +86,9 @@ void TitleScene::Initialize()
   // スタートボタンテキストの初期化
   startButtonText_ = make_unique<Sprite>();
   startButtonText_->Initialize("title_button.png");
-  startButtonText_->SetPos(Vector2(WinApp::clientWidth / 2.f - startButtonText_->GetSize().x / 2.f, WinApp::clientHeight - 250.f));
+  startButtonText_->SetPos(Vector2(
+    WinApp::clientWidth / 2.f - startButtonText_->GetSize().x / 2.f,
+    WinApp::clientHeight - 250.f));
 
   // タイトルテキストエフェクトの初期化（拡大フェードアウト用）
   titleTextEffect_ = make_unique<Sprite>();
@@ -136,7 +138,9 @@ void TitleScene::Update()
     sprite->SetPos(Vector2(WinApp::clientWidth / 2.f - sprite->GetSize().x / 2.f, 100.f));
   }
 
-  startButtonText_->SetPos(Vector2(WinApp::clientWidth / 2.f - startButtonText_->GetSize().x / 2.f, WinApp::clientHeight - 250.f));
+  startButtonText_->SetPos(Vector2(
+      WinApp::clientWidth / 2.f - startButtonText_->GetSize().x / 2.f,
+      WinApp::clientHeight - 250.f));
 
   // スタートボタンの点滅アニメーション処理
   if (isButtonBlinking_) {
@@ -199,7 +203,7 @@ void TitleScene::Update()
       // アニメーション終了
       progress = 1.0f;
       isSlashEmitterAnimating_ = false;
-      SceneManager::GetInstance()->ChangeScene("game", 0.8f);
+      SceneManager::GetInstance()->ChangeScene("game", 0.5f);
       emitterManager_->SetEmitterActive("slash", false);
       emitterManager_->SetEmitterActive("border1", false);
       emitterManager_->SetEmitterActive("border1", false);
