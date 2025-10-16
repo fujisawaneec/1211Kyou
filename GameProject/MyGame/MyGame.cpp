@@ -12,7 +12,7 @@
 #include "ModelManager.h"
 #include "GPUParticle.h"
 #include "SpriteBasic.h"
-#include "Transition.h"
+#include "TransitionManager.h"
 
 void MyGame::Initialize()
 {
@@ -135,7 +135,7 @@ void MyGame::Draw()
   // シーンの描画
   SceneManager::GetInstance()->DrawWithoutEffect();
 
-  Transition::GetInstance()->Draw();
+  TransitionManager::GetInstance()->Draw();
 
   Draw2D::GetInstance()->Reset();
 
