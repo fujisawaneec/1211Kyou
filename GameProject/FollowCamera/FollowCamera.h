@@ -7,7 +7,10 @@
 #include "Camera.h"
 
 #include <math.h>
+#include <memory>
 #include <DirectXMath.h>
+
+class CameraAnimation;
 
 struct TopDownSettings {
   float baseHeight = 10.0f;
@@ -48,6 +51,9 @@ public: // メンバ関数
   // 画面揺れ
   void ShakeScreen(float power);
 
+  // ゲーム開始時のCameraアニメーション再生
+  void PlayStartCameraAnimation();
+
   //-----------------------------Setters------------------------------//
   void SetTarget(const Transform* target);
   void SetTarget2(const Transform* target2);
@@ -74,6 +80,8 @@ public: // メンバ関数
 
 private: // メンバ変数
   Camera* camera_;
+
+  std::unique_ptr<CameraAnimation> cameraAnimation_;
 
   const Transform* target_ = nullptr;
   const Transform* target2_ = nullptr;
@@ -102,4 +110,3 @@ private: // メンバ変数
   TopDownSettings topDownSettings_;
 
 };
-

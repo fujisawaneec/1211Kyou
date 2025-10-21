@@ -9,9 +9,6 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="FollowCamera">
-      <UniqueIdentifier>{B83E8A0D-6A37-4A88-8BC7-D45E82E0C234}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Collision">
       <UniqueIdentifier>{a8b2c4d5-9e7f-4b8c-9a5e-6f8d9c2e1b3a}</UniqueIdentifier>
     </Filter>
@@ -33,13 +30,16 @@
     <Filter Include="Object\Boss">
       <UniqueIdentifier>{2eb72ef7-09cc-4ffc-9df7-2ec9f26636ad}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Camera">
+      <UniqueIdentifier>{B83E8A0D-6A37-4A88-8BC7-D45E82E0C234}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MyGame\MyGame.cpp">
       <Filter>MyGame</Filter>
     </ClCompile>
     <ClCompile Include="FollowCamera\FollowCamera.cpp">
-      <Filter>FollowCamera</Filter>
+      <Filter>Camera</Filter>
     </ClCompile>
     <ClCompile Include="scene\GameScene.cpp">
       <Filter>scene</Filter>
@@ -93,6 +93,9 @@
     <ClCompile Include="scene\ClearScene.cpp">
       <Filter>scene</Filter>
     </ClCompile>
+    <ClCompile Include="CameraAnimation\CameraAnimation.cpp">
+      <Filter>Camera</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Collision\CollisionTypeIdDef.h">
@@ -102,7 +105,7 @@
       <Filter>MyGame</Filter>
     </ClInclude>
     <ClInclude Include="FollowCamera\FollowCamera.h">
-      <Filter>FollowCamera</Filter>
+      <Filter>Camera</Filter>
     </ClInclude>
     <ClInclude Include="scene\GameScene.h">
       <Filter>scene</Filter>
@@ -154,6 +157,12 @@
     </ClInclude>
     <ClInclude Include="scene\ClearScene.h">
       <Filter>scene</Filter>
+    </ClInclude>
+    <ClInclude Include="CameraAnimation\CameraAnimation.h">
+      <Filter>Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="CameraAnimation\CameraKeyframe.h">
+      <Filter>Camera</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

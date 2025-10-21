@@ -1,0 +1,53 @@
+{
+    "animation_name": "Untitled",
+    "duration": 3.0,
+    "keyframes": [
+        {
+            "fov": 0.1745329350233078,
+            "interpolation": "EASE_OUT",
+            "position": [
+                0.0,
+                0.4000000059604645,
+                6.400000095367432
+            ],
+            "rotation": [
+                -0.01745329238474369,
+                0.0,
+                0.0
+            ],
+            "time": 0.0
+        },
+        {
+            "fov": 0.44999998807907104,
+            "interpolation": "EASE_IN",
+            "position": [
+                0.0,
+                6.5,
+                -22.899999618530273
+            ],
+            "rotation": [
+                0.10471975803375244,
+                0.0,
+                0.0
+            ],
+            "time": 1.5
+        },
+        {
+            "fov": 0.44999998807907104,
+            "interpolation": "EASE_OUT",
+            "position": [
+                0.0,
+                29.200000762939453,
+                -64.0
+            ],
+            "rotation": [
+                0.4363323152065277,
+                0.0,
+                0.0
+            ],
+            "time": 3.0
+        }
+    ],
+    "loop": false,
+    "play_speed": 1.0
+}

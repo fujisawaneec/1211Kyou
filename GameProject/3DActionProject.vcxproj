@@ -152,6 +152,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="CameraAnimation\CameraAnimation.cpp" />
     <ClCompile Include="FollowCamera\FollowCamera.cpp" />
     <ClCompile Include="Input\InputHandler.cpp" />
     <ClCompile Include="main.cpp" />
@@ -185,6 +186,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CameraAnimation\CameraAnimation.h" />
+    <ClInclude Include="CameraAnimation\CameraKeyframe.h" />
     <ClInclude Include="Collision\CollisionTypeIdDef.h" />
     <ClInclude Include="FollowCamera\FollowCamera.h" />
     <ClInclude Include="Input\InputHandler.h" />

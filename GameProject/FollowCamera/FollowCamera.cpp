@@ -1,4 +1,6 @@
 #include "followCamera.h"
+#include "FrameTimer.h"
+#include "CameraAnimation/CameraAnimation.h"
 #include "imgui.h"
 #ifdef DEBUG
 #include "ImGuiManager.h"
@@ -15,6 +17,10 @@ void FollowCamera::Initialize(Camera* camera) {
   camera_ = camera;
 
   destinationAngleX_ = DirectX::XMConvertToRadians(8.0f);
+
+  cameraAnimation_ = std::make_unique<CameraAnimation>();
+
+  cameraAnimation_->SetCamera(camera_);
 }
 
 void FollowCamera::Finalize()
@@ -24,6 +30,19 @@ void FollowCamera::Finalize()
 
 void FollowCamera::Update()
 {
+  cameraAnimation_->Update(FrameTimer::GetInstance()->GetDeltaTime());
+  CameraAnimation::PlayState playState = cameraAnimation_->GetPlayState();
+
+  // アニメーション再生中、またはキーフレーム編集中はFollowCameraの更新をスキップ
+  if (playState == CameraAnimation::PlayState::PLAYING ||
+      cameraAnimation_->IsEditingKeyframe()) {
+    // 編集中のキーフレームをカメラに適用
+    if (cameraAnimation_->IsEditingKeyframe()) {
+      cameraAnimation_->ApplyKeyframeToCamera();
+    }
+    return;
+  }
+
   if (mode_)
   {
     FirstPersonMode();
@@ -172,6 +191,12 @@ void FollowCamera::SetTarget2(const Transform* target2) {
   target2_ = target2;
 }
 
+void FollowCamera::PlayStartCameraAnimation()
+{
+  cameraAnimation_->LoadFromJson("game_start.json");
+  cameraAnimation_->Play();
+}
+
 void FollowCamera::DrawImGui() {
 #ifdef _DEBUG
 
@@ -241,5 +266,7 @@ void FollowCamera::DrawImGui() {
       ImGui::Text("Target2: Not Set");
     }
   }
+
+  cameraAnimation_->DrawImGui();
 #endif _DEBUG
 }
