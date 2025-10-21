@@ -138,6 +138,7 @@ void GameScene::Update()
   ground_->Update();
   player_->Update();
   boss_->Update();
+
   followCamera_->Update();
   //emitterManager_->Update();
   toTitleText_->Update();
@@ -148,7 +149,7 @@ void GameScene::Update()
   // シーン遷移
   if (Input::GetInstance()->TriggerKey(DIK_RETURN))
   {
-    SceneManager::GetInstance()->ChangeScene("title");
+    SceneManager::GetInstance()->ChangeScene("title", "Fade",0.3f);
   }
 }
 

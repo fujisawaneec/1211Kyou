@@ -535,7 +535,7 @@ void TitleScene::UpdateSlashParticleAnimation()
   float progress = slashEmitterAnimTimer_ / slashEmitterAnimDuration_;
 
   if (progress >= 0.9f) {
-    SceneManager::GetInstance()->ChangeScene("game", 0.2f);
+    SceneManager::GetInstance()->ChangeScene("game","Fade",0.2f);
   }
 
   if (progress >= 1.0f) {
