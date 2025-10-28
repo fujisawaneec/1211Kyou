@@ -172,8 +172,4 @@ private:
 
     // ソートが必要かのフラグ
     bool needsSort_ = false;
-
-    // 現在アクティブなコントローラーのインデックス（キャッシュ）
-    mutable int cachedActiveIndex_ = -1;
-    mutable bool cacheValid_ = false;
 };

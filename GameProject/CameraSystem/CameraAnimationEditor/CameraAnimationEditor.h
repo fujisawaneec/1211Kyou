@@ -11,7 +11,6 @@
 class CameraAnimationTimeline;
 class CameraAnimationCurveEditor;
 class CameraAnimationHistory;
-class CameraAnimationPresets;
 
 /// <summary>
 /// 高度なカメラアニメーションエディター
@@ -58,6 +57,13 @@ public:
     void Initialize(CameraAnimation* animation, Camera* camera);
 
     /// <summary>
+    /// 初期化（CameraAnimationController使用）
+    /// </summary>
+    /// <param name="controller">アニメーションコントローラー</param>
+    /// <param name="camera">カメラ</param>
+    void Initialize(class CameraAnimationController* controller, Camera* camera);
+
+    /// <summary>
     /// エディターUIの描画
     /// </summary>
     void Draw();
@@ -101,6 +107,11 @@ private:
     void DrawMenuBar();
 
     /// <summary>
+    /// アニメーション選択UIの描画
+    /// </summary>
+    void DrawAnimationSelector();
+
+    /// <summary>
     /// タイムラインパネルの描画
     /// </summary>
     void DrawTimelinePanel();
@@ -119,11 +130,6 @@ private:
     /// プレビューパネルの描画
     /// </summary>
     void DrawPreviewPanel();
-
-    /// <summary>
-    /// プリセットパネルの描画
-    /// </summary>
-    void DrawPresetsPanel();
 
     /// <summary>
     /// ステータスバーの描画
@@ -196,12 +202,12 @@ private:
     // 編集対象
     CameraAnimation* animation_ = nullptr;       ///< 編集中のアニメーション
     Camera* camera_ = nullptr;                   ///< カメラ
+    class CameraAnimationController* controller_ = nullptr; ///< アニメーションコントローラー（複数管理用）
 
     // UIコンポーネント
     std::unique_ptr<CameraAnimationTimeline> timeline_;     ///< タイムラインコンポーネント
     std::unique_ptr<CameraAnimationCurveEditor> curveEditor_; ///< カーブエディター
     std::unique_ptr<CameraAnimationHistory> history_;        ///< 編集履歴
-    std::unique_ptr<CameraAnimationPresets> presets_;        ///< プリセット管理
 
     // 選択状態
     std::vector<int> selectedKeyframes_;         ///< 選択中のキーフレームインデックス

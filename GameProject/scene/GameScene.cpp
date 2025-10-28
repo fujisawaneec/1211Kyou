@@ -131,7 +131,7 @@ void GameScene::Initialize()
   cameraManager_->RegisterController("Animation", std::move(animController));
 
   // ゲーム開始アニメーションを再生
-  animationController_->LoadAnimation("game_start.json");
+  animationController_->LoadAnimation("game_start");
   animationController_->Play();
 
   // デフォルトモードを設定（TopDown）
@@ -160,6 +160,8 @@ void GameScene::Finalize()
   DebugUIManager::GetInstance()->ClearDebugInfo();
   // ゲームオブジェクトの登録解除
   DebugUIManager::GetInstance()->ClearGameObjects();
+  // AnimationEditorのクリーンアップ
+  CameraDebugUI::CleanupAnimationEditor();
 #endif
 
   // オブジェクトの終了処理

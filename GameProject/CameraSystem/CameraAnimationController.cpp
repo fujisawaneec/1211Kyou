@@ -1,22 +1,26 @@
 #include "CameraAnimationController.h"
 
 CameraAnimationController::CameraAnimationController() {
-    animation_ = std::make_unique<CameraAnimation>();
+    // デフォルトアニメーションを作成
+    animations_["Default"] = std::make_unique<CameraAnimation>();
+    animations_["Default"]->SetAnimationName("Default");
+    currentAnimationName_ = "Default";
 }
 
 void CameraAnimationController::Update(float deltaTime) {
-    if (!animation_ || !camera_) {
+    auto* animation = GetCurrentAnimation();
+    if (!animation || !camera_) {
         return;
     }
 
     // アニメーション更新
-    animation_->Update(deltaTime);
+    animation->Update(deltaTime);
 
     // 再生完了時の自動非アクティブ化
     if (autoDeactivateOnComplete_) {
-        auto state = animation_->GetPlayState();
+        auto state = animation->GetPlayState();
         if (state == CameraAnimation::PlayState::STOPPED &&
-            !animation_->IsLooping()) {
+            !animation->IsLooping()) {
             // ワンショット再生が完了したら自動的に非アクティブ化
             isActive_ = false;
         }
@@ -24,137 +28,343 @@ void CameraAnimationController::Update(float deltaTime) {
 }
 
 bool CameraAnimationController::IsActive() const {
-    if (!animation_) {
+    auto* animation = const_cast<CameraAnimationController*>(this)->GetCurrentAnimation();
+    if (!animation) {
         return false;
     }
 
     // アニメーション再生中または編集中の場合はアクティブ
-    return animation_->GetPlayState() == CameraAnimation::PlayState::PLAYING ||
-           animation_->IsEditingKeyframe() ||
+    return animation->GetPlayState() == CameraAnimation::PlayState::PLAYING ||
+           animation->IsEditingKeyframe() ||
            isActive_;
 }
 
 void CameraAnimationController::Activate() {
     isActive_ = true;
-    if (animation_) {
-        animation_->Play();
+    auto* animation = GetCurrentAnimation();
+    if (animation) {
+        animation->Play();
     }
 }
 
 void CameraAnimationController::Deactivate() {
     isActive_ = false;
-    if (animation_) {
-        animation_->Stop();
+    auto* animation = GetCurrentAnimation();
+    if (animation) {
+        animation->Stop();
     }
 }
 
 void CameraAnimationController::SetCamera(Camera* camera) {
     ICameraController::SetCamera(camera);
-    if (animation_) {
-        animation_->SetCamera(camera);
+
+    // 全てのアニメーションにカメラを設定
+    for (auto& pair : animations_) {
+        pair.second->SetCamera(camera);
     }
 }
 
 bool CameraAnimationController::LoadAnimation(const std::string& filepath) {
-    if (!animation_) {
+    // デフォルトアニメーションに読み込む（後方互換性のため）
+    auto* animation = GetCurrentAnimation();
+    if (!animation) {
         return false;
     }
-    return animation_->LoadFromJson(filepath);
+    return animation->LoadFromJson(filepath);
 }
 
 void CameraAnimationController::Play() {
-    if (animation_) {
-        animation_->Play();
+    auto* animation = GetCurrentAnimation();
+    if (animation) {
+        animation->Play();
         isActive_ = true;
     }
 }
 
 void CameraAnimationController::Pause() {
-    if (animation_) {
-        animation_->Pause();
+    auto* animation = GetCurrentAnimation();
+    if (animation) {
+        animation->Pause();
     }
 }
 
 void CameraAnimationController::Stop() {
-    if (animation_) {
-        animation_->Stop();
+    auto* animation = GetCurrentAnimation();
+    if (animation) {
+        animation->Stop();
         isActive_ = false;
     }
 }
 
 void CameraAnimationController::Reset() {
-    if (animation_) {
-        animation_->Reset();
+    auto* animation = GetCurrentAnimation();
+    if (animation) {
+        animation->Reset();
     }
 }
 
 void CameraAnimationController::AddKeyframe(const CameraKeyframe& keyframe) {
-    if (animation_) {
-        animation_->AddKeyframe(keyframe);
+    auto* animation = GetCurrentAnimation();
+    if (animation) {
+        animation->AddKeyframe(keyframe);
     }
 }
 
 void CameraAnimationController::AddKeyframeFromCurrentCamera(float time,
     CameraKeyframe::InterpolationType interpolation) {
-    if (animation_) {
-        animation_->AddKeyframeFromCurrentCamera(time, interpolation);
+    auto* animation = GetCurrentAnimation();
+    if (animation) {
+        animation->AddKeyframeFromCurrentCamera(time, interpolation);
     }
 }
 
 void CameraAnimationController::RemoveKeyframe(size_t index) {
-    if (animation_) {
-        animation_->RemoveKeyframe(index);
+    auto* animation = GetCurrentAnimation();
+    if (animation) {
+        animation->RemoveKeyframe(index);
     }
 }
 
 void CameraAnimationController::ClearKeyframes() {
-    if (animation_) {
-        animation_->ClearKeyframes();
+    auto* animation = GetCurrentAnimation();
+    if (animation) {
+        animation->ClearKeyframes();
     }
 }
 
 void CameraAnimationController::SetLooping(bool loop) {
-    if (animation_) {
-        animation_->SetLooping(loop);
+    auto* animation = GetCurrentAnimation();
+    if (animation) {
+        animation->SetLooping(loop);
     }
 }
 
 void CameraAnimationController::SetPlaySpeed(float speed) {
-    if (animation_) {
-        animation_->SetPlaySpeed(speed);
+    auto* animation = GetCurrentAnimation();
+    if (animation) {
+        animation->SetPlaySpeed(speed);
     }
 }
 
 void CameraAnimationController::SetAnimationName(const std::string& name) {
-    if (animation_) {
-        animation_->SetAnimationName(name);
+    auto* animation = GetCurrentAnimation();
+    if (animation) {
+        animation->SetAnimationName(name);
     }
 }
 
 CameraAnimation::PlayState CameraAnimationController::GetPlayState() const {
-    if (animation_) {
-        return animation_->GetPlayState();
+    auto* animation = const_cast<CameraAnimationController*>(this)->GetCurrentAnimation();
+    if (animation) {
+        return animation->GetPlayState();
     }
     return CameraAnimation::PlayState::STOPPED;
 }
 
 float CameraAnimationController::GetDuration() const {
-    if (animation_) {
-        return animation_->GetDuration();
+    auto* animation = const_cast<CameraAnimationController*>(this)->GetCurrentAnimation();
+    if (animation) {
+        return animation->GetDuration();
     }
     return 0.0f;
 }
 
 float CameraAnimationController::GetCurrentTime() const {
-    if (animation_) {
-        return animation_->GetCurrentTime();
+    auto* animation = const_cast<CameraAnimationController*>(this)->GetCurrentAnimation();
+    if (animation) {
+        return animation->GetCurrentTime();
     }
     return 0.0f;
 }
 
 bool CameraAnimationController::IsEditingKeyframe() const {
-    if (animation_) {
-        return animation_->IsEditingKeyframe();
+    auto* anim = const_cast<CameraAnimationController*>(this)->GetCurrentAnimation();
+    if (anim) {
+        return anim->IsEditingKeyframe();
     }
     return false;
+}
+
+//==================== アニメーション管理の実装 ====================
+
+CameraAnimation* CameraAnimationController::GetCurrentAnimation() {
+    auto it = animations_.find(currentAnimationName_);
+    if (it != animations_.end()) {
+        return it->second.get();
+    }
+    return nullptr;
+}
+
+CameraAnimation* CameraAnimationController::GetAnimation(const std::string& name) {
+    auto it = animations_.find(name);
+    if (it != animations_.end()) {
+        return it->second.get();
+    }
+    return nullptr;
+}
+
+bool CameraAnimationController::CreateAnimation(const std::string& name) {
+    // 既に存在する場合は失敗
+    if (animations_.find(name) != animations_.end()) {
+        return false;
+    }
+
+    // 新規作成
+    animations_[name] = std::make_unique<CameraAnimation>();
+    animations_[name]->SetAnimationName(name);
+
+    // カメラを設定
+    if (camera_) {
+        animations_[name]->SetCamera(camera_);
+    }
+
+    return true;
+}
+
+bool CameraAnimationController::SwitchAnimation(const std::string& name) {
+    // 存在チェック
+    if (animations_.find(name) == animations_.end()) {
+        return false;
+    }
+
+    // 現在のアニメーションを停止
+    auto* current = GetCurrentAnimation();
+    if (current) {
+        current->Stop();
+    }
+
+    // 切り替え
+    currentAnimationName_ = name;
+
+    // カメラを再設定
+    auto* newAnim = GetCurrentAnimation();
+    if (newAnim && camera_) {
+        newAnim->SetCamera(camera_);
+    }
+
+    return true;
+}
+
+bool CameraAnimationController::DeleteAnimation(const std::string& name) {
+    // デフォルトアニメーションは削除不可
+    if (name == "Default") {
+        return false;
+    }
+
+    // 存在チェック
+    auto it = animations_.find(name);
+    if (it == animations_.end()) {
+        return false;
+    }
+
+    // 現在アクティブなアニメーションを削除しようとしている場合
+    if (name == currentAnimationName_) {
+        // Defaultに切り替え
+        currentAnimationName_ = "Default";
+    }
+
+    // 削除
+    animations_.erase(it);
+    return true;
+}
+
+bool CameraAnimationController::RenameAnimation(const std::string& oldName, const std::string& newName) {
+    // Defaultはリネーム不可
+    if (oldName == "Default") {
+        return false;
+    }
+
+    // 存在チェック
+    auto it = animations_.find(oldName);
+    if (it == animations_.end()) {
+        return false;
+    }
+
+    // 新しい名前が既に存在する場合は失敗
+    if (animations_.find(newName) != animations_.end()) {
+        return false;
+    }
+
+    // 移動
+    auto animation = std::move(it->second);
+    animation->SetAnimationName(newName);
+    animations_.erase(it);
+    animations_[newName] = std::move(animation);
+
+    // 現在アクティブなアニメーションの場合は名前を更新
+    if (oldName == currentAnimationName_) {
+        currentAnimationName_ = newName;
+    }
+
+    return true;
+}
+
+bool CameraAnimationController::DuplicateAnimation(const std::string& sourceName, const std::string& newName) {
+    // ソース存在チェック
+    auto* source = GetAnimation(sourceName);
+    if (!source) {
+        return false;
+    }
+
+    // 新しい名前が既に存在する場合は失敗
+    if (animations_.find(newName) != animations_.end()) {
+        return false;
+    }
+
+    // 新規作成
+    animations_[newName] = std::make_unique<CameraAnimation>();
+    animations_[newName]->SetAnimationName(newName);
+
+    // カメラを設定
+    if (camera_) {
+        animations_[newName]->SetCamera(camera_);
+    }
+
+    // キーフレームをコピー
+    for (size_t i = 0; i < source->GetKeyframeCount(); ++i) {
+        animations_[newName]->AddKeyframe(source->GetKeyframe(i));
+    }
+
+    // 設定をコピー
+    animations_[newName]->SetLooping(source->IsLooping());
+
+    return true;
+}
+
+bool CameraAnimationController::LoadAnimationFromFile(const std::string& filepath, const std::string& name) {
+    // 新規アニメーション作成
+    if (!CreateAnimation(name)) {
+        // 既に存在する場合は上書き確認が必要だが、ここでは単純に失敗とする
+        return false;
+    }
+
+    // JSONから読み込み（filepathを正しく渡す）
+    auto* anim = GetAnimation(name);
+    if (!anim || !anim->LoadFromJson(filepath)) {
+        // 失敗した場合は削除
+        DeleteAnimation(name);
+        return false;
+    }
+
+    return true;
+}
+
+bool CameraAnimationController::SaveAnimationToFile(const std::string& name, const std::string& filepath) {
+    auto* anim = GetAnimation(name);
+    if (!anim) {
+        return false;
+    }
+
+    return anim->SaveToJson(filepath);
+}
+
+std::vector<std::string> CameraAnimationController::GetAnimationList() const {
+    std::vector<std::string> names;
+    names.reserve(animations_.size());
+
+    for (const auto& pair : animations_) {
+        names.push_back(pair.first);
+    }
+
+    return names;
 }

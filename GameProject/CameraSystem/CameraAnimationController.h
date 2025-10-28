@@ -137,11 +137,91 @@ public:
 
     //==================== Getter ====================
 
+    //==================== アニメーション管理 ====================
+
     /// <summary>
-    /// CameraAnimationオブジェクトを取得
+    /// 新規アニメーションを作成
     /// </summary>
-    /// <returns>内部のアニメーションオブジェクト</returns>
-    CameraAnimation* GetAnimation() { return animation_.get(); }
+    /// <param name="name">アニメーション名</param>
+    /// <returns>作成成功した場合true</returns>
+    bool CreateAnimation(const std::string& name);
+
+    /// <summary>
+    /// アニメーションを切り替え
+    /// </summary>
+    /// <param name="name">切り替え先のアニメーション名</param>
+    /// <returns>切り替え成功した場合true</returns>
+    bool SwitchAnimation(const std::string& name);
+
+    /// <summary>
+    /// アニメーションを削除
+    /// </summary>
+    /// <param name="name">削除するアニメーション名</param>
+    /// <returns>削除成功した場合true</returns>
+    bool DeleteAnimation(const std::string& name);
+
+    /// <summary>
+    /// アニメーションをリネーム
+    /// </summary>
+    /// <param name="oldName">現在の名前</param>
+    /// <param name="newName">新しい名前</param>
+    /// <returns>リネーム成功した場合true</returns>
+    bool RenameAnimation(const std::string& oldName, const std::string& newName);
+
+    /// <summary>
+    /// アニメーションを複製
+    /// </summary>
+    /// <param name="sourceName">複製元のアニメーション名</param>
+    /// <param name="newName">複製先の名前</param>
+    /// <returns>複製成功した場合true</returns>
+    bool DuplicateAnimation(const std::string& sourceName, const std::string& newName);
+
+    /// <summary>
+    /// アニメーションをファイルから読み込み
+    /// </summary>
+    /// <param name="filepath">JSONファイルパス</param>
+    /// <param name="name">アニメーション名</param>
+    /// <returns>読み込み成功した場合true</returns>
+    bool LoadAnimationFromFile(const std::string& filepath, const std::string& name);
+
+    /// <summary>
+    /// アニメーションをファイルに保存
+    /// </summary>
+    /// <param name="name">保存するアニメーション名</param>
+    /// <param name="filepath">保存先ファイルパス</param>
+    /// <returns>保存成功した場合true</returns>
+    bool SaveAnimationToFile(const std::string& name, const std::string& filepath);
+
+    /// <summary>
+    /// 現在のアニメーションオブジェクトを取得
+    /// </summary>
+    /// <returns>現在のアニメーションオブジェクト</returns>
+    CameraAnimation* GetCurrentAnimation();
+
+    /// <summary>
+    /// 指定した名前のアニメーションを取得
+    /// </summary>
+    /// <param name="name">アニメーション名</param>
+    /// <returns>アニメーションオブジェクト（存在しない場合nullptr）</returns>
+    CameraAnimation* GetAnimation(const std::string& name);
+
+    /// <summary>
+    /// アニメーション名のリストを取得
+    /// </summary>
+    /// <returns>全アニメーション名のリスト</returns>
+    std::vector<std::string> GetAnimationList() const;
+
+    /// <summary>
+    /// アニメーション数を取得
+    /// </summary>
+    /// <returns>登録されているアニメーション数</returns>
+    size_t GetAnimationCount() const { return animations_.size(); }
+
+    /// <summary>
+    /// 現在のアニメーション名を取得
+    /// </summary>
+    /// <returns>現在のアニメーション名</returns>
+    const std::string& GetCurrentAnimationName() const { return currentAnimationName_; }
 
     /// <summary>
     /// 再生状態を取得
@@ -168,8 +248,11 @@ public:
     bool IsEditingKeyframe() const;
 
 private:
-    // カメラアニメーションオブジェクト
-    std::unique_ptr<CameraAnimation> animation_;
+    // カメラアニメーションオブジェクト（複数管理）
+    std::map<std::string, std::unique_ptr<CameraAnimation>> animations_;
+
+    // 現在アクティブなアニメーション名
+    std::string currentAnimationName_ = "Default";
 
     // 再生完了時に自動で非アクティブ化するかのフラグ
     bool autoDeactivateOnComplete_ = true;

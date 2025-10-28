@@ -163,7 +163,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="CameraSystem\CameraAnimationEditor\CameraAnimationTimeline.cpp" />
     <ClCompile Include="CameraSystem\CameraAnimationEditor\CameraAnimationCurveEditor.cpp" />
     <ClCompile Include="CameraSystem\CameraAnimationEditor\CameraAnimationHistory.cpp" />
-    <ClCompile Include="CameraSystem\CameraAnimationEditor\CameraAnimationPresets.cpp" />
     <ClCompile Include="CameraSystem\TopDownController.cpp" />
     <ClCompile Include="FollowCamera\FollowCamera.cpp" />
     <ClCompile Include="Input\InputHandler.cpp" />
@@ -209,7 +208,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="CameraSystem\CameraAnimationEditor\CameraAnimationTimeline.h" />
     <ClInclude Include="CameraSystem\CameraAnimationEditor\CameraAnimationCurveEditor.h" />
     <ClInclude Include="CameraSystem\CameraAnimationEditor\CameraAnimationHistory.h" />
-    <ClInclude Include="CameraSystem\CameraAnimationEditor\CameraAnimationPresets.h" />
     <ClInclude Include="CameraSystem\ICameraController.h" />
     <ClInclude Include="CameraSystem\TopDownController.h" />
     <ClInclude Include="Collision\CollisionTypeIdDef.h" />

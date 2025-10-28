@@ -4,7 +4,7 @@
 #include "CameraAnimationTimeline.h"
 #include "CameraAnimationCurveEditor.h"
 #include "CameraAnimationHistory.h"
-#include "CameraAnimationPresets.h"
+#include "CameraSystem/CameraAnimationController.h"
 #include <imgui.h>
 // #include <imgui_internal.h> // 不要な場合はコメントアウト
 #include <algorithm>
@@ -31,9 +31,26 @@ void CameraAnimationEditor::Initialize(CameraAnimation* animation, Camera* camer
 
     history_ = std::make_unique<CameraAnimationHistory>();
     history_->Initialize(animation);
+}
 
-    presets_ = std::make_unique<CameraAnimationPresets>();
-    presets_->Initialize();
+void CameraAnimationEditor::Initialize(CameraAnimationController* controller, Camera* camera) {
+    controller_ = controller;
+    camera_ = camera;
+
+    // 現在のアニメーションを取得
+    animation_ = controller ? controller->GetCurrentAnimation() : nullptr;
+
+    // コンポーネントの初期化
+    if (animation_) {
+        timeline_ = std::make_unique<CameraAnimationTimeline>();
+        timeline_->Initialize(animation_);
+
+        curveEditor_ = std::make_unique<CameraAnimationCurveEditor>();
+        curveEditor_->Initialize(animation_);
+
+        history_ = std::make_unique<CameraAnimationHistory>();
+        history_->Initialize(animation_);
+    }
 }
 
 void CameraAnimationEditor::Draw() {
@@ -53,6 +70,11 @@ void CameraAnimationEditor::Draw() {
 
     // メニューバー
     DrawMenuBar();
+
+    // アニメーション選択UI（コントローラー経由の場合のみ）
+    if (controller_) {
+        DrawAnimationSelector();
+    }
 
     // レイアウトに応じた描画
     switch (layoutMode_) {
@@ -84,12 +106,6 @@ void CameraAnimationEditor::Draw() {
                 // 右側：インスペクター
                 if (ImGui::BeginChild("RightPanel", ImVec2(inspectorPanelWidth_, 0), false)) {
                     DrawInspectorPanel();
-
-                    ImGui::Separator();
-
-                    if (ImGui::CollapsingHeader("Presets")) {
-                        DrawPresetsPanel();
-                    }
                 }
                 ImGui::EndChild();
             }
@@ -114,24 +130,13 @@ void CameraAnimationEditor::Draw() {
                 }
                 ImGui::EndChild();
 
-                // 下部を3分割
+                // 下部を2分割
                 float availWidth = ImGui::GetContentRegionAvail().x;
-                float leftWidth = availWidth * 0.25f;
-                float centerWidth = availWidth * 0.5f;
-                float rightWidth = availWidth * 0.25f;
+                float leftWidth = availWidth * 0.7f;
+                float rightWidth = availWidth * 0.3f;
 
-                // 左：プリセット
-                if (ImGui::BeginChild("PresetSection", ImVec2(leftWidth - 5, bottomHeight), true)) {
-                    ImGui::Text("Presets");
-                    ImGui::Separator();
-                    DrawPresetsPanel();
-                }
-                ImGui::EndChild();
-
-                ImGui::SameLine();
-
-                // 中央：カーブエディター
-                if (ImGui::BeginChild("CurveSection", ImVec2(centerWidth, bottomHeight), true)) {
+                // 左：カーブエディター
+                if (ImGui::BeginChild("CurveSection", ImVec2(leftWidth - 5, bottomHeight), true)) {
                     ImGui::Text("Curve Editor");
                     ImGui::Separator();
                     DrawCurveEditorPanel();
@@ -424,17 +429,32 @@ void CameraAnimationEditor::DrawPlaybackControls() {
     // 再生ボタン
     if (animation_->GetPlayState() == CameraAnimation::PlayState::PLAYING) {
         if (ImGui::Button("||", ImVec2(40, 0))) {
-            animation_->Pause();
+            // コントローラー経由で呼び出し（isActive_フラグを更新するため）
+            if (controller_) {
+                controller_->Pause();
+            } else {
+                animation_->Pause();
+            }
         }
     } else {
         if (ImGui::Button(">", ImVec2(40, 0))) {
-            animation_->Play();
+            // コントローラー経由で呼び出し（isActive_フラグを更新するため）
+            if (controller_) {
+                controller_->Play();
+            } else {
+                animation_->Play();
+            }
         }
     }
 
     ImGui::SameLine();
     if (ImGui::Button("[]", ImVec2(40, 0))) {
-        animation_->Stop();
+        // コントローラー経由で呼び出し（isActive_フラグを更新するため）
+        if (controller_) {
+            controller_->Stop();
+        } else {
+            animation_->Stop();
+        }
     }
 
     ImGui::SameLine();
@@ -696,28 +716,6 @@ void CameraAnimationEditor::DrawPreviewPanel() {
     }
 }
 
-void CameraAnimationEditor::DrawPresetsPanel() {
-    if (!animation_) {
-        ImGui::Text("Animation not available for preset application");
-        return;
-    }
-
-    if (presets_) {
-        presets_->Draw();
-
-        // プリセット適用
-        if (presets_->HasSelectedPreset()) {
-            if (ImGui::Button("Apply Preset")) {
-                auto preset = presets_->GetSelectedPreset();
-                // プリセットをアニメーションに適用
-                for (const auto& kf : preset) {
-                    animation_->AddKeyframe(kf);
-                }
-            }
-        }
-    }
-}
-
 void CameraAnimationEditor::DrawStatusBar() {
     ImGui::Separator();
 
@@ -854,6 +852,155 @@ void CameraAnimationEditor::Redo() {
     if (history_ && history_->CanRedo()) {
         history_->Redo();
     }
+}
+
+void CameraAnimationEditor::DrawAnimationSelector() {
+    if (!controller_) return;
+
+    ImGui::Separator();
+
+    // アニメーション選択コンボボックス
+    auto animList = controller_->GetAnimationList();
+    std::string currentName = controller_->GetCurrentAnimationName();
+
+    ImGui::Text("Animation:");
+    ImGui::SameLine();
+    ImGui::SetNextItemWidth(200);
+    if (ImGui::BeginCombo("##AnimSelect", currentName.c_str())) {
+        for (const auto& name : animList) {
+            bool isSelected = (name == currentName);
+            if (ImGui::Selectable(name.c_str(), isSelected)) {
+                if (controller_->SwitchAnimation(name)) {
+                    // アニメーション切り替え成功
+                    animation_ = controller_->GetCurrentAnimation();
+
+                    // コンポーネントを再初期化
+                    if (animation_) {
+                        timeline_->Initialize(animation_);
+                        curveEditor_->Initialize(animation_);
+                        history_->Initialize(animation_);
+                    }
+                }
+            }
+            if (isSelected) {
+                ImGui::SetItemDefaultFocus();
+            }
+        }
+        ImGui::EndCombo();
+    }
+
+    ImGui::SameLine();
+
+    // 新規作成ボタン
+    if (ImGui::Button("New")) {
+        ImGui::OpenPopup("NewAnimation");
+    }
+
+    ImGui::SameLine();
+
+    // 複製ボタン
+    if (ImGui::Button("Duplicate")) {
+        std::string newName = currentName + "_copy";
+        if (controller_->DuplicateAnimation(currentName, newName)) {
+            controller_->SwitchAnimation(newName);
+            animation_ = controller_->GetCurrentAnimation();
+        }
+    }
+
+    ImGui::SameLine();
+
+    // 削除ボタン
+    if (currentName != "Default") {
+        if (ImGui::Button("Delete")) {
+            ImGui::OpenPopup("DeleteAnimation");
+        }
+    }
+
+    ImGui::SameLine();
+
+    // 保存ボタン
+    if (ImGui::Button("Save")) {
+        // TODO: ファイル選択ダイアログ実装
+        std::string fileName = currentName + ".json";
+        controller_->SaveAnimationToFile(currentName, fileName);
+    }
+
+    ImGui::SameLine();
+
+    // 読み込みボタン
+    if (ImGui::Button("Load")) {
+        ImGui::OpenPopup("LoadAnimation");
+    }
+
+    // 新規作成ダイアログ
+    if (ImGui::BeginPopup("NewAnimation")) {
+        static char nameBuf[128] = "NewAnimation";
+        ImGui::Text("Animation Name:");
+        ImGui::InputText("##Name", nameBuf, sizeof(nameBuf));
+
+        if (ImGui::Button("Create")) {
+            if (controller_->CreateAnimation(nameBuf)) {
+                controller_->SwitchAnimation(nameBuf);
+                animation_ = controller_->GetCurrentAnimation();
+            }
+            ImGui::CloseCurrentPopup();
+        }
+
+        ImGui::SameLine();
+        if (ImGui::Button("Cancel")) {
+            ImGui::CloseCurrentPopup();
+        }
+
+        ImGui::EndPopup();
+    }
+
+    // 削除確認ダイアログ
+    if (ImGui::BeginPopup("DeleteAnimation")) {
+        ImGui::Text("Delete animation '%s'?", currentName.c_str());
+        ImGui::Text("This action cannot be undone.");
+
+        if (ImGui::Button("Delete", ImVec2(120, 0))) {
+            controller_->DeleteAnimation(currentName);
+            animation_ = controller_->GetCurrentAnimation();
+            ImGui::CloseCurrentPopup();
+        }
+
+        ImGui::SameLine();
+        if (ImGui::Button("Cancel", ImVec2(120, 0))) {
+            ImGui::CloseCurrentPopup();
+        }
+
+        ImGui::EndPopup();
+    }
+
+    // 読み込みダイアログ
+    if (ImGui::BeginPopup("LoadAnimation")) {
+        static char nameBuf[128] = "LoadedAnimation";
+        static char pathBuf[256] = "resources/CameraAnimations/";
+
+        ImGui::Text("Animation Name:");
+        ImGui::InputText("##LoadName", nameBuf, sizeof(nameBuf));
+
+        ImGui::Text("File Path:");
+        ImGui::InputText("##LoadPath", pathBuf, sizeof(pathBuf));
+
+        if (ImGui::Button("Load")) {
+            if (controller_->LoadAnimationFromFile(pathBuf, nameBuf)) {
+                controller_->SwitchAnimation(nameBuf);
+                animation_ = controller_->GetCurrentAnimation();
+            }
+            ImGui::CloseCurrentPopup();
+        }
+
+        ImGui::SameLine();
+        if (ImGui::Button("Cancel")) {
+            ImGui::CloseCurrentPopup();
+        }
+
+        ImGui::EndPopup();
+    }
+
+    ImGui::Separator();
 }
 
 #endif // _DEBUG

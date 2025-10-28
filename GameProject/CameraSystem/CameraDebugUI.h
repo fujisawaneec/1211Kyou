@@ -54,6 +54,11 @@ public:
     static void InitializeAnimationEditor();
 
     /// <summary>
+    /// アニメーションエディターをクリーンアップ
+    /// </summary>
+    static void CleanupAnimationEditor();
+
+    /// <summary>
     /// アニメーションエディターの更新
     /// </summary>
     /// <param name="deltaTime">前フレームからの経過時間</param>

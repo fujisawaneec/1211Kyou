@@ -102,9 +102,6 @@
     <ClCompile Include="scene\ClearScene.cpp">
       <Filter>scene</Filter>
     </ClCompile>
-    <ClCompile Include="CameraAnimation\CameraAnimation.cpp">
-      <Filter>Camera</Filter>
-    </ClCompile>
     <ClCompile Include="CameraSystem\CameraDebugUI.cpp">
       <Filter>CameraSystem</Filter>
     </ClCompile>
@@ -120,9 +117,6 @@
     <ClCompile Include="CameraSystem\CameraAnimationEditor\CameraAnimationHistory.cpp">
       <Filter>CameraSystem\CameraAnimationEditor</Filter>
     </ClCompile>
-    <ClCompile Include="CameraSystem\CameraAnimationEditor\CameraAnimationPresets.cpp">
-      <Filter>CameraSystem\CameraAnimationEditor</Filter>
-    </ClCompile>
     <ClCompile Include="CameraSystem\CameraManager.cpp">
       <Filter>CameraSystem</Filter>
     </ClCompile>
@@ -134,6 +128,9 @@
     </ClCompile>
     <ClCompile Include="CameraSystem\TopDownController.cpp">
       <Filter>CameraSystem\Controller</Filter>
+    </ClCompile>
+    <ClCompile Include="CameraAnimation\CameraAnimation.cpp">
+      <Filter>CameraSystem</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -197,9 +194,6 @@
     <ClInclude Include="scene\ClearScene.h">
       <Filter>scene</Filter>
     </ClInclude>
-    <ClInclude Include="CameraAnimation\CameraAnimation.h">
-      <Filter>Camera</Filter>
-    </ClInclude>
     <ClInclude Include="CameraAnimation\CameraKeyframe.h">
       <Filter>Camera</Filter>
     </ClInclude>
@@ -221,9 +215,6 @@
     <ClInclude Include="CameraSystem\CameraAnimationEditor\CameraAnimationHistory.h">
       <Filter>CameraSystem\CameraAnimationEditor</Filter>
     </ClInclude>
-    <ClInclude Include="CameraSystem\CameraAnimationEditor\CameraAnimationPresets.h">
-      <Filter>CameraSystem\CameraAnimationEditor</Filter>
-    </ClInclude>
     <ClInclude Include="CameraSystem\CameraManager.h">
       <Filter>CameraSystem</Filter>
     </ClInclude>
@@ -238,6 +229,9 @@
     </ClInclude>
     <ClInclude Include="CameraSystem\TopDownController.h">
       <Filter>CameraSystem\Controller</Filter>
+    </ClInclude>
+    <ClInclude Include="CameraAnimation\CameraAnimation.h">
+      <Filter>CameraSystem</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

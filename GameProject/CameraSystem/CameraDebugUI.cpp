@@ -2,7 +2,7 @@
 
 #include "CameraDebugUI.h"
 #include "CameraAnimationEditor/CameraAnimationEditor.h"
-#include "CameraSystem/CameraAnimationController.h"
+#include "CameraAnimationController.h"
 #include "FrameTimer.h"
 #include <imgui.h>
 #include <sstream>
@@ -279,20 +279,41 @@ void CameraDebugUI::DrawAnimationInfo(CameraAnimation* animation) {
     ImGui::Separator();
 
     // 再生コントロール
+    // CameraManagerからAnimationControllerを取得
+    auto* animController = dynamic_cast<CameraAnimationController*>(
+        CameraManager::GetInstance()->GetController("Animation"));
+
     if (ImGui::Button("Play")) {
-        animation->Play();
+        // コントローラー経由で呼び出し（isActive_フラグを更新するため）
+        if (animController) {
+            animController->Play();
+        } else {
+            animation->Play();
+        }
     }
     ImGui::SameLine();
     if (ImGui::Button("Pause")) {
-        animation->Pause();
+        if (animController) {
+            animController->Pause();
+        } else {
+            animation->Pause();
+        }
     }
     ImGui::SameLine();
     if (ImGui::Button("Stop")) {
-        animation->Stop();
+        if (animController) {
+            animController->Stop();
+        } else {
+            animation->Stop();
+        }
     }
     ImGui::SameLine();
     if (ImGui::Button("Reset")) {
-        animation->Reset();
+        if (animController) {
+            animController->Reset();
+        } else {
+            animation->Reset();
+        }
     }
 
     // ループ設定
@@ -421,7 +442,8 @@ void CameraDebugUI::DrawAnimationEditorOnly() {
 }
 
 void CameraDebugUI::InitializeAnimationEditor() {
-    if (animationEditor_) return;  // 既に初期化済み
+
+  animationEditor_.reset();
 
     CameraManager* manager = CameraManager::GetInstance();
     if (!manager) return;
@@ -431,13 +453,14 @@ void CameraDebugUI::InitializeAnimationEditor() {
         manager->GetController("Animation"));
     if (!animController) return;
 
-    // CameraAnimationを取得
-    CameraAnimation* animation = animController->GetAnimation();
-    if (!animation) return;
-
-    // エディターの初期化
+    // エディターの初期化（CameraAnimationControllerを渡す）
     animationEditor_ = std::make_unique<CameraAnimationEditor>();
-    animationEditor_->Initialize(animation, manager->GetCamera());
+    animationEditor_->Initialize(animController, manager->GetCamera());
+}
+
+void CameraDebugUI::CleanupAnimationEditor()
+{
+  animationEditor_.reset();
 }
 
 void CameraDebugUI::UpdateAnimationEditor(float deltaTime) {

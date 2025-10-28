@@ -16,8 +16,6 @@ void CameraManager::Initialize(Camera* camera) {
     camera_ = camera;
     controllers_.clear();
     nameToIndex_.clear();
-    cachedActiveIndex_ = -1;
-    cacheValid_ = false;
     needsSort_ = false;
 }
 
@@ -70,7 +68,6 @@ void CameraManager::RegisterController(const std::string& name,
 
     // ソートが必要
     needsSort_ = true;
-    cacheValid_ = false;
 }
 
 ICameraController* CameraManager::GetController(const std::string& name) {
@@ -99,7 +96,6 @@ bool CameraManager::RemoveController(const std::string& name) {
         nameToIndex_[controllers_[i].name] = i;
     }
 
-    cacheValid_ = false;
     return true;
 }
 
@@ -107,8 +103,7 @@ bool CameraManager::ActivateController(const std::string& name) {
     ICameraController* controller = GetController(name);
     if (controller) {
         controller->Activate();
-        cacheValid_ = false;
-        return true;
+            return true;
     }
     return false;
 }
@@ -117,8 +112,7 @@ bool CameraManager::DeactivateController(const std::string& name) {
     ICameraController* controller = GetController(name);
     if (controller) {
         controller->Deactivate();
-        cacheValid_ = false;
-        return true;
+            return true;
     }
     return false;
 }
@@ -127,34 +121,21 @@ void CameraManager::DeactivateAllControllers() {
     for (auto& entry : controllers_) {
         entry.controller->Deactivate();
     }
-    cacheValid_ = false;
 }
 
 ICameraController* CameraManager::GetActiveController() const {
-    if (!cacheValid_) {
-        cachedActiveIndex_ = FindHighestPriorityActiveController();
-        cacheValid_ = true;
+    int activeIndex = FindHighestPriorityActiveController();
+    if (activeIndex >= 0 && activeIndex < static_cast<int>(controllers_.size())) {
+        return controllers_[activeIndex].controller.get();
     }
-
-    if (cachedActiveIndex_ >= 0 &&
-        cachedActiveIndex_ < static_cast<int>(controllers_.size())) {
-        return controllers_[cachedActiveIndex_].controller.get();
-    }
-
     return nullptr;
 }
 
 std::string CameraManager::GetActiveControllerName() const {
-    if (!cacheValid_) {
-        cachedActiveIndex_ = FindHighestPriorityActiveController();
-        cacheValid_ = true;
+    int activeIndex = FindHighestPriorityActiveController();
+    if (activeIndex >= 0 && activeIndex < static_cast<int>(controllers_.size())) {
+        return controllers_[activeIndex].name;
     }
-
-    if (cachedActiveIndex_ >= 0 &&
-        cachedActiveIndex_ < static_cast<int>(controllers_.size())) {
-        return controllers_[cachedActiveIndex_].name;
-    }
-
     return "";
 }
 
@@ -187,7 +168,6 @@ void CameraManager::SortControllersByPriority() {
     }
 
     needsSort_ = false;
-    cacheValid_ = false;
 }
 
 int CameraManager::FindHighestPriorityActiveController() const {
