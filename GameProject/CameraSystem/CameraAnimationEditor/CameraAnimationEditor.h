@@ -182,8 +182,6 @@ private:
     std::vector<float> dragStartTimes_;          ///< ドラッグ開始時の各キーフレーム時間
 
     // タイムライン設定
-    float timelineZoom_ = 1.0f;                  ///< タイムラインのズーム率
-    float timelineOffset_ = 0.0f;                ///< タイムラインのオフセット
     float gridSnapInterval_ = 0.1f;              ///< グリッドスナップ間隔
     bool enableGridSnap_ = true;                 ///< グリッドスナップ有効化
 

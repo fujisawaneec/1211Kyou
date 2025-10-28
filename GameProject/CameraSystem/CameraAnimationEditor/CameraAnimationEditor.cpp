@@ -468,7 +468,7 @@ void CameraAnimationEditor::DrawTimelinePanel() {
     timeline_->SetPreviewMode(enablePreview_);
 
     // タイムラインコンポーネントに描画を委譲
-    timeline_->Draw(timelineZoom_, timelineOffset_);
+    timeline_->Draw();
 
     // 選択状態を同期
     selectedKeyframes_ = timeline_->GetSelectedKeyframes();

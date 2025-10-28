@@ -20,7 +20,7 @@ void CameraAnimationTimeline::Initialize(CameraAnimation* animation) {
   hoveredKeyframe_ = -1;
 }
 
-void CameraAnimationTimeline::Draw(float zoom, float offset) {
+void CameraAnimationTimeline::Draw() {
   if (!animation_) return;
 
   ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
@@ -46,22 +46,22 @@ void CameraAnimationTimeline::Draw(float zoom, float offset) {
       IM_COL32(40, 40, 40, 255));
 
     // グリッド描画
-    DrawGrid(zoom, offset);
+    DrawGrid();
 
     // タイムルーラー描画
-    DrawTimeRuler(zoom, offset);
+    DrawTimeRuler();
 
     // トラック描画
     float yPos = canvasPos.y + rulerHeight_;
     for (int i = 0; i < static_cast<int>(TrackType::COUNT); ++i) {
       if (trackVisible_[i]) {
-        DrawTrack(static_cast<TrackType>(i), yPos, zoom, offset);
+        DrawTrack(static_cast<TrackType>(i), yPos);
         yPos += trackHeight_;
       }
     }
 
     // 再生ヘッド描画
-    DrawPlayhead(zoom, offset);
+    DrawPlayhead();
 
     // 選択矩形描画
     if (isRectSelecting_) {
@@ -69,7 +69,7 @@ void CameraAnimationTimeline::Draw(float zoom, float offset) {
     }
 
     // マウス入力処理
-    HandleMouseInput(zoom, offset);
+    HandleMouseInput();
 
     // キーボード入力処理
     HandleKeyboardInput();
@@ -100,7 +100,7 @@ void CameraAnimationTimeline::SetTrackVisible(TrackType track, bool visible) {
   }
 }
 
-void CameraAnimationTimeline::DrawTimeRuler(float zoom, float offset) {
+void CameraAnimationTimeline::DrawTimeRuler() {
   ImDrawList* drawList = ImGui::GetWindowDrawList();
   ImVec2 canvasPos = ImGui::GetCursorScreenPos();
   ImVec2 canvasSize = ImGui::GetContentRegionAvail();
@@ -113,7 +113,7 @@ void CameraAnimationTimeline::DrawTimeRuler(float zoom, float offset) {
 
   // 時間マーカー
   float duration = animation_->GetDuration();
-  float timeStep = 1.0f / zoom;  // 1秒ごと（ズームに応じて調整）
+  float timeStep = 1.0f / zoom_;  // 1秒ごと（ズームに応じて調整）
 
   // 適切な時間刻みを選択
   if (timeStep < 0.1f) timeStep = 0.1f;
@@ -123,7 +123,7 @@ void CameraAnimationTimeline::DrawTimeRuler(float zoom, float offset) {
   else timeStep = 10.0f;
 
   for (float time = 0; time <= duration + timeStep; time += timeStep) {
-    float x = TimeToScreenX(time, zoom, offset);
+    float x = TimeToScreenX(time);
     if (x < trackLabelWidth_ || x > canvasSize.x) continue;
 
     // 主目盛り
@@ -143,7 +143,7 @@ void CameraAnimationTimeline::DrawTimeRuler(float zoom, float offset) {
     // 副目盛り（0.1秒刻み）
     if (timeStep >= 1.0f) {
       for (float subTime = time + 0.1f; subTime < time + timeStep && subTime <= duration; subTime += 0.1f) {
-        float subX = TimeToScreenX(subTime, zoom, offset);
+        float subX = TimeToScreenX(subTime);
         if (subX < trackLabelWidth_ || subX > canvasSize.x) continue;
 
         drawList->AddLine(
@@ -155,7 +155,7 @@ void CameraAnimationTimeline::DrawTimeRuler(float zoom, float offset) {
   }
 }
 
-void CameraAnimationTimeline::DrawGrid(float zoom, float offset) {
+void CameraAnimationTimeline::DrawGrid() {
   ImDrawList* drawList = ImGui::GetWindowDrawList();
   ImVec2 canvasPos = ImGui::GetCursorScreenPos();
   ImVec2 canvasSize = ImGui::GetContentRegionAvail();
@@ -165,7 +165,7 @@ void CameraAnimationTimeline::DrawGrid(float zoom, float offset) {
   float duration = animation_->GetDuration();
 
   for (float time = 0; time <= duration + timeStep; time += timeStep) {
-    float x = TimeToScreenX(time, zoom, offset);
+    float x = TimeToScreenX(time);
     if (x < trackLabelWidth_ || x > canvasSize.x) continue;
 
     drawList->AddLine(
@@ -187,13 +187,13 @@ void CameraAnimationTimeline::DrawGrid(float zoom, float offset) {
   }
 }
 
-void CameraAnimationTimeline::DrawPlayhead(float zoom, float offset) {
+void CameraAnimationTimeline::DrawPlayhead() {
   ImDrawList* drawList = ImGui::GetWindowDrawList();
   ImVec2 canvasPos = ImGui::GetCursorScreenPos();
   ImVec2 canvasSize = ImGui::GetContentRegionAvail();
 
   float currentTime = animation_->GetCurrentTime();
-  float x = TimeToScreenX(currentTime, zoom, offset);
+  float x = TimeToScreenX(currentTime);
 
   if (x >= trackLabelWidth_ && x <= canvasSize.x) {
     // 再生ヘッド本体
@@ -212,7 +212,7 @@ void CameraAnimationTimeline::DrawPlayhead(float zoom, float offset) {
   }
 }
 
-void CameraAnimationTimeline::DrawTrack(TrackType trackType, float yPos, float zoom, float offset) {
+void CameraAnimationTimeline::DrawTrack(TrackType trackType, float yPos) {
   ImDrawList* drawList = ImGui::GetWindowDrawList();
   ImVec2 canvasPos = ImGui::GetCursorScreenPos();
   ImVec2 canvasSize = ImGui::GetContentRegionAvail();
@@ -236,7 +236,7 @@ void CameraAnimationTimeline::DrawTrack(TrackType trackType, float yPos, float z
   // キーフレーム描画
   for (size_t i = 0; i < animation_->GetKeyframeCount(); ++i) {
     const CameraKeyframe& kf = animation_->GetKeyframe(i);
-    float x = TimeToScreenX(kf.time, zoom, offset);
+    float x = TimeToScreenX(kf.time);
 
     if (x < trackLabelWidth_ || x > canvasSize.x) continue;
 
@@ -335,7 +335,7 @@ void CameraAnimationTimeline::DrawSelectionRect() {
   drawList->AddRect(dragStartPos_, dragCurrentPos_, borderColor);
 }
 
-void CameraAnimationTimeline::HandleMouseInput(float zoom, float offset) {
+void CameraAnimationTimeline::HandleMouseInput() {
   ImVec2 mousePos = ImGui::GetMousePos();
   ImVec2 canvasPos = ImGui::GetCursorScreenPos();
   ImVec2 canvasSize = ImGui::GetContentRegionAvail();
@@ -354,7 +354,7 @@ void CameraAnimationTimeline::HandleMouseInput(float zoom, float offset) {
     // タイムルーラー上でクリック → スクラブ開始
     if (relY < rulerHeight_) {
       isScrubbing_ = true;
-      scrubTime_ = ScreenXToTime(relX, zoom, offset);
+      scrubTime_ = ScreenXToTime(relX);
       // キーフレームプレビュー中でない場合のみSetCurrentTime()を呼ぶ
       if (isPreviewModeEnabled_ && !isKeyframePreviewActive_) {
         animation_->SetCurrentTime(scrubTime_);
@@ -448,7 +448,7 @@ void CameraAnimationTimeline::HandleMouseInput(float zoom, float offset) {
     if (isScrubbing_) {
       // スクラブ中
       float relX = mousePos.x - canvasPos.x;
-      scrubTime_ = ScreenXToTime(relX, zoom, offset);
+      scrubTime_ = ScreenXToTime(relX);
       scrubTime_ = std::max(0.0f, std::min(scrubTime_, animation_->GetDuration()));
       // キーフレームプレビュー中でない場合のみSetCurrentTime()を呼ぶ
       if (isPreviewModeEnabled_ && !isKeyframePreviewActive_) {
@@ -456,7 +456,7 @@ void CameraAnimationTimeline::HandleMouseInput(float zoom, float offset) {
       }
     } else if (isDragging_) {
       // キーフレームドラッグ中
-      ProcessKeyframeDrag(zoom, offset);
+      ProcessKeyframeDrag();
     } else if (isRectSelecting_) {
       // 矩形選択中
       dragCurrentPos_ = mousePos;
@@ -496,9 +496,45 @@ void CameraAnimationTimeline::HandleMouseInput(float zoom, float offset) {
     hoveredKeyframe_ = HitTestKeyframe(relX, relY, hoveredTrack_);
   }
 
-  // マウスホイール（ズーム）
-  if (ImGui::GetIO().MouseWheel != 0 && ImGui::GetIO().KeyCtrl) {
-    // TODO: ズーム処理をエディタークラスに委譲
+  // 中ボタンクリック（パン開始）
+  if (ImGui::IsMouseClicked(ImGuiMouseButton_Middle)) {
+    isPanning_ = true;
+    dragStartOffset_ = offset_;
+  }
+
+  // 中ボタンドラッグ（パン）
+  if (ImGui::IsMouseDragging(ImGuiMouseButton_Middle) && isPanning_) {
+    ImVec2 delta = ImGui::GetMouseDragDelta(ImGuiMouseButton_Middle);
+    offset_ = dragStartOffset_ - delta.x / (100.0f * zoom_);
+    ClampOffset();
+  }
+
+  // 中ボタンリリース
+  if (ImGui::IsMouseReleased(ImGuiMouseButton_Middle)) {
+    isPanning_ = false;
+  }
+
+  // マウスホイール（ズーム/スクロール）
+  if (ImGui::GetIO().MouseWheel != 0) {
+    if (ImGui::GetIO().KeyCtrl) {
+      // Ctrl + ホイール：ズーム
+      float zoomDelta = ImGui::GetIO().MouseWheel > 0 ? 1.2f : 0.8f;
+      float newZoom = zoom_ * zoomDelta;
+
+      // ズーム制限
+      newZoom = std::max(minZoom_, std::min(maxZoom_, newZoom));
+
+      // マウス位置を中心にズーム
+      float mouseTime = ScreenXToTime(mousePos.x - canvasPos.x);
+      zoom_ = newZoom;
+      float newMouseTime = ScreenXToTime(mousePos.x - canvasPos.x);
+      offset_ += (newMouseTime - mouseTime);
+      ClampOffset();
+    } else if (ImGui::GetIO().KeyShift) {
+      // Shift + ホイール：横スクロール
+      offset_ -= ImGui::GetIO().MouseWheel * 0.5f / zoom_;
+      ClampOffset();
+    }
   }
 }
 
@@ -517,12 +553,12 @@ void CameraAnimationTimeline::HandleKeyboardInput() {
   }
 }
 
-float CameraAnimationTimeline::TimeToScreenX(float time, float zoom, float offset) const {
-  return trackLabelWidth_ + (time - offset) * 100.0f * zoom;
+float CameraAnimationTimeline::TimeToScreenX(float time) const {
+  return trackLabelWidth_ + (time - offset_) * 100.0f * zoom_;
 }
 
-float CameraAnimationTimeline::ScreenXToTime(float x, float zoom, float offset) const {
-  return ((x - trackLabelWidth_) / (100.0f * zoom)) + offset;
+float CameraAnimationTimeline::ScreenXToTime(float x) const {
+  return ((x - trackLabelWidth_) / (100.0f * zoom_)) + offset_;
 }
 
 int CameraAnimationTimeline::HitTestKeyframe(float x, float y, TrackType trackType) const {
@@ -542,7 +578,7 @@ int CameraAnimationTimeline::HitTestKeyframe(float x, float y, TrackType trackTy
   // キーフレームとの距離チェック
   for (size_t i = 0; i < animation_->GetKeyframeCount(); ++i) {
     const CameraKeyframe& kf = animation_->GetKeyframe(i);
-    float kfX = TimeToScreenX(kf.time, 1.0f, 0.0f);  // TODO: zoom/offset引数化
+    float kfX = TimeToScreenX(kf.time);
     float kfY = trackY + trackHeight_ / 2;
 
     float dist = std::sqrt((x - kfX) * (x - kfX) + (y - kfY) * (y - kfY));
@@ -563,7 +599,7 @@ void CameraAnimationTimeline::ProcessRectSelection() {
 
   for (size_t i = 0; i < animation_->GetKeyframeCount(); ++i) {
     const CameraKeyframe& kf = animation_->GetKeyframe(i);
-    float kfX = TimeToScreenX(kf.time, 1.0f, 0.0f);  // TODO: zoom/offset引数化
+    float kfX = TimeToScreenX(kf.time);
 
     // 各表示トラック上でのY座標を計算
     float trackY = rulerHeight_;
@@ -585,10 +621,10 @@ void CameraAnimationTimeline::ProcessRectSelection() {
   }
 }
 
-void CameraAnimationTimeline::ProcessKeyframeDrag(float zoom, float offset) {
+void CameraAnimationTimeline::ProcessKeyframeDrag() {
   ImVec2 mousePos = ImGui::GetMousePos();
   float deltaX = mousePos.x - dragStartPos_.x;
-  float deltaTime = deltaX / (100.0f * zoom);
+  float deltaTime = deltaX / (100.0f * zoom_);
 
   for (size_t i = 0; i < selectedKeyframes_.size(); ++i) {
     int idx = selectedKeyframes_[i];
@@ -648,6 +684,37 @@ ImU32 CameraAnimationTimeline::GetTrackColor(TrackType track) const {
   case TrackType::ROTATION_Z: return IM_COL32(100, 200, 255, 255);
   case TrackType::FOV: return IM_COL32(255, 255, 100, 255);
   default: return IM_COL32(150, 150, 150, 255);
+  }
+}
+
+void CameraAnimationTimeline::SetZoom(float zoom) {
+  zoom_ = std::max(minZoom_, std::min(maxZoom_, zoom));
+  ClampOffset();
+}
+
+void CameraAnimationTimeline::SetOffset(float offset) {
+  offset_ = offset;
+  ClampOffset();
+}
+
+void CameraAnimationTimeline::ClampOffset() {
+  if (!animation_) return;
+
+  // キャンバスサイズを取得（簡易的に800として仮定、実際はImGuiから取得）
+  float visibleWidth = 800.0f - trackLabelWidth_;
+  float visibleTime = visibleWidth / (100.0f * zoom_);
+  float duration = animation_->GetDuration();
+
+  // 左端制限（アニメーション開始より前は見せない）
+  offset_ = std::max(-1.0f, offset_);
+
+  // 右端制限
+  if (visibleTime >= duration + 2.0f) {
+    // 全体が見える場合は左寄せ
+    offset_ = 0.0f;
+  } else {
+    // スクロールが必要な場合は、終端より先を見せすぎない
+    offset_ = std::min(offset_, duration - visibleTime + 1.0f);
   }
 }
 

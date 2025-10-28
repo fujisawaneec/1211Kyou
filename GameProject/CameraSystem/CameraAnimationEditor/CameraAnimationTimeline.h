@@ -57,9 +57,7 @@ public:
     /// <summary>
     /// タイムラインの描画
     /// </summary>
-    /// <param name="zoom">ズーム率</param>
-    /// <param name="offset">タイムオフセット</param>
-    void Draw(float zoom = 1.0f, float offset = 0.0f);
+    void Draw();
 
     /// <summary>
     /// 更新処理
@@ -129,31 +127,48 @@ public:
     /// </summary>
     int GetPreviewKeyframeIndex() const { return previewKeyframeIndex_; }
 
+    /// <summary>
+    /// 現在のズーム値を取得
+    /// </summary>
+    float GetZoom() const { return zoom_; }
+
+    /// <summary>
+    /// 現在のオフセット値を取得
+    /// </summary>
+    float GetOffset() const { return offset_; }
+
+    /// <summary>
+    /// ズーム値を設定
+    /// </summary>
+    void SetZoom(float zoom);
+
+    /// <summary>
+    /// オフセット値を設定
+    /// </summary>
+    void SetOffset(float offset);
 
 private:
     /// <summary>
     /// タイムルーラーの描画
     /// </summary>
-    void DrawTimeRuler(float zoom, float offset);
+    void DrawTimeRuler();
 
     /// <summary>
     /// グリッドの描画
     /// </summary>
-    void DrawGrid(float zoom, float offset);
+    void DrawGrid();
 
     /// <summary>
     /// 再生ヘッドの描画
     /// </summary>
-    void DrawPlayhead(float zoom, float offset);
+    void DrawPlayhead();
 
     /// <summary>
     /// トラックの描画
     /// </summary>
     /// <param name="trackType">トラックタイプ</param>
     /// <param name="yPos">Y座標</param>
-    /// <param name="zoom">ズーム率</param>
-    /// <param name="offset">オフセット</param>
-    void DrawTrack(TrackType trackType, float yPos, float zoom, float offset);
+    void DrawTrack(TrackType trackType, float yPos);
 
     /// <summary>
     /// キーフレームの描画
@@ -173,7 +188,7 @@ private:
     /// <summary>
     /// マウス入力の処理
     /// </summary>
-    void HandleMouseInput(float zoom, float offset);
+    void HandleMouseInput();
 
     /// <summary>
     /// キーボード入力の処理
@@ -183,12 +198,12 @@ private:
     /// <summary>
     /// 時間をX座標に変換
     /// </summary>
-    float TimeToScreenX(float time, float zoom, float offset) const;
+    float TimeToScreenX(float time) const;
 
     /// <summary>
     /// X座標を時間に変換
     /// </summary>
-    float ScreenXToTime(float x, float zoom, float offset) const;
+    float ScreenXToTime(float x) const;
 
     /// <summary>
     /// キーフレームのヒットテスト
@@ -207,7 +222,7 @@ private:
     /// <summary>
     /// キーフレームの移動処理
     /// </summary>
-    void ProcessKeyframeDrag(float zoom, float offset);
+    void ProcessKeyframeDrag();
 
     /// <summary>
     /// グリッドにスナップ
@@ -223,6 +238,11 @@ private:
     /// トラックの色を取得
     /// </summary>
     ImU32 GetTrackColor(TrackType track) const;
+
+    /// <summary>
+    /// オフセット値を制限
+    /// </summary>
+    void ClampOffset();
 
 private:
     // 参照
@@ -264,9 +284,11 @@ private:
     float previewTime_ = 0.0f;                   ///< プレビュー時刻
     int previewKeyframeIndex_ = -1;              ///< プレビュー中のキーフレームインデックス
 
-    // スクロール状態
-    float scrollX_ = 0.0f;                       ///< 水平スクロール
-    float scrollY_ = 0.0f;                       ///< 垂直スクロール
+    // ズーム・スクロール状態
+    float zoom_ = 1.0f;                          ///< 現在のズーム値
+    float offset_ = 0.0f;                        ///< 現在のオフセット（スクロール位置）
+    float dragStartOffset_ = 0.0f;               ///< ドラッグ開始時のオフセット
+    bool isPanning_ = false;                     ///< パン（中ボタンドラッグ）中か
 
     // グリッドスナップ
     bool enableGridSnap_ = true;                 ///< グリッドスナップ有効
