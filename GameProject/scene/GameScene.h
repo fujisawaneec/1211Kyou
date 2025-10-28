@@ -48,6 +48,16 @@ public: // メンバ関数
   /// </summary>
   void DrawImGui() override;
 
+  /// <summary>
+  /// ゲームオーバー演出開始
+  /// </summary>
+  void StartOverAnim();
+
+  /// <summary>
+  /// ゲームオーバー演出更新
+  /// </summary>
+  void UpdateOverAnim();
+
 private: // メンバ変数
 
 	std::unique_ptr<SkyBox> skyBox_;  ///< スカイボックス（環境マップ）
@@ -70,6 +80,11 @@ private: // メンバ変数
 	std::unique_ptr<EmitterManager> emitterManager_;  ///< パーティクルエミッター管理
 
 	std::unique_ptr<Sprite> toTitleText_;  ///< タイトルに戻るボタンテキスト
+
+  float overAnimTimer_ = 0.0f;  ///< ゲームオーバー演出タイマー
+  bool isOver_ = false;        ///< ゲームオーバーフラグ
+  bool isOver1Emit = false;   ///< ゲームオーバー演出用エミッター発生フラグ
+  bool isOver2Emit = false;   ///< ゲームオーバー演出用エミッター発生フラグ
 
 	bool isDebug_ = false;  ///< デバッグモードフラグ
 };

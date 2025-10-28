@@ -46,7 +46,7 @@ void GameScene::Initialize()
 
   // デバッグビルドではコライダー表示をデフォルトでON
   collisionManager->SetDebugDrawEnabled(true);
-  
+
   // DebugUIManagerにシーン名を設定
   DebugUIManager::GetInstance()->SetSceneName("GameScene");
 
@@ -156,7 +156,7 @@ void GameScene::Initialize()
     static_cast<uint32_t>(CollisionTypeId::kEnemy),
     true
   );
-  
+
   collisionManager->SetCollisionMask(
     static_cast<uint32_t>(CollisionTypeId::kPlayer),
     static_cast<uint32_t>(CollisionTypeId::kEnemyAttack),
@@ -217,26 +217,43 @@ void GameScene::Update()
   ground_->Update();
   player_->Update();
   boss_->Update();
+  toTitleText_->Update();
 
-  // カメラシステムの更新
   cameraManager_->Update(FrameTimer::GetInstance()->GetDeltaTime());
 
-  //emitterManager_->Update();
-  toTitleText_->Update();
+  Vector3 playerPos = { .x = player_->GetTransform().translate.x,
+                      .y = player_->GetTransform().translate.y,
+                      .z = player_->GetTransform().translate.z };
+
+  emitterManager_->SetEmitterPosition("over1", playerPos);
+  emitterManager_->SetEmitterPosition("over2", playerPos);
+
+  emitterManager_->Update();
+
+  UpdateOverAnim();
 
   // 衝突判定の実行
   CollisionManager::GetInstance()->CheckAllCollisions();
 
+  if (Input::GetInstance()->TriggerKey(DIK_O))
+  {
+    StartOverAnim();
+  }
+
+  if (Input::GetInstance()->TriggerKey(DIK_2))
+  {
+    emitterManager_->CreateTemporaryEmitterFrom("over2", "over2_temp", 0.1f);
+  }
+
   if (Input::GetInstance()->TriggerKey(DIK_1))
   {
-    animationController_->SwitchAnimation("over_anim");
-    animationController_->Play();
+    emitterManager_->CreateTemporaryEmitterFrom("over1", "over1_temp", 0.1f);
   }
 
   // シーン遷移
   if (Input::GetInstance()->TriggerKey(DIK_RETURN))
   {
-    SceneManager::GetInstance()->ChangeScene("title", "Fade",0.3f);
+    SceneManager::GetInstance()->ChangeScene("title", "Fade", 0.3f);
   }
 }
 
@@ -313,4 +330,35 @@ void GameScene::DrawImGui()
 #ifdef _DEBUG
 
 #endif // DEBUG
+}
+
+void GameScene::StartOverAnim()
+{
+  isOver_ = true;
+
+  animationController_->SwitchAnimation("over_anim");
+  animationController_->Play();
+
+}
+
+void GameScene::UpdateOverAnim()
+{
+  if (isOver_) overAnimTimer_ += FrameTimer::GetInstance()->GetDeltaTime();
+
+  if (overAnimTimer_ > 1.5f && !isOver1Emit)
+  {
+    emitterManager_->CreateTemporaryEmitterFrom("over1", "over1_temp", 0.5f);
+    isOver1Emit = true;
+  }
+
+  if (overAnimTimer_ > 2.0f && !isOver2Emit)
+  {
+    emitterManager_->CreateTemporaryEmitterFrom("over2", "over2_temp", 0.1f);
+    isOver2Emit = true;
+  }
+
+  if (overAnimTimer_ > 2.8f)
+  {
+    SceneManager::GetInstance()->ChangeScene("title", "Fade", 0.3f);
+  }
 }
