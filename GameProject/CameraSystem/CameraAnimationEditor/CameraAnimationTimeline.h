@@ -107,6 +107,29 @@ public:
     /// </summary>
     void SetGridSnapInterval(float interval) { gridSnapInterval_ = interval; }
 
+    /// <summary>
+    /// プレビューモードの設定
+    /// </summary>
+    /// <param name="enabled">プレビューモードが有効か</param>
+    void SetPreviewMode(bool enabled) {
+        isPreviewModeEnabled_ = enabled;
+        if (!enabled) {
+            isKeyframePreviewActive_ = false;
+            previewKeyframeIndex_ = -1;
+        }
+    }
+
+    /// <summary>
+    /// キーフレームプレビュー中かどうか
+    /// </summary>
+    bool IsKeyframePreviewActive() const { return isKeyframePreviewActive_; }
+
+    /// <summary>
+    /// プレビュー中のキーフレームインデックス取得
+    /// </summary>
+    int GetPreviewKeyframeIndex() const { return previewKeyframeIndex_; }
+
+
 private:
     /// <summary>
     /// タイムルーラーの描画
@@ -234,6 +257,12 @@ private:
     // スクラブ状態
     bool isScrubbing_ = false;                   ///< スクラブ中か
     float scrubTime_ = 0.0f;                     ///< スクラブ時間
+
+    // プレビューモード制御
+    bool isPreviewModeEnabled_ = false;          ///< プレビューモードが有効か
+    bool isKeyframePreviewActive_ = false;       ///< キーフレームプレビュー中か
+    float previewTime_ = 0.0f;                   ///< プレビュー時刻
+    int previewKeyframeIndex_ = -1;              ///< プレビュー中のキーフレームインデックス
 
     // スクロール状態
     float scrollX_ = 0.0f;                       ///< 水平スクロール

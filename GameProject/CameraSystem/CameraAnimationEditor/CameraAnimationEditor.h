@@ -18,15 +18,6 @@ class CameraAnimationHistory;
 /// </summary>
 class CameraAnimationEditor {
 public:
-    /// <summary>
-    /// エディターのレイアウトモード
-    /// </summary>
-    enum class LayoutMode {
-        COMPACT,        ///< コンパクトモード（基本機能のみ）
-        STANDARD,       ///< 標準モード（タイムライン＋インスペクター）
-        ADVANCED,       ///< 詳細モード（全機能表示）
-        CUSTOM          ///< カスタムレイアウト
-    };
 
     /// <summary>
     /// プレビューモード
@@ -94,11 +85,6 @@ public:
     /// </summary>
     bool IsOpen() const { return isOpen_; }
 
-    /// <summary>
-    /// レイアウトモードの設定
-    /// </summary>
-    void SetLayoutMode(LayoutMode mode) { layoutMode_ = mode; }
-
 
 private:
     /// <summary>
@@ -141,10 +127,6 @@ private:
     /// </summary>
     void DrawPlaybackControls();
 
-    /// <summary>
-    /// キーフレームリストの描画
-    /// </summary>
-    void DrawKeyframeList();
 
     /// <summary>
     /// モーションパスの描画（3D空間）
@@ -196,7 +178,6 @@ private:
 private:
     // エディター状態
     bool isOpen_ = false;                        ///< エディターが開いているか
-    LayoutMode layoutMode_ = LayoutMode::STANDARD; ///< レイアウトモード
     PreviewMode previewMode_ = PreviewMode::MOTION_PATH; ///< プレビューモード
 
     // 編集対象
@@ -234,9 +215,6 @@ private:
     // コピーバッファ
     std::vector<CameraKeyframe> clipboard_;      ///< コピーしたキーフレーム
 
-    // 再生状態
-    bool isScrubbing_ = false;                   ///< スクラブ再生中か
-    float scrubTime_ = 0.0f;                     ///< スクラブ時間
 
     // UIレイアウト設定
     float timelinePanelHeight_ = 200.0f;         ///< タイムラインパネル高さ
@@ -249,6 +227,10 @@ private:
     bool showTimeRuler_ = true;                  ///< 時間ルーラー表示
     bool showPropertyTracks_ = true;             ///< プロパティトラック表示
     bool lockTimelineScroll_ = false;            ///< タイムラインスクロールロック
+
+    // プレビュー機能
+    bool enablePreview_ = false;                  ///< プレビューモード有効化
+    std::string previousControllerName_;         ///< プレビュー前のコントローラー名
 };
 
 #endif // _DEBUG
