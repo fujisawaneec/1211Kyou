@@ -1,7 +1,9 @@
+// Engine includes
 #include "GameScene.h"
 #include "ModelManager.h"
 #include "Object3dBasic.h"
 #include "SpriteBasic.h"
+#include "Sprite.h"
 #include "Input.h"
 #include "DebugCamera.h"
 #include "Draw2D.h"
@@ -13,16 +15,15 @@
 #include "Model.h"
 #include "ShadowRenderer.h"
 #include "CollisionManager.h"
-#include "../Collision/CollisionTypeIdDef.h"
 
-// Camera System includes
+// Game includes
+#include "../Collision/CollisionTypeIdDef.h"
 #include "CameraSystem/CameraManager.h"
 #include "CameraSystem/FirstPersonController.h"
 #include "CameraSystem/TopDownController.h"
 #include "CameraSystem/CameraAnimationController.h"
 
-#include <numbers>
-
+// Debug includes
 #ifdef _DEBUG
 #include"ImGui.h"
 #include "DebugCamera.h"

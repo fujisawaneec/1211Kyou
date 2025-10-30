@@ -6,6 +6,7 @@
 #include <filesystem>
 #include <cmath>
 
+#include "DebugUIManager.h"
 #include "CameraSystem/CameraConfig.h"
 
 #ifdef _DEBUG
@@ -660,6 +661,12 @@ bool CameraAnimation::LoadFromJson(const std::string& filepath) {
         SortKeyframes();
         UpdateDuration();
 
+#ifdef _DEBUG
+        DebugUIManager::GetInstance()->AddLog(
+            " CameraAnimation: Loaded animation" + animationName_ + " from " + jsonPath.string(),
+            DebugUIManager::LogType::Info);
+#endif
+
         // 読み込み成功
         return true;
 
@@ -714,7 +721,12 @@ bool CameraAnimation::SaveToJson(const std::string& filepath) const {
         file << json.dump(4);
         file.close();
 
-
+#ifdef _DEBUG
+        // Debugログ出力
+        DebugUIManager::GetInstance()->AddLog(
+            " CameraAnimation: Saved animation " + animationName_ + " to " + jsonPath.string(),
+            DebugUIManager::LogType::Info);
+#endif
 
         // 保存成功
         return true;

@@ -1,15 +1,17 @@
 #pragma once
 #include "BaseScene.h"
-#include"Object3d.h"
-#include "EmitterManager.h"
-#include "Sprite.h"
-#include "SkyBox.h"
-#include "BoneTracker.h"
-#include "EmitterManager.h"
-#include "Object/Player/Player.h"
+#include "Transform.h"
 #include "Object/Boss/Boss.h"
+#include "Object/Player/Player.h"
+#include  "SkyBox.h"
 
-// Forward declarations for camera system
+#include <memory>
+
+// クラス前方宣言
+class Object3d;
+class EmitterManager;
+class Sprite;
+class BoneTracker;
 class CameraManager;
 class FirstPersonController;
 class TopDownController;
