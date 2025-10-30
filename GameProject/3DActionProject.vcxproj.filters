@@ -96,9 +96,6 @@
     <ClCompile Include="Object\Boss\Boss.cpp">
       <Filter>Object\Boss</Filter>
     </ClCompile>
-    <ClCompile Include="Object\Player\MeleeAttackCollider.cpp">
-      <Filter>Object\Player</Filter>
-    </ClCompile>
     <ClCompile Include="scene\ClearScene.cpp">
       <Filter>scene</Filter>
     </ClCompile>
@@ -131,6 +128,9 @@
     </ClCompile>
     <ClCompile Include="CameraAnimation\CameraAnimation.cpp">
       <Filter>CameraSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="Object\Player\MeleeAttackCollider.cpp">
+      <Filter>Collision</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -188,9 +188,6 @@
     <ClInclude Include="Object\Boss\Boss.h">
       <Filter>Object\Boss</Filter>
     </ClInclude>
-    <ClInclude Include="Object\Player\MeleeAttackCollider.h">
-      <Filter>Object\Player</Filter>
-    </ClInclude>
     <ClInclude Include="scene\ClearScene.h">
       <Filter>scene</Filter>
     </ClInclude>
@@ -232,6 +229,9 @@
     </ClInclude>
     <ClInclude Include="CameraAnimation\CameraAnimation.h">
       <Filter>CameraSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="Object\Player\MeleeAttackCollider.h">
+      <Filter>Collision</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
