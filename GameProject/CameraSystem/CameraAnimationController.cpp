@@ -98,13 +98,13 @@ void CameraAnimationController::SetCurrentAnimationTarget(const Transform* targe
     }
 }
 
-bool CameraAnimationController::LoadAnimation(const std::string& filepath) {
+bool CameraAnimationController::LoadAnimation(const std::string& name) {
     // デフォルトアニメーションに読み込む（後方互換性のため）
     auto* animation = GetCurrentAnimation();
     if (!animation) {
         return false;
     }
-    return animation->LoadFromJson(filepath);
+    return animation->LoadFromJson(name);
 }
 
 void CameraAnimationController::Play() {
@@ -390,7 +390,7 @@ bool CameraAnimationController::DuplicateAnimation(const std::string& sourceName
     return true;
 }
 
-bool CameraAnimationController::LoadAnimationFromFile(const std::string& filepath, const std::string& name) {
+bool CameraAnimationController::LoadAnimationFromFile(const std::string& name) {
     // 新規アニメーション作成
     if (!CreateAnimation(name)) {
         // 既に存在する場合は上書き確認が必要だが、ここでは単純に失敗とする
@@ -399,7 +399,7 @@ bool CameraAnimationController::LoadAnimationFromFile(const std::string& filepat
 
     // JSONから読み込み（filepathを正しく渡す）
     auto* anim = GetAnimation(name);
-    if (!anim || !anim->LoadFromJson(filepath)) {
+    if (!anim || !anim->LoadFromJson(name)) {
         // 失敗した場合は削除
         DeleteAnimation(name);
         return false;
@@ -408,13 +408,13 @@ bool CameraAnimationController::LoadAnimationFromFile(const std::string& filepat
     return true;
 }
 
-bool CameraAnimationController::SaveAnimationToFile(const std::string& name, const std::string& filepath) {
+bool CameraAnimationController::SaveAnimationToFile(const std::string& name) {
     auto* anim = GetAnimation(name);
     if (!anim) {
         return false;
     }
 
-    return anim->SaveToJson(filepath);
+    return anim->SaveToJson(name);
 }
 
 std::vector<std::string> CameraAnimationController::GetAnimationList() const {

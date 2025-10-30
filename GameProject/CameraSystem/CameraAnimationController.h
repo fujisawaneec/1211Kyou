@@ -83,9 +83,9 @@ public:
     /// <summary>
     /// アニメーションを読み込み
     /// </summary>
-    /// <param name="filepath">JSONファイルパス</param>
+    /// <param name="name">JSONファイルパス</param>
     /// <returns>読み込み成功した場合true</returns>
-    bool LoadAnimation(const std::string& filepath);
+    bool LoadAnimation(const std::string& name);
 
     /// <summary>
     /// アニメーション再生
@@ -218,7 +218,7 @@ public:
     /// <param name="filepath">JSONファイルパス</param>
     /// <param name="name">アニメーション名</param>
     /// <returns>読み込み成功した場合true</returns>
-    bool LoadAnimationFromFile(const std::string& filepath, const std::string& name);
+    bool LoadAnimationFromFile(const std::string& name);
 
     /// <summary>
     /// アニメーションをファイルに保存
@@ -226,7 +226,7 @@ public:
     /// <param name="name">保存するアニメーション名</param>
     /// <param name="filepath">保存先ファイルパス</param>
     /// <returns>保存成功した場合true</returns>
-    bool SaveAnimationToFile(const std::string& name, const std::string& filepath);
+    bool SaveAnimationToFile(const std::string& name);
 
     /// <summary>
     /// 現在のアニメーションオブジェクトを取得

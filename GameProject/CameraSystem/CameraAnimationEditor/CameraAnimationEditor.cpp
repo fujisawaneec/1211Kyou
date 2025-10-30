@@ -484,30 +484,7 @@ void CameraAnimationEditor::DrawTimelinePanel() {
   }
 
   if (timeline_) {
-    // タイムラインにプレビューモードを通知
-    timeline_->SetPreviewMode(enablePreview_);
-
-    // タイムラインコンポーネントに描画を委譲
-    timeline_->Draw();
-
-    // 選択状態を同期
-    selectedKeyframes_ = timeline_->GetSelectedKeyframes();
-    hoveredKeyframe_ = timeline_->GetHoveredKeyframe();
-    isDragging_ = timeline_->IsDragging();
-  }
-}
-
-void CameraAnimationEditor::DrawInspectorPanel() {
-  ImGui::Text("Inspector");
-  ImGui::Separator();
-
-  if (!animation_) {
-    ImGui::TextDisabled("No animation loaded");
-    return;
-  }
-
-  // プレビュー設定セクション
-  if (ImGui::CollapsingHeader("Preview Settings", ImGuiTreeNodeFlags_DefaultOpen)) {
+    // プレビューモード切り替え
     if (ImGui::Checkbox("Enable Preview", &enablePreview_)) {
       if (enablePreview_) {
         // プレビュー開始：現在のコントローラーを記憶してAnimationControllerをアクティブ化
@@ -529,51 +506,26 @@ void CameraAnimationEditor::DrawInspectorPanel() {
       }
     }
 
-    if (enablePreview_) {
-      ImGui::Text("Preview Status:");
-      ImGui::SameLine();
-      if (timeline_ && timeline_->IsKeyframePreviewActive()) {
-        ImGui::TextColored(ImVec4(0.4f, 0.8f, 1.0f, 1.0f),
-          "Keyframe #%d", timeline_->GetPreviewKeyframeIndex());
-      }else {
-        ImGui::TextColored(ImVec4(0.5f, 0.5f, 0.5f, 1.0f), "Idle");
-      }
+    // タイムラインにプレビューモードを通知
+    timeline_->SetPreviewMode(enablePreview_);
 
-      if (ImGui::Button("Reset Camera")) {
-        // アニメーションの現在時刻に戻す
-        if (animation_) {
-          // AnimationControllerをアクティブ化
-          CameraManager* manager = CameraManager::GetInstance();
-          if (manager && manager->GetActiveControllerName() != "Animation") {
-            if (previousControllerName_.empty()) {
-              previousControllerName_ = manager->GetActiveControllerName();
-            }
-            manager->DeactivateAllControllers();
-            manager->ActivateController("Animation");
-          }
+    // タイムラインコンポーネントに描画を委譲
+    timeline_->Draw();
 
-          animation_->SetCurrentTime(animation_->GetCurrentTime());
-          // SetCurrentTime()内で自動的に補間が実行される
-        }
-      }
+    // 選択状態を同期
+    selectedKeyframes_ = timeline_->GetSelectedKeyframes();
+    hoveredKeyframe_ = timeline_->GetHoveredKeyframe();
+    isDragging_ = timeline_->IsDragging();
+  }
+}
 
-      ImGui::SameLine();
-      if (ImGui::Button("Go to Start")) {
-        // AnimationControllerをアクティブ化
-        CameraManager* manager = CameraManager::GetInstance();
-        if (manager && manager->GetActiveControllerName() != "Animation") {
-          if (previousControllerName_.empty()) {
-            previousControllerName_ = manager->GetActiveControllerName();
-          }
-          manager->DeactivateAllControllers();
-          manager->ActivateController("Animation");
-        }
+void CameraAnimationEditor::DrawInspectorPanel() {
+  ImGui::Text("Inspector");
+  ImGui::Separator();
 
-        animation_->SetCurrentTime(0.0f);
-      }
-    }
-
-    ImGui::Separator();
+  if (!animation_) {
+    ImGui::TextDisabled("No animation loaded");
+    return;
   }
 
   // Start Mode Settings セクション
@@ -1075,9 +1027,8 @@ void CameraAnimationEditor::DrawAnimationSelector() {
 
   // 保存ボタン
   if (ImGui::Button("Save")) {
-    // TODO: ファイル選択ダイアログ実装
-    std::string fileName = currentName + ".json";
-    controller_->SaveAnimationToFile(currentName, fileName);
+    std::string fileName = currentName;
+    controller_->SaveAnimationToFile(fileName);
   }
 
   ImGui::SameLine();
@@ -1144,11 +1095,8 @@ void CameraAnimationEditor::DrawAnimationSelector() {
     ImGui::Text("Animation Name:");
     ImGui::InputText("##LoadName", nameBuf, sizeof(nameBuf));
 
-    ImGui::Text("File Path:");
-    ImGui::InputText("##LoadPath", pathBuf, sizeof(pathBuf));
-
     if (ImGui::Button("Load")) {
-      if (controller_->LoadAnimationFromFile(pathBuf, nameBuf)) {
+      if (controller_->LoadAnimationFromFile(nameBuf)) {
         controller_->SwitchAnimation(nameBuf);
         animation_ = controller_->GetCurrentAnimation();
         // 重要：読み込んだアニメーションにもカメラを設定
