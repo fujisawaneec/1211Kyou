@@ -142,7 +142,7 @@ void GameScene::Initialize()
   animationController_->Play();
 
   // game_overアニメーションの設定
-  animationController_->LoadAnimationFromFile("over_anim", "over_anim");
+  animationController_->LoadAnimationFromFile("over_anim");
   animationController_->SetAnimationTargetByName("over_anim", player_->GetTransformPtr());
 
 
