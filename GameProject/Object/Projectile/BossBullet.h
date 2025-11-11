@@ -74,5 +74,5 @@ private:
     /// <summary>
     /// モデルをロード
     /// </summary>
-    void LoadModel();
+    void SetModel();
 };

@@ -24,7 +24,7 @@ void BossDashState::Enter(Boss* boss) {
     dashDirection_ = Vector3(cosf(randomAngle), 0.0f, sinf(randomAngle));
     dashDirection_ = dashDirection_.Normalize();
 
-    // ダッシュ距離を計算（10～15ユニット）
+    // ダッシュ距離を計算
     std::uniform_real_distribution<float> distDist(10.0f, 50.0f);
     float dashDistance = distDist(gen);
 
@@ -48,14 +48,18 @@ void BossDashState::Enter(Boss* boss) {
         float angle = atan2f(dashDirection_.x, dashDirection_.z);
         boss->SetRotation(Vector3(0.0f, angle, 0.0f));
     }
-
-    // フェーズ2では速度を上げる
-    if (boss->GetPhase() == 2) {
-        dashSpeed_ = 40.0f;
-    }
 }
 
 void BossDashState::Update(Boss* boss, float deltaTime) {
+
+    // フェーズ2では速度を下げる
+    if (boss->GetPhase() == 2) {
+        dashSpeed_ = 30.0f;
+    }else
+    {
+        dashSpeed_ = 60.0f;
+    }
+
     stateTimer_ += deltaTime;
 
     if (stateTimer_ < dashDuration_) {
@@ -94,10 +98,10 @@ Vector3 BossDashState::ClampToArea(const Vector3& position) {
 
     // Playerクラスと同じ静的境界を使用
     // X座標の制限（-100.0f ～ 100.0f）
-    clampedPos.x = std::clamp(clampedPos.x, Player::X_MIN, Player::X_MAX);
+    clampedPos.x = std::clamp(clampedPos.x, Player::X_MIN + 5.0f, Player::X_MAX - 5.0f);
 
     // Z座標の制限（-140.0f ～ 60.0f）
-    clampedPos.z = std::clamp(clampedPos.z, Player::Z_MIN, Player::Z_MAX);
+    clampedPos.z = std::clamp(clampedPos.z, Player::Z_MIN + 5.0f, Player::Z_MAX - 5.0f);
 
     // Y座標は元の値を保持
     clampedPos.y = position.y;

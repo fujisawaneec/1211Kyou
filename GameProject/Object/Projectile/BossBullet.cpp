@@ -8,10 +8,10 @@
 
 BossBullet::BossBullet() {
     // 弾のパラメータ設定
-    damage_ = 10.0f;  // プレイヤーHPの1/10
-    lifeTime_ = 5.0f;  // 5秒間生存
+    damage_ = 10.0f;
+    lifeTime_ = 5.0f;
 
-    // ランダムな回転速度を設定（見た目の演出用）
+    // ランダムな回転速度を設定
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_real_distribution<float> rotDist(-10.0f, 10.0f);
@@ -32,7 +32,7 @@ void BossBullet::Initialize(const Vector3& position, const Vector3& velocity) {
     Projectile::Initialize(position, velocity);
 
     // モデルをロード
-    LoadModel();
+    SetModel();
 
     model_->Update();
 
@@ -76,15 +76,15 @@ void BossBullet::Update(float deltaTime) {
     // 親クラスの更新処理
     Projectile::Update(deltaTime);
 
-    // 回転アニメーション（見た目の演出）
+    // 回転アニメーション
     transform_.rotate += rotationSpeed_ * deltaTime;
 
-    // モデルの更新（回転を反映）
+    // モデルの更新
     if (model_) {
         model_->SetTransform(transform_);
     }
 
-    // 軌跡エフェクト的な処理（将来的にパーティクル追加可能）
+    // 軌跡エフェクト的な処理
     particleTimer_ += deltaTime;
     if (particleTimer_ >= particleInterval_) {
         particleTimer_ = 0.0f;
@@ -100,9 +100,9 @@ void BossBullet::Update(float deltaTime) {
     }
 }
 
-void BossBullet::LoadModel() {
+void BossBullet::SetModel() {
     if (model_) {
-        // モデルをロード（キャッシュされていれば再利用）
+        // モデルをロード
         model_->SetModel("sphere.gltf");
 
         if (!model_->GetModel()) {
