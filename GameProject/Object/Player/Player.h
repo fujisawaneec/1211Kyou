@@ -178,11 +178,40 @@ public: // メンバ関数
     /// <returns>InputHandlerのポインタ</returns>
     InputHandler* GetInputHandler() { return inputHandlerPtr_; };
 
+    /// <summary>
+    /// 動的移動範囲を設定
+    /// </summary>
+    /// <param name="xMin">X座標の最小値</param>
+    /// <param name="xMax">X座標の最大値</param>
+    /// <param name="zMin">Z座標の最小値</param>
+    /// <param name="zMax">Z座標の最大値</param>
+    void SetDynamicBounds(float xMin, float xMax, float zMin, float zMax);
+
+    /// <summary>
+    /// 中心点と範囲から動的移動範囲を設定
+    /// </summary>
+    /// <param name="center">中心座標</param>
+    /// <param name="xRange">X方向の範囲（片側）</param>
+    /// <param name="zRange">Z方向の範囲（片側）</param>
+    void SetDynamicBoundsFromCenter(const Vector3& center, float xRange, float zRange);
+
+    /// <summary>
+    /// 動的移動範囲をクリア（無効化）
+    /// </summary>
+    void ClearDynamicBounds();
+
 private: // メンバ変数
+    // ステージ全体の移動制限（静的）
     static float X_MIN;
     static float X_MAX;
     static float Z_MIN;
     static float Z_MAX;
+
+    // 動的移動制限（ボス戦闘エリアなど）
+    float dynamicXMin_;
+    float dynamicXMax_;
+    float dynamicZMin_;
+    float dynamicZMax_;
 
     std::unique_ptr<Object3d> model_; ///< モデル
     Camera* camera_ = nullptr;        ///< カメラ

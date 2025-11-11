@@ -19,7 +19,7 @@
 // Game includes
 #include "../Collision/CollisionTypeIdDef.h"
 #include "CameraSystem/CameraManager.h"
-#include "CameraSystem/FirstPersonController.h"
+#include "CameraSystem/ThirdPersonController.h"
 #include "CameraSystem/TopDownController.h"
 #include "CameraSystem/CameraAnimationController.h"
 
@@ -124,10 +124,10 @@ void GameScene::Initialize()
     cameraManager_->Initialize((*Object3dBasic::GetInstance()->GetCamera()));
 
     // FirstPersonControllerを登録
-    auto fpController = std::make_unique<FirstPersonController>();
+    auto fpController = std::make_unique<ThirdPersonController>();
     firstPersonController_ = fpController.get();
     firstPersonController_->SetTarget(&player_->GetTransform());
-    cameraManager_->RegisterController("FirstPerson", std::move(fpController));
+    cameraManager_->RegisterController("ThirdPerson", std::move(fpController));
 
     // TopDownControllerを登録
     auto tdController = std::make_unique<TopDownController>();
@@ -369,13 +369,20 @@ void GameScene::UpdateCameraMode()
     if (boss_->GetPhase() == 1)
     {
         cameraMode_ = false;
-    } else if (boss_->GetPhase() == 2)
+        // フェーズ1: 動的制限を解除（ステージ全体を移動可能）
+        player_->ClearDynamicBounds();
+    }
+    else if (boss_->GetPhase() == 2)
     {
         cameraMode_ = true;
+        // フェーズ2: ボス中心の戦闘エリアに移動制限
+        Vector3 bossPos = boss_->GetTransform().translate;
+        float battleAreaSize = 20.0f;  // 戦闘エリアのサイズ（片側）
+        player_->SetDynamicBoundsFromCenter(bossPos, battleAreaSize, battleAreaSize);
     }
 
     if (cameraMode_) {
-        cameraManager_->ActivateController("FirstPerson");
+        cameraManager_->ActivateController("ThirdPerson");
     } else {
         cameraManager_->ActivateController("TopDown");
     }

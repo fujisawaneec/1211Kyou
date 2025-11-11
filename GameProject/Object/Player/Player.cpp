@@ -34,6 +34,8 @@ Player::Player()
     , targetAngle_(0.0f)
     , mode_(false)
 {
+    // 動的制限を初期化（無効化）
+    ClearDynamicBounds();
 }
 
 Player::~Player()
@@ -88,11 +90,17 @@ void Player::Update()
         stateMachine_->Update(FrameTimer::GetInstance()->GetDeltaTime());
     }
 
-    // 位置制限
-    transform_.translate.x = std::min<float>(transform_.translate.x, X_MAX);
-    transform_.translate.x = std::max<float>(transform_.translate.x, X_MIN);
-    transform_.translate.z = std::min<float>(transform_.translate.z, Z_MAX);
-    transform_.translate.z = std::max<float>(transform_.translate.z, Z_MIN);
+    // 実効的な制限を計算（静的制限と動的制限の交差）
+    float effectiveXMin = std::max<float>(X_MIN, dynamicXMin_);
+    float effectiveXMax = std::min<float>(X_MAX, dynamicXMax_);
+    float effectiveZMin = std::max<float>(Z_MIN, dynamicZMin_);
+    float effectiveZMax = std::min<float>(Z_MAX, dynamicZMax_);
+
+    // 位置制限適用
+    transform_.translate.x = std::min<float>(transform_.translate.x, effectiveXMax);
+    transform_.translate.x = std::max<float>(transform_.translate.x, effectiveXMin);
+    transform_.translate.z = std::min<float>(transform_.translate.z, effectiveZMax);
+    transform_.translate.z = std::max<float>(transform_.translate.z, effectiveZMin);
 
     // モデルの更新
     model_->SetTransform(transform_);
@@ -493,4 +501,29 @@ void Player::DrawImGui()
     }
 
 #endif
+}
+
+void Player::SetDynamicBounds(float xMin, float xMax, float zMin, float zMax)
+{
+    dynamicXMin_ = xMin;
+    dynamicXMax_ = xMax;
+    dynamicZMin_ = zMin;
+    dynamicZMax_ = zMax;
+}
+
+void Player::SetDynamicBoundsFromCenter(const Vector3& center, float xRange, float zRange)
+{
+    dynamicXMin_ = center.x - xRange;
+    dynamicXMax_ = center.x + xRange;
+    dynamicZMin_ = center.z - zRange;
+    dynamicZMax_ = center.z + zRange;
+}
+
+void Player::ClearDynamicBounds()
+{
+    // 非常に大きな値に設定して実質的に無効化
+    dynamicXMin_ = -9999.0f;
+    dynamicXMax_ = 9999.0f;
+    dynamicZMin_ = -9999.0f;
+    dynamicZMax_ = 9999.0f;
 }
