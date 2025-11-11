@@ -55,9 +55,7 @@ void Player::Initialize()
   stateMachine_->ChangeState("Idle");
   stateMachine_->Initialize();
 
-  // Input Handlerの初期化
-  inputHandler_ = std::make_unique<InputHandler>();
-  inputHandler_->Initialize();
+
 
   // Colliderの初期化
   SetupColliders();
@@ -77,12 +75,6 @@ void Player::Finalize()
 void Player::Update()
 {
   float deltaTime = 1.0f / 60.0f; // 60FPSを仮定
-
-  // Inputの更新（StateのHandleInputより前に実行）
-  if (inputHandler_)
-  {
-    inputHandler_->Update();
-  }
 
   // State Machineの更新
   if (stateMachine_)
@@ -106,9 +98,9 @@ void Player::Draw()
 
 void Player::Move(float speedMultiplier)
 {
-  if (!inputHandler_) return;
+  if (!inputHandlerPtr_) return;
 
-  Vector2 moveDir = inputHandler_->GetMoveDirection();
+  Vector2 moveDir = inputHandlerPtr_->GetMoveDirection();
   if (moveDir.Length() < 0.1f) return;
 
   // 3Dベクトルに変換
@@ -452,12 +444,12 @@ void Player::DrawImGui()
 
 			// Input Status
 			if (ImGui::TreeNode("Input Status")) {
-				if (inputHandler_) {
-					bool moving = inputHandler_->IsMoving();
-					bool attacking = inputHandler_->IsAttacking();
-					bool shooting = inputHandler_->IsShooting();
-					bool dashing = inputHandler_->IsDashing();
-					bool parrying = inputHandler_->IsParrying();
+				if (inputHandlerPtr_) {
+					bool moving = inputHandlerPtr_->IsMoving();
+					bool attacking = inputHandlerPtr_->IsAttacking();
+					bool shooting = inputHandlerPtr_->IsShooting();
+					bool dashing = inputHandlerPtr_->IsDashing();
+					bool parrying = inputHandlerPtr_->IsParrying();
 
 					ImGui::Text("Moving: %s", moving ? "✓" : "✗");
 					ImGui::Text("Attacking: %s", attacking ? "✓" : "✗");

@@ -26,6 +26,11 @@ public:
 	/// </summary>
 	void Update();
 
+    /// <summary>
+    /// 全ての入力状態をリセット
+    /// </summary>
+    void ResetInputs();
+
 	/// <summary>
 	/// 移動入力があるか判定
 	/// </summary>

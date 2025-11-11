@@ -42,6 +42,17 @@ void InputHandler::Update()
   isPaused_ = input->TriggerKey(DIK_ESCAPE) || input->TriggerButton(XButtons.Start);
 }
 
+void InputHandler::ResetInputs()
+{
+    moveDirection_ = Vector2(0.0f, 0.0f);
+    isMoving_ = false;
+    isDashing_ = false;
+    isAttacking_ = false;
+    isShooting_ = false;
+    isParrying_ = false;
+    isPaused_ = false;
+}
+
 bool InputHandler::IsMoving() const
 {
   return isMoving_;

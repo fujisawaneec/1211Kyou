@@ -108,6 +108,11 @@ public: // メンバ関数
     void SetHp(float hp) { hp_ = hp; if (hp_ < 0.f) hp_ = 0.f; }
 
     /// <summary>
+    /// 入力ハンドラを設定
+    /// </summary>
+    void SetInputHandler(InputHandler* inputHandler) { inputHandlerPtr_ = inputHandler; }
+
+    /// <summary>
     /// 移動速度を取得
     /// </summary>
     /// <returns>現在の移動速度</returns>
@@ -150,12 +155,6 @@ public: // メンバ関数
     PlayerStateMachine* GetStateMachine() const { return stateMachine_.get(); }
 
     /// <summary>
-    /// 入力ハンドラーを取得
-    /// </summary>
-    /// <returns>入力ハンドラーのポインタ</returns>
-    InputHandler* GetInputHandler() const { return inputHandler_.get(); }
-
-    /// <summary>
     /// 近接攻撃コライダーを取得
     /// </summary>
     /// <returns>近接攻撃コライダーのポインタ</returns>
@@ -173,6 +172,12 @@ public: // メンバ関数
     /// <returns>現在のVelocity値の参照</returns>
     Vector3& GetVelocity() { return velocity_; }
 
+    /// <summary>
+    /// InputHandlerを取得
+    /// </summary>
+    /// <returns>InputHandlerのポインタ</returns>
+    InputHandler* GetInputHandler() { return inputHandlerPtr_; };
+
 private: // メンバ変数
 
     std::unique_ptr<Object3d> model_; ///< モデル
@@ -188,7 +193,7 @@ private: // メンバ変数
 
     // システム
     std::unique_ptr<PlayerStateMachine> stateMachine_;
-    std::unique_ptr<InputHandler> inputHandler_;
+    InputHandler* inputHandlerPtr_;
 
     // Colliders
     std::unique_ptr<AABBCollider> bodyCollider_;

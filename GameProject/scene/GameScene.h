@@ -1,9 +1,10 @@
 #pragma once
 #include "BaseScene.h"
 #include "Transform.h"
+#include  "SkyBox.h"
 #include "Object/Boss/Boss.h"
 #include "Object/Player/Player.h"
-#include  "SkyBox.h"
+#include "Input/InputHandler.h"
 
 #include <memory>
 
@@ -70,6 +71,8 @@ private: // メンバ変数
 
 	std::unique_ptr<Boss> boss_;  ///< ボスキャラクター
 
+    std::unique_ptr<InputHandler> inputHandler_; ///< 入力ハンドラー
+
 	// Camera system components
 	CameraManager* cameraManager_ = nullptr;  ///< カメラシステム管理
 	FirstPersonController* firstPersonController_ = nullptr;  ///< 一人称視点コントローラー
@@ -81,7 +84,7 @@ private: // メンバ変数
 
 	std::unique_ptr<EmitterManager> emitterManager_;  ///< パーティクルエミッター管理
 
-	std::unique_ptr<Sprite> toTitleText_;  ///< タイトルに戻るボタンテキスト
+	std::unique_ptr<Sprite> toTitleSprite_;  ///< タイトルに戻るボタンテキスト
 
   float overAnimTimer_ = 0.0f;  ///< ゲームオーバー演出タイマー
   bool isOver_ = false;        ///< ゲームオーバーフラグ

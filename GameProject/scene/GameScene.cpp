@@ -86,9 +86,9 @@ void GameScene::Initialize()
     emitterManager_->LoadPreset("over2", "over2");
 
     // タイトルボタンテキストの初期化
-    toTitleText_ = std::make_unique<Sprite>();
-    toTitleText_->Initialize("game_button_text.png");
-    toTitleText_->SetPos(Vector2(WinApp::clientWidth / 2.f - toTitleText_->GetSize().x / 2.f, 200.f));
+    toTitleSprite_ = std::make_unique<Sprite>();
+    toTitleSprite_->Initialize("game_button_text.png");
+    toTitleSprite_->SetPos(Vector2(WinApp::clientWidth / 2.f - toTitleSprite_->GetSize().x / 2.f, 200.f));
 
     // SkyBoxの初期化
     skyBox_ = std::make_unique<SkyBox>();
@@ -106,6 +106,10 @@ void GameScene::Initialize()
     ground_->SetModel("ground_black.gltf");
     ground_->SetUvTransform(groundUvTransform_);
 
+    // Input Handlerの初期化
+    inputHandler_ = std::make_unique<InputHandler>();
+    inputHandler_->Initialize();
+
     // 敵モデルの初期化
     boss_ = std::make_unique<Boss>();
     boss_->Initialize();
@@ -114,6 +118,7 @@ void GameScene::Initialize()
     player_ = std::make_unique<Player>();
     player_->Initialize();
     player_->SetCamera((*Object3dBasic::GetInstance()->GetCamera()));
+    player_->SetInputHandler(inputHandler_.get());
 
     // カメラシステムの初期化
     cameraManager_ = CameraManager::GetInstance();
@@ -145,7 +150,6 @@ void GameScene::Initialize()
     // game_overアニメーションの設定
     animationController_->LoadAnimationFromFile("over_anim");
     animationController_->SetAnimationTargetByName("over_anim", player_->GetTransformPtr());
-
 
     // デフォルトモードを設定（TopDown）
     cameraMode_ = false;
@@ -224,12 +228,15 @@ void GameScene::Update()
     // カメラモードをPlayerに設定
     player_->SetMode(cameraMode_);
 
+    // 入力ハンドラーの更新。カメラアニメーション再生中は入力をリセットし、操作を受け付けない
+    animationController_->GetPlayState() != CameraAnimation::PlayState::PLAYING ? inputHandler_->Update() : inputHandler_->ResetInputs();
+
     // オブジェクトの更新処理
     skyBox_->Update();
     ground_->Update();
     player_->Update();
     boss_->Update();
-    toTitleText_->Update();
+    toTitleSprite_->Update();
     cameraManager_->Update(FrameTimer::GetInstance()->GetDeltaTime());
 
     // プレイヤーの位置にエミッターをセット
@@ -317,7 +324,7 @@ void GameScene::DrawWithoutEffect()
     // スプライト共通描画設定
     SpriteBasic::GetInstance()->SetCommonRenderSetting();
 
-    toTitleText_->Draw();
+    toTitleSprite_->Draw();
 }
 
 void GameScene::DrawImGui()
