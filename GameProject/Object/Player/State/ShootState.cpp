@@ -4,6 +4,10 @@
 #include "Input/InputHandler.h"
 #include "Camera.h"
 #include "Matrix4x4.h"
+#include <algorithm>  // for std::max
+#ifdef _DEBUG
+#include <imgui.h>
+#endif
 
 void ShootState::Enter(Player* player)
 {
@@ -80,4 +84,49 @@ void ShootState::Fire(Player* player)
 {
 	// 弾を発射する処理
 	// TODO: 弾オブジェクトの生成と発射処理を実装
+}
+
+void ShootState::DrawImGui(Player* player)
+{
+#ifdef _DEBUG
+	ImGui::Text("=== Shoot State Details ===");
+	ImGui::Separator();
+
+	// 発射レート情報
+	ImGui::Text("Fire Rate: %.2f (%.1f shots/sec)", fireRate_, 1.0f / fireRate_);
+	ImGui::Text("Next Shot In: %.2f", std::max<float>(0.0f, fireRate_ - fireRateTimer_));
+
+	// プログレスバー
+	float progress = (fireRate_ > 0.0f) ? (fireRateTimer_ / fireRate_) : 0.0f;
+	ImGui::ProgressBar(progress, ImVec2(-1, 0), "Reload");
+
+	// 照準方向
+	if (ImGui::TreeNode("Aim Direction")) {
+		ImGui::Text("X: %.3f", aimDirection_.x);
+		ImGui::Text("Y: %.3f", aimDirection_.y);
+		ImGui::Text("Z: %.3f", aimDirection_.z);
+		ImGui::Text("Length: %.3f", aimDirection_.Length());
+		ImGui::TreePop();
+	}
+
+	// パラメータ調整
+	if (ImGui::TreeNode("Shooting Parameters")) {
+		ImGui::SliderFloat("Fire Rate", &fireRate_, 0.05f, 2.0f, "%.2f sec");
+
+		// プリセット
+		if (ImGui::Button("Rapid Fire")) {
+			fireRate_ = 0.05f;
+		}
+		ImGui::SameLine();
+		if (ImGui::Button("Normal")) {
+			fireRate_ = 0.2f;
+		}
+		ImGui::SameLine();
+		if (ImGui::Button("Slow")) {
+			fireRate_ = 0.5f;
+		}
+
+		ImGui::TreePop();
+	}
+#endif
 }

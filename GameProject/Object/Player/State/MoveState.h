@@ -14,4 +14,12 @@ public:
 	void Update(Player* player, float deltaTime) override;
 	void Exit(Player* player) override;
 	void HandleInput(Player* player) override;
+
+	/// <summary>
+	/// ImGuiデバッグ情報の描画
+	/// </summary>
+	void DrawImGui(Player* player) override;
+
+private:
+	float moveTime_ = 0.0f;  ///< 移動継続時間
 };

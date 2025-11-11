@@ -162,7 +162,7 @@ void Player::SetupColliders()
   // 本体のCollider
   bodyCollider_ = std::make_unique<AABBCollider>();
   bodyCollider_->SetTransform(&transform_);
-  bodyCollider_->SetSize(Vector3(1.5f, 1.5f, 1.5f));
+  bodyCollider_->SetSize(Vector3(3.2f, 3.2f, 3.2f));
   bodyCollider_->SetOffset(Vector3(0.0f, 0.0f, 0.0f));
   bodyCollider_->SetTypeID(static_cast<uint32_t>(CollisionTypeId::kPlayer));
   bodyCollider_->SetOwner(this);
@@ -170,8 +170,8 @@ void Player::SetupColliders()
   // 攻撃範囲のCollider
   meleeAttackCollider_ = std::make_unique<MeleeAttackCollider>(this);
   meleeAttackCollider_->SetTransform(&transform_);
-  meleeAttackCollider_->SetSize(Vector3(5.f, 2.0f, 25.0f));
-  meleeAttackCollider_->SetOffset(Vector3(0.0f, 0.0f, 15.0f));
+  meleeAttackCollider_->SetSize(Vector3(5.f, 2.0f, 17.0f));
+  meleeAttackCollider_->SetOffset(Vector3(0.0f, 0.0f, 10.0f));
   meleeAttackCollider_->SetActive(false);
 
   // CollisionManagerに登録
@@ -205,73 +205,242 @@ void Player::OnMeleeAttackHit(Collider* other)
 void Player::DrawImGui()
 {
 #ifdef _DEBUG
+	static int selectedTab = 0;  // タブの選択状態を保持
 
-  // プレイヤーの状態
-  ImGui::Text("=== Player Status ===");
-  ImGui::Text("HP: %.1f", hp_);
-  ImGui::Text("Position: (%.2f, %.2f, %.2f)", transform_.translate.x, transform_.translate.y, transform_.translate.z);
-  ImGui::Text("Speed: %.2f", speed_);
+	// タブバー開始
+	if (ImGui::BeginTabBar("PlayerDebugTabs", ImGuiTabBarFlags_None)) {
 
-  // State Machine
-  ImGui::Separator();
-  ImGui::Text("=== State Machine ===");
-  if (stateMachine_) {
-    PlayerState* currentState = stateMachine_->GetCurrentState();
-    if (currentState) {
-      ImGui::Text("Current State: %s", currentState->GetName().c_str());
+		// ========== General タブ ==========
+		if (ImGui::BeginTabItem("General")) {
+			selectedTab = 0;
 
-      // AttackStateの場合、詳細情報を表示
-      if (currentState->GetName() == "Attack") {
-        AttackState* attackState = static_cast<AttackState*>(currentState);
-        const char* phaseNames[] = { "SearchTarget", "MoveToTarget", "ExecuteAttack", "Recovery" };
-        ImGui::Text("  Attack Phase: %s", phaseNames[attackState->GetPhase()]);
-        ImGui::Text("  Search Timer: %.2f / %.2f", attackState->GetSearchTimer(), 0.1f);
-        ImGui::Text("  Attack Timer: %.2f", attackState->GetAttackTimer());
-        ImGui::Text("  Target Enemy: %s", attackState->GetTargetEnemy() ? "Found" : "None");
-      }
+			// HP
+			ImGui::Text("Health");
+			ImGui::SliderFloat("HP", &hp_, 0.0f, 200.0f, "%.1f");
+			ImGui::ProgressBar(hp_ / 100.0f, ImVec2(-1, 0), "");
+
+			ImGui::Separator();
+
+			// Transform
+			if (ImGui::TreeNode("Transform")) {
+				ImGui::DragFloat3("Position", &transform_.translate.x, 0.1f);
+				ImGui::DragFloat3("Rotation", &transform_.rotate.x, 0.01f);
+				ImGui::DragFloat3("Scale", &transform_.scale.x, 0.01f);
+				ImGui::TreePop();
+			}
+
+			// Speed
+			ImGui::Separator();
+			ImGui::SliderFloat("Move Speed", &speed_, 0.0f, 2.0f);
+
+			ImGui::EndTabItem();
+		}
+
+		// ========== States タブ ==========
+		if (ImGui::BeginTabItem("States")) {
+			selectedTab = 1;
+
+			// 現在のステート情報
+			if (stateMachine_) {
+				PlayerState* currentState = stateMachine_->GetCurrentState();
+				if (currentState) {
+					// 現在のステート名を強調表示
+					ImGui::TextColored(ImVec4(0.0f, 1.0f, 0.0f, 1.0f), "Current State: %s", currentState->GetName().c_str());
+					ImGui::Separator();
+
+					// ステート固有のデバッグ情報を表示
+					currentState->DrawImGui(this);
+				}
+
+				ImGui::Separator();
+
+				// ステート手動切り替え（デバッグ用）
+				if (ImGui::TreeNode("Manual State Change")) {
+					if (ImGui::Button("Idle")) stateMachine_->ChangeState("Idle");
+					ImGui::SameLine();
+					if (ImGui::Button("Move")) stateMachine_->ChangeState("Move");
+					ImGui::SameLine();
+					if (ImGui::Button("Dash")) stateMachine_->ChangeState("Dash");
+
+					if (ImGui::Button("Attack")) stateMachine_->ChangeState("Attack");
+					ImGui::SameLine();
+					if (ImGui::Button("Shoot")) stateMachine_->ChangeState("Shoot");
+					ImGui::SameLine();
+					if (ImGui::Button("Parry")) stateMachine_->ChangeState("Parry");
+
+					ImGui::TreePop();
+				}
+			}
+
+			ImGui::EndTabItem();
+		}
+
+		// ========== Combat タブ ==========
+		if (ImGui::BeginTabItem("Combat")) {
+			selectedTab = 2;
+
+			// Body Collider
+			if (ImGui::TreeNode("Body Collider")) {
+				if (bodyCollider_) {
+					bool isActive = bodyCollider_->IsActive();
+					if (ImGui::Checkbox("Active", &isActive)) {
+						bodyCollider_->SetActive(isActive);
+					}
+
+					// 実際の中心座標（読み取り専用）
+					Vector3 actualCenter = bodyCollider_->GetCenter();
+					ImGui::Text("Actual Center: (%.2f, %.2f, %.2f)",
+								actualCenter.x, actualCenter.y, actualCenter.z);
+
+					// オフセット（調整可能）
+					Vector3 offset = bodyCollider_->GetOffset();
+					if (ImGui::DragFloat3("Offset", &offset.x, 0.1f)) {
+						bodyCollider_->SetOffset(offset);
+					}
+
+					Vector3 size = bodyCollider_->GetSize();
+					if (ImGui::DragFloat3("Size", &size.x, 0.1f, 0.1f, 10.0f)) {
+						bodyCollider_->SetSize(size);
+					}
+				}
+				ImGui::TreePop();
+			}
+
+			// Attack Collider
+			if (ImGui::TreeNode("Attack Collider")) {
+				if (meleeAttackCollider_) {
+					bool isActive = meleeAttackCollider_->IsActive();
+					ImGui::Text("Active: %s", isActive ? "YES" : "NO");
+
+					// 実際の中心座標（読み取り専用）
+					Vector3 actualCenter = meleeAttackCollider_->GetCenter();
+					ImGui::Text("Actual Center: (%.2f, %.2f, %.2f)",
+								actualCenter.x, actualCenter.y, actualCenter.z);
+
+					// オフセット（調整可能）
+					Vector3 offset = meleeAttackCollider_->GetOffset();
+					if (ImGui::DragFloat3("Offset", &offset.x, 0.1f)) {
+						meleeAttackCollider_->SetOffset(offset);
+					}
+
+					// サイズ（調整可能）
+					Vector3 size = meleeAttackCollider_->GetSize();
+					if (ImGui::DragFloat3("Size", &size.x, 0.1f, 0.1f, 50.0f)) {
+						meleeAttackCollider_->SetSize(size);
+					}
+
+					ImGui::Separator();
+					Boss* detectedEnemy = meleeAttackCollider_->GetDetectedEnemy();
+					if (detectedEnemy) {
+						ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Enemy Detected!");
+					} else {
+						ImGui::Text("No Enemy Detected");
+					}
+					ImGui::Text("Collision Count: %d", meleeAttackCollider_->GetCollisionCount());
+				}
+				ImGui::TreePop();
+			}
+
+			// Combat Parameters
+			if (ImGui::TreeNode("Combat Parameters")) {
+				ImGui::SliderFloat("Attack Move Speed", &attackMoveSpeed_, 0.5f, 10.0f);
+				ImGui::TreePop();
+			}
+
+			ImGui::EndTabItem();
+		}
+
+		// ========== Physics タブ ==========
+		if (ImGui::BeginTabItem("Physics")) {
+			selectedTab = 3;
+
+			// Velocity
+			ImGui::Text("Velocity");
+			ImGui::Text("X: %.3f, Y: %.3f, Z: %.3f", velocity_.x, velocity_.y, velocity_.z);
+			ImGui::Text("Magnitude: %.3f", velocity_.Length());
+
+			// Velocity Graph
+			static float velocityHistory[100] = {0};
+			static int historyOffset = 0;
+			velocityHistory[historyOffset] = velocity_.Length();
+			historyOffset = (historyOffset + 1) % 100;
+			ImGui::PlotLines("Velocity History", velocityHistory, 100, historyOffset, nullptr, 0.0f, 20.0f, ImVec2(0, 80));
+
+			ImGui::Separator();
+
+			// Target Angle
+			ImGui::Text("Target Angle: %.2f degrees", targetAngle_ * 180.0f / 3.14159f);
+			ImGui::Text("Current Y Rotation: %.2f degrees", transform_.rotate.y * 180.0f / 3.14159f);
+
+			ImGui::Separator();
+
+			// Movement Direction Visualization
+			if (ImGui::TreeNode("Movement Visualization")) {
+				float angle = transform_.rotate.y;
+				ImDrawList* draw_list = ImGui::GetWindowDrawList();
+				ImVec2 center = ImGui::GetCursorScreenPos();
+				center.x += 50;
+				center.y += 50;
+
+				// Draw circle
+				draw_list->AddCircle(center, 40, IM_COL32(100, 100, 100, 255));
+
+				// Draw direction arrow
+				float arrowX = cosf(angle) * 35;
+				float arrowY = sinf(angle) * 35;
+				draw_list->AddLine(center,
+					ImVec2(center.x + arrowX, center.y - arrowY),
+					IM_COL32(0, 255, 0, 255), 3.0f);
+
+				ImGui::Dummy(ImVec2(100, 100));
+				ImGui::TreePop();
+			}
+
+			ImGui::EndTabItem();
+		}
+
+		// ========== Debug タブ ==========
+		if (ImGui::BeginTabItem("Debug")) {
+			selectedTab = 4;
+
+			// Input Status
+			if (ImGui::TreeNode("Input Status")) {
+				if (inputHandler_) {
+					bool moving = inputHandler_->IsMoving();
+					bool attacking = inputHandler_->IsAttacking();
+					bool shooting = inputHandler_->IsShooting();
+					bool dashing = inputHandler_->IsDashing();
+					bool parrying = inputHandler_->IsParrying();
+
+					ImGui::Text("Moving: %s", moving ? "✓" : "✗");
+					ImGui::Text("Attacking: %s", attacking ? "✓" : "✗");
+					ImGui::Text("Shooting: %s", shooting ? "✓" : "✗");
+					ImGui::Text("Dashing: %s", dashing ? "✓" : "✗");
+					ImGui::Text("Parrying: %s", parrying ? "✓" : "✗");
+				}
+				ImGui::TreePop();
+			}
+
+			// Model Debug
+			ImGui::Separator();
+            if (ImGui::Button("Show Model Debug Info")) isDisModelDebugInfo_ = !isDisModelDebugInfo_;
+
+			// Animation Control (TODO)
+			if (ImGui::TreeNode("Animation Control")) {
+				ImGui::Text("TODO: Animation system integration");
+				// 将来的にアニメーション制御UIを追加
+				ImGui::TreePop();
+			}
+
+			ImGui::EndTabItem();
+		}
+
+		ImGui::EndTabBar();
+	}
+
+    if (isDisModelDebugInfo_) {
+        model_->DrawImGui();
     }
-  }
-
-  // Input状態
-  ImGui::Separator();
-  ImGui::Text("=== Input Status ===");
-  if (inputHandler_) {
-    ImGui::Text("Moving: %s", inputHandler_->IsMoving() ? "Yes" : "No");
-    ImGui::Text("Attacking: %s", inputHandler_->IsAttacking() ? "Yes" : "No");
-    ImGui::Text("Shooting: %s", inputHandler_->IsShooting() ? "Yes" : "No");
-    ImGui::Text("Dashing: %s", inputHandler_->IsDashing() ? "Yes" : "No");
-    ImGui::Text("Parrying: %s", inputHandler_->IsParrying() ? "Yes" : "No");
-  }
-
-  // Collider状態
-  ImGui::Separator();
-  ImGui::Text("=== Colliders ===");
-  if (bodyCollider_) {
-    ImGui::Text("Body Collider: %s", bodyCollider_->IsActive() ? "Active" : "Inactive");
-    Vector3 center = bodyCollider_->GetCenter();
-    ImGui::Text("Body Center: (%.2f, %.2f, %.2f)", center.x, center.y, center.z);
-    Vector3 size = bodyCollider_->GetSize();
-    ImGui::Text("Body Size: (%.2f, %.2f, %.2f)", size.x, size.y, size.z);
-  }
-  if (meleeAttackCollider_) {
-    ImGui::Text("Attack Collider: %s", meleeAttackCollider_->IsActive() ? "Active" : "Inactive");
-    Boss* detectedEnemy = meleeAttackCollider_->GetDetectedEnemy();
-    ImGui::Text("Detected Enemy: %s", detectedEnemy ? "Yes" : "No");
-    ImGui::Text("Collision Count: %d", meleeAttackCollider_->GetCollisionCount());
-    // 攻撃範囲のオフセット情報
-    Vector3 offset = meleeAttackCollider_->GetOffset();
-    ImGui::Text("Attack Offset: (%.2f, %.2f, %.2f)", offset.x, offset.y, offset.z);
-    Vector3 size = meleeAttackCollider_->GetSize();
-    ImGui::Text("Attack Size: (%.2f, %.2f, %.2f)", size.x, size.y, size.z);
-  }
-
-  if (ImGui::Button("Model Debug Info")) {
-    isDisModelDebugInfo_ = !isDisModelDebugInfo_;
-  }
-
-  if (isDisModelDebugInfo_) {
-    model_->DrawImGui();
-  }
 
 #endif
 }

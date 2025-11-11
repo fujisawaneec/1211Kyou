@@ -60,6 +60,13 @@ public:
 	/// <returns>状態名の参照</returns>
 	const std::string& GetName() const { return stateName_; }
 
+	/// <summary>
+	/// ImGuiを使用したデバッグ情報の描画
+	/// 各ステート固有のデバッグ情報を表示するために使用
+	/// </summary>
+	/// <param name="player">プレイヤーインスタンス</param>
+	virtual void DrawImGui(Player* player) {}
+
 protected:
 	/// <summary>
 	/// 状態を変更

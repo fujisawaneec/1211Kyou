@@ -87,4 +87,25 @@ public:
 	/// </summary>
 	/// <returns>現在の検索タイマー値（秒）</returns>
 	float GetSearchTimer() const { return searchTimer_; }
+
+	/// <summary>
+	/// ImGuiデバッグ情報の描画
+	/// </summary>
+	/// <param name="player">プレイヤーインスタンス</param>
+	void DrawImGui(Player* player) override;
+
+	// DrawImGui用のゲッター追加
+	int GetComboCount() const { return comboCount_; }
+	int GetMaxCombo() const { return maxCombo_; }
+	float GetMoveTimer() const { return moveTimer_; }
+	float GetMaxMoveTime() const { return maxMoveTime_; }
+	float GetAttackDuration() const { return attackDuration_; }
+	float GetComboWindow() const { return comboWindow_; }
+	bool CanCombo() const { return canCombo_; }
+
+	// DrawImGui用のセッター追加（デバッグ調整用）
+	void SetMaxCombo(int combo) { maxCombo_ = combo; }
+	void SetAttackDuration(float duration) { attackDuration_ = duration; }
+	void SetMaxMoveTime(float time) { maxMoveTime_ = time; }
+	void SetComboWindow(float window) { comboWindow_ = window; }
 };

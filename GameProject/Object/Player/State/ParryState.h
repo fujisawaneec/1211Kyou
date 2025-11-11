@@ -27,6 +27,21 @@ public:
 	/// <returns>パリィウィンドウ内の場合true</returns>
 	bool IsInParryWindow() const { return parryTimer_ <= parryWindow_; }
 
+	/// <summary>
+	/// ImGuiデバッグ情報の描画
+	/// </summary>
+	void DrawImGui(Player* player) override;
+
+	// DrawImGui用のゲッター
+	float GetParryTimer() const { return parryTimer_; }
+	float GetParryWindow() const { return parryWindow_; }
+	float GetParryDuration() const { return parryDuration_; }
+	bool IsPerfectParryActive() const { return perfectParryActive_; }
+
+	// DrawImGui用のセッター（デバッグ調整用）
+	void SetParryWindow(float window) { parryWindow_ = window; }
+	void SetParryDuration(float duration) { parryDuration_ = duration; }
+
 private:
 	float parryTimer_ = 0.0f;          ///< パリィ経過時間
 	float parryWindow_ = 0.2f;         ///< パーフェクトパリィの受付時間

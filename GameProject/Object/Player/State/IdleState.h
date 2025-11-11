@@ -34,4 +34,12 @@ public:
 	/// </summary>
 	/// <param name="player">プレイヤーインスタンス</param>
 	void HandleInput(Player* player) override;
+
+	/// <summary>
+	/// ImGuiデバッグ情報の描画
+	/// </summary>
+	void DrawImGui(Player* player) override;
+
+private:
+	float idleTime_ = 0.0f;  ///< 待機状態の継続時間
 };

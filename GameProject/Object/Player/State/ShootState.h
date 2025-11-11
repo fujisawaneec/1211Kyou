@@ -16,6 +16,19 @@ public:
 	void Exit(Player* player) override;
 	void HandleInput(Player* player) override;
 
+	/// <summary>
+	/// ImGuiデバッグ情報の描画
+	/// </summary>
+	void DrawImGui(Player* player) override;
+
+	// DrawImGui用のゲッター
+	float GetFireRate() const { return fireRate_; }
+	float GetFireRateTimer() const { return fireRateTimer_; }
+	const Vector3& GetAimDirection() const { return aimDirection_; }
+
+	// DrawImGui用のセッター（デバッグ調整用）
+	void SetFireRate(float rate) { fireRate_ = rate; }
+
 private:
 	float fireRate_ = 0.2f;         ///< 発射レート（秒間隔）
 	float fireRateTimer_ = 0.0f;    ///< 発射間隔タイマー
