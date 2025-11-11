@@ -5,8 +5,8 @@
 #include "Input.h"
 
 /// <summary>
-/// 一人称視点カメラコントローラー
-/// ターゲット追従と回転制御に特化
+/// 三人称視点カメラコントローラー
+/// プレイヤーの後方からターゲットを追従し、ボス注視機能を持つ
 /// </summary>
 class ThirdPersonController : public TargetedCameraController {
 public:
@@ -82,6 +82,22 @@ public:
         followSmoothness_ = smoothness;
     }
 
+    /// <summary>
+    /// セカンダリターゲット（ボスなど）を設定
+    /// </summary>
+    /// <param name="target">注視対象のTransform</param>
+    void SetSecondaryTarget(const Transform* target) {
+        secondaryTarget_ = target;
+    }
+
+    /// <summary>
+    /// ターゲット注視機能の有効/無効を設定
+    /// </summary>
+    /// <param name="enable">有効にする場合true</param>
+    void EnableLookAtTarget(bool enable) {
+        enableLookAtTarget_ = enable;
+    }
+
     //==================== Getter ====================
 
     /// <summary>
@@ -121,12 +137,19 @@ private:
     /// <returns>計算されたオフセット</returns>
     Vector3 CalculateOffset() const;
 
+    /// <summary>
+    /// セカンダリターゲットへの注視回転を計算
+    /// </summary>
+    /// <returns>注視方向の回転角度</returns>
+    Vector3 CalculateLookAtRotation() const;
+
 private:
     // 入力システム
     Input* input_ = nullptr;
 
     // 位置関連
     Vector3 interpolatedTargetPos_ = {};
+    // CameraConfig::FirstPersonは実際にはThirdPerson用の設定
     Vector3 offset_ = {
         CameraConfig::FirstPerson::DEFAULT_OFFSET_X,
         CameraConfig::FirstPerson::DEFAULT_OFFSET_Y,
@@ -134,13 +157,16 @@ private:
     };
     Vector3 offsetOrigin_ = offset_;
 
-    // 回転関連
-    float destinationAngleX_ = CameraConfig::FirstPerson::DEFAULT_ANGLE_X;
-    float destinationAngleY_ = 0.0f;
-    float destinationAngleZ_ = 0.0f;
+    // 回転関連（すべてラジアン単位）
+    // CameraConfig::FirstPerson::DEFAULT_ANGLE_Xはラジアン単位（約8度）
+    float destinationAngleX_ = CameraConfig::FirstPerson::DEFAULT_ANGLE_X;  // ラジアン単位
+    float destinationAngleY_ = 0.0f;  // ラジアン
+    float destinationAngleZ_ = 0.0f;  // ラジアン
 
     // パラメータ
-    float rotateSpeed_ = CameraConfig::FirstPerson::DEFAULT_ROTATE_SPEED;
+    // CameraConfig::FirstPersonは実際にはThirdPerson用の設定
+    // 回転速度をラジアン単位に変換（0.05度 ≈ 0.00087ラジアン）
+    float rotateSpeed_ = CameraConfig::FirstPerson::DEFAULT_ROTATE_SPEED * (3.14159265359f / 180.0f);
     float followSmoothness_ = CameraConfig::FOLLOW_SMOOTHNESS;
     float offsetLerpSpeed_ = CameraConfig::OFFSET_LERP_SPEED;
     float rotationLerpSpeed_ = CameraConfig::ROTATION_LERP_SPEED;
@@ -148,4 +174,8 @@ private:
 
     // 状態
     bool isRotating_ = false;
+
+    // セカンダリターゲット機能
+    const Transform* secondaryTarget_ = nullptr;  // 注視対象（ボスなど）
+    bool enableLookAtTarget_ = false;             // ターゲット注視機能の有効/無効
 };

@@ -127,6 +127,9 @@ void GameScene::Initialize()
     auto fpController = std::make_unique<ThirdPersonController>();
     firstPersonController_ = fpController.get();
     firstPersonController_->SetTarget(&player_->GetTransform());
+    // ボスをセカンダリターゲットとして設定し、注視機能を有効化
+    firstPersonController_->SetSecondaryTarget(&boss_->GetTransform());
+    firstPersonController_->EnableLookAtTarget(true);
     cameraManager_->RegisterController("ThirdPerson", std::move(fpController));
 
     // TopDownControllerを登録
