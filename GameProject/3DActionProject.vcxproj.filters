@@ -54,6 +54,12 @@
     <Filter Include="Shader\3D">
       <UniqueIdentifier>{3563bb5b-e7ce-4874-aa39-2e413a4572ee}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Object\Boss\State">
+      <UniqueIdentifier>{a3322f20-7330-4a84-bf4a-91518358fbf6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Object\Projectile">
+      <UniqueIdentifier>{93d8772f-6abc-484f-8174-74dbb0339c46}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MyGame\MyGame.cpp">
@@ -139,6 +145,27 @@
       <Filter>CameraSystem</Filter>
     </ClCompile>
     <ClCompile Include="Object\Player\MeleeAttackCollider.cpp">
+      <Filter>Collision</Filter>
+    </ClCompile>
+    <ClCompile Include="Object\Boss\States\BossDashState.cpp">
+      <Filter>Object\Boss\State</Filter>
+    </ClCompile>
+    <ClCompile Include="Object\Boss\States\BossIdleState.cpp">
+      <Filter>Object\Boss\State</Filter>
+    </ClCompile>
+    <ClCompile Include="Object\Boss\States\BossShootState.cpp">
+      <Filter>Object\Boss\State</Filter>
+    </ClCompile>
+    <ClCompile Include="Object\Boss\States\BossStateMachine.cpp">
+      <Filter>Object\Boss\State</Filter>
+    </ClCompile>
+    <ClCompile Include="Object\Projectile\BossBullet.cpp">
+      <Filter>Object\Projectile</Filter>
+    </ClCompile>
+    <ClCompile Include="Object\Projectile\Projectile.cpp">
+      <Filter>Object\Projectile</Filter>
+    </ClCompile>
+    <ClCompile Include="Object\Projectile\BossBulletCollider.cpp">
       <Filter>Collision</Filter>
     </ClCompile>
   </ItemGroup>
@@ -238,6 +265,30 @@
     </ClInclude>
     <ClInclude Include="CameraAnimation\CameraKeyframe.h">
       <Filter>CameraSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="Object\Boss\States\BossDashState.h">
+      <Filter>Object\Boss\State</Filter>
+    </ClInclude>
+    <ClInclude Include="Object\Boss\States\BossIdleState.h">
+      <Filter>Object\Boss\State</Filter>
+    </ClInclude>
+    <ClInclude Include="Object\Boss\States\BossShootState.h">
+      <Filter>Object\Boss\State</Filter>
+    </ClInclude>
+    <ClInclude Include="Object\Boss\States\BossStateBase.h">
+      <Filter>Object\Boss\State</Filter>
+    </ClInclude>
+    <ClInclude Include="Object\Boss\States\BossStateMachine.h">
+      <Filter>Object\Boss\State</Filter>
+    </ClInclude>
+    <ClInclude Include="Object\Projectile\BossBullet.h">
+      <Filter>Object\Projectile</Filter>
+    </ClInclude>
+    <ClInclude Include="Object\Projectile\Projectile.h">
+      <Filter>Object\Projectile</Filter>
+    </ClInclude>
+    <ClInclude Include="Object\Projectile\BossBulletCollider.h">
+      <Filter>Collision</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

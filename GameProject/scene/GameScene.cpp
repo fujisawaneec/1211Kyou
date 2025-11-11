@@ -22,6 +22,8 @@
 #include "CameraSystem/ThirdPersonController.h"
 #include "CameraSystem/TopDownController.h"
 #include "CameraSystem/CameraAnimationController.h"
+#include "../Object/Projectile/BossBullet.h"
+#include <algorithm>
 
 // Debug includes
 #ifdef _DEBUG
@@ -118,6 +120,12 @@ void GameScene::Initialize()
     player_->Initialize();
     player_->SetCamera((*Object3dBasic::GetInstance()->GetCamera()));
     player_->SetInputHandler(inputHandler_.get());
+
+    // ボスにプレイヤーの参照を設定
+    boss_->SetPlayer(player_.get());
+
+    // 弾のオブジェクトプールを初期化（最大50発）
+    bossBullets_.reserve(50);
 
     // カメラシステムの初期化
     cameraManager_ = CameraManager::GetInstance();
@@ -252,9 +260,20 @@ void GameScene::Update()
     skyBox_->Update();
     ground_->Update();
     player_->Update();
-    boss_->Update();
+    boss_->Update(FrameTimer::GetInstance()->GetDeltaTime());
     toTitleSprite_->Update();
     cameraManager_->Update(FrameTimer::GetInstance()->GetDeltaTime());
+
+    // プロジェクタイルの更新
+    float deltaTime = FrameTimer::GetInstance()->GetDeltaTime();
+    UpdateProjectiles(deltaTime);
+
+    // ボスからの弾生成リクエストを処理
+    for (const auto& request : boss_->ConsumePendingBullets()) {
+        auto bullet = std::make_unique<BossBullet>();
+        bullet->Initialize(request.position, request.velocity);
+        bossBullets_.push_back(std::move(bullet));
+    }
 
     // プレイヤーの位置にエミッターをセット
     Vector3 playerPos = { .x = player_->GetTransform().translate.x,
@@ -342,6 +361,14 @@ void GameScene::Draw()
         ground_->Draw();
         player_->Draw();
         boss_->Draw();
+
+        // ボスの弾のシャドウ
+        for (const auto& bullet : bossBullets_) {
+            if (bullet && bullet->IsActive()) {
+                bullet->Draw();
+            }
+        }
+
         ShadowRenderer::GetInstance()->EndShadowPass();
     }
 
@@ -358,6 +385,13 @@ void GameScene::Draw()
     ground_->Draw();
     player_->Draw();
     boss_->Draw();
+
+    // ボスの弾を描画
+    for (const auto& bullet : bossBullets_) {
+        if (bullet && bullet->IsActive()) {
+            bullet->Draw();
+        }
+    }
 
     //------------------前景Spriteの描画------------------//
     // スプライト共通描画設定
@@ -477,3 +511,28 @@ void GameScene::UpdateInput()
         inputHandler_->ResetInputs();
     }
 }
+
+void GameScene::UpdateProjectiles(float deltaTime)
+{
+    // 全ての弾を更新
+    for (auto& bullet : bossBullets_) {
+        if (bullet && bullet->IsActive()) {
+            bullet->Update(deltaTime);
+        }
+    }
+
+    // 非アクティブな弾を削除（オブジェクトプールとして再利用可能）
+    bossBullets_.erase(
+        std::remove_if(bossBullets_.begin(), bossBullets_.end(),
+            [](const std::unique_ptr<BossBullet>& bullet) {
+                if (bullet && !bullet->IsActive()) {
+                    // Finalize()で自動的にコライダーが削除される
+                    bullet->Finalize();
+                    return true;
+                }
+                return false;
+            }),
+        bossBullets_.end()
+    );
+}
+

@@ -23,11 +23,12 @@
 #include "ImGui.h"
 #endif
 
-// Static member initialization
-float Player::X_MIN = -100.0f;
-float Player::X_MAX = 100.0f;
-float Player::Z_MIN = -140.0f;
-float Player::Z_MAX = 60.0f;
+// Static const member initialization
+const float Player::X_MIN = -100.0f;
+const float Player::X_MAX = 100.0f;
+const float Player::Z_MIN = -140.0f;
+const float Player::Z_MAX = 60.0f;
+
 
 Player::Player()
     : camera_(nullptr)

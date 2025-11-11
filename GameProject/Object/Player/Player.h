@@ -200,12 +200,14 @@ public: // メンバ関数
     /// </summary>
     void ClearDynamicBounds();
 
-private: // メンバ変数
+public: // 定数
     // ステージ全体の移動制限（静的）
-    static float X_MIN;
-    static float X_MAX;
-    static float Z_MIN;
-    static float Z_MAX;
+    static const float X_MIN;
+    static const float X_MAX;
+    static const float Z_MIN;
+    static const float Z_MAX;
+
+private: // メンバ変数
 
     // 動的移動制限（ボス戦闘エリアなど）
     float dynamicXMin_;

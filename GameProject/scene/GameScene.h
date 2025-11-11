@@ -5,8 +5,10 @@
 #include "Object/Boss/Boss.h"
 #include "Object/Player/Player.h"
 #include "Input/InputHandler.h"
+#include "../Object/Projectile/BossBullet.h"
 
 #include <memory>
+#include <vector>
 
 // クラス前方宣言
 class Object3d;
@@ -17,6 +19,7 @@ class CameraManager;
 class ThirdPersonController;
 class TopDownController;
 class CameraAnimationController;
+class BossBullet;
 
 /// <summary>
 /// ゲームメインシーンクラス
@@ -71,6 +74,11 @@ public: // メンバ関数
     /// </summary>
     void UpdateInput();
 
+    /// <summary>
+    /// プロジェクタイル（弾）の更新処理
+    /// </summary>
+    void UpdateProjectiles(float deltaTime);
+
 private: // メンバ変数
 
     std::unique_ptr<SkyBox> skyBox_;  ///< スカイボックス（環境マップ）
@@ -98,6 +106,11 @@ private: // メンバ変数
 
     float overAnimTimer_ = 0.0f;  ///< ゲームオーバー演出タイマー
     bool isOver_ = false;        ///< ゲームオーバーフラグ
+
+    /// <summary>
+    /// ボスの弾リスト（オブジェクトプール）
+    /// </summary>
+    std::vector<std::unique_ptr<BossBullet>> bossBullets_;
     bool isOver1Emit = false;   ///< ゲームオーバー演出用エミッター発生フラグ
     bool isOver2Emit = false;   ///< ゲームオーバー演出用エミッター発生フラグ
 

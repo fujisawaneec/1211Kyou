@@ -6,6 +6,10 @@
 #include "CollisionManager.h"
 #include "../../Collision/CollisionTypeIdDef.h"
 #include "FrameTimer.h"
+#include "States/BossStateMachine.h"
+#include "States/BossIdleState.h"
+#include "States/BossDashState.h"
+#include "States/BossShootState.h"
 
 #ifdef _DEBUG
 #include "ImGui.h"
@@ -42,6 +46,18 @@ void Boss::Initialize()
 
     // CollisionManagerに登録
     CollisionManager::GetInstance()->AddCollider(bodyCollider_.get());
+
+    // ステートマシンの初期化
+    stateMachine_ = std::make_unique<BossStateMachine>();
+    stateMachine_->Initialize(this);
+
+    // 各状態を追加
+    stateMachine_->AddState("Idle", std::make_unique<BossIdleState>());
+    stateMachine_->AddState("Dash", std::make_unique<BossDashState>());
+    stateMachine_->AddState("Shoot", std::make_unique<BossShootState>());
+
+    // 初期状態をIdleに設定
+    stateMachine_->ChangeState("Idle");
 }
 
 void Boss::Finalize()
@@ -52,10 +68,15 @@ void Boss::Finalize()
     }
 }
 
-void Boss::Update()
+void Boss::Update(float deltaTime)
 {
     // フェーズとライフの更新
     UpdatePhaseAndLive();
+
+    // ステートマシンの更新
+    if (stateMachine_ && !isDead_) {
+        stateMachine_->Update(deltaTime);
+    }
 
     // ヒットエフェクトの更新
     UpdateHitEffect(Vector4(1.0f, 1.0f, 1.0f, 1.0f), 0.1f);
@@ -163,4 +184,14 @@ void Boss::DrawImGui()
     }
 
 #endif
+}
+
+void Boss::RequestBulletSpawn(const Vector3& position, const Vector3& velocity) {
+    pendingBullets_.push_back({position, velocity});
+}
+
+std::vector<Boss::BulletSpawnRequest> Boss::ConsumePendingBullets() {
+    auto result = std::move(pendingBullets_);
+    pendingBullets_.clear();
+    return result;
 }
