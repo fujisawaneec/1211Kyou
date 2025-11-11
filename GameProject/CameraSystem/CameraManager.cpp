@@ -100,6 +100,12 @@ bool CameraManager::RemoveController(const std::string& name) {
 }
 
 bool CameraManager::ActivateController(const std::string& name) {
+    if (GetActiveControllerName() == name) {
+        // 既にアクティブなので何もしない
+        return true;
+    }
+
+    DeactivateAllControllers();
     ICameraController* controller = GetController(name);
     if (controller) {
         controller->Activate();

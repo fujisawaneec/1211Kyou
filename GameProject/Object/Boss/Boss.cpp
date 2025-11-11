@@ -67,6 +67,12 @@ void Boss::Draw()
 
 void Boss::OnHit(float damage)
 {
+    if (isReadyToChangePhase_)
+    {
+        phase_ = 2;
+        isReadyToChangePhase_ = false;
+    }
+
     hp_ -= damage;
     hp_ = std::max<float>(hp_, 0.0f);
 
@@ -91,14 +97,9 @@ void Boss::UpdateHitEffect(Vector4 color, float duration)
 
 void Boss::UpdatePhaseAndLive()
 {
-    if (hp_ < 100.f) {
-        phase_ = 2;
+    if (hp_ <= 100.f) {
+        isReadyToChangePhase_ = true;
     }
-    else
-    {
-        phase_ = 1;
-    }
-
 
     if (hp_ <= 0.0f && life_ > 0) {
         life_--;
@@ -109,6 +110,7 @@ void Boss::UpdatePhaseAndLive()
         }
 
         hp_ = maxHp_;
+        phase_ = 1;
     }
 }
 

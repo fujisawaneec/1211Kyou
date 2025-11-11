@@ -17,6 +17,8 @@
 #include "../Boss/Boss.h"
 #include <cmath>
 
+#include "FrameTimer.h"
+
 #ifdef _DEBUG
 #include "ImGui.h"
 #endif
@@ -78,13 +80,12 @@ void Player::Finalize()
 
 void Player::Update()
 {
-    float deltaTime = 1.0f / 60.0f; // 60FPSを仮定
 
     // State Machineの更新
     if (stateMachine_)
     {
         stateMachine_->HandleInput();
-        stateMachine_->Update(deltaTime);
+        stateMachine_->Update(FrameTimer::GetInstance()->GetDeltaTime());
     }
 
     // 位置制限

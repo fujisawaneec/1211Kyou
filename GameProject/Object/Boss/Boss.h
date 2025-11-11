@@ -123,10 +123,13 @@ private:
     float hp_ = maxHp_;
 
     /// ボスのライフ（HPが0になるたびに減少、0でゲームクリア）
-    uint8_t life_ = 1;
+    uint8_t life_ = 2;
 
     /// 現在の戦闘フェーズ（HP200~100:フェーズ1、HP100~0:フェーズ2）
     uint32_t phase_ = 1;
+
+    /// フェーズ変更準備完了フラグ
+    bool isReadyToChangePhase_ = false;
 
     /// 死亡フラグ
     bool isDead_ = false;

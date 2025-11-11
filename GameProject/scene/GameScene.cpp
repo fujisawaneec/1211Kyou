@@ -208,13 +208,6 @@ void GameScene::Update()
     // Pキーでカメラモード切り替え
     if (Input::GetInstance()->TriggerKey(DIK_P)) {
         cameraMode_ = !cameraMode_;
-        cameraManager_->DeactivateAllControllers();
-
-        if (cameraMode_) {
-            cameraManager_->ActivateController("FirstPerson");
-        } else {
-            cameraManager_->ActivateController("TopDown");
-        }
     }
 
     // ゲームオーバーアニメーションEnterキーで再生
@@ -227,27 +220,15 @@ void GameScene::Update()
     // ゲームクリア判定
     if (boss_->IsDead())
     {
-        /// TODO: ゲームオーバーシーンを作成したら"title"をそちらに変更
+        /// TODO: ゲームクリアシーンを作成したら"title"をそちらに変更
         SceneManager::GetInstance()->ChangeScene("title", "Fade", 0.3f);
     }
 
-    // カメラモードをPlayerに設定
-    player_->SetMode(cameraMode_);
+    // カメラモードの更新
+    UpdateCameraMode();
 
-    // 入力ハンドラーの更新。カメラアニメーション再生中、デバッグカメラ操作中は入力をリセットし、操作を受け付けない
-    if (animationController_->GetPlayState() != CameraAnimation::PlayState::PLAYING
-#ifdef  _DEBUG
-        && !Object3dBasic::GetInstance()->GetDebug()
-#endif
-        )
-    {
-        inputHandler_->Update();
-        
-    }
-    else
-    {
-        inputHandler_->ResetInputs();
-    }
+    // 入力の更新
+    UpdateInput();
 
     // オブジェクトの更新処理
     skyBox_->Update();
@@ -380,5 +361,42 @@ void GameScene::UpdateOverAnim()
     if (overAnimTimer_ > 3.8f)
     {
         SceneManager::GetInstance()->ChangeScene("title", "Fade", 0.3f);
+    }
+}
+
+void GameScene::UpdateCameraMode()
+{
+    if (boss_->GetPhase() == 1)
+    {
+        cameraMode_ = false;
+    } else if (boss_->GetPhase() == 2)
+    {
+        cameraMode_ = true;
+    }
+
+    if (cameraMode_) {
+        cameraManager_->ActivateController("FirstPerson");
+    } else {
+        cameraManager_->ActivateController("TopDown");
+    }
+
+    // カメラモードをPlayerに設定
+    player_->SetMode(cameraMode_);
+}
+
+void GameScene::UpdateInput()
+{
+    // 入力ハンドラーの更新。カメラアニメーション再生中、デバッグカメラ操作中は入力をリセットし、操作を受け付けない
+    if (animationController_->GetPlayState() != CameraAnimation::PlayState::PLAYING
+#ifdef  _DEBUG
+        && !Object3dBasic::GetInstance()->GetDebug()
+#endif
+        )
+    {
+        inputHandler_->Update();
+
+    } else
+    {
+        inputHandler_->ResetInputs();
     }
 }
