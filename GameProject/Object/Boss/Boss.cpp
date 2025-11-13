@@ -102,7 +102,8 @@ void Boss::Update(float deltaTime)
     if (phase_ == 1) {
         hpBarSprite1_->SetSize(Vector2(hpBarSize1_.x * (hp_ - 100.0f) / 100.0f, hpBarSize1_.y));
         hpBarSprite2_->SetSize(Vector2(hpBarSize2_.x, hpBarSize2_.y));
-    }else if (phase_ == 2) {
+    }
+    else if (phase_ == 2) {
         hpBarSprite1_->SetSize(Vector2(0.0f, hpBarSize1_.y));
         hpBarSprite2_->SetSize(Vector2(hpBarSize2_.x * (hp_ / 100.0f), hpBarSize2_.y));
     }
@@ -150,8 +151,7 @@ void Boss::DrawSprite()
 
 void Boss::OnHit(float damage)
 {
-    if (isReadyToChangePhase_)
-    {
+    if (isReadyToChangePhase_) {
         phase_ = 2;
         isReadyToChangePhase_ = false;
     }
@@ -171,8 +171,8 @@ void Boss::UpdateHitEffect(Vector4 color, float duration)
 
     if (hitEffectTimer_ <= duration) {
         model_->SetMaterialColor(color);
-    } else
-    {
+    }
+    else {
         isPlayHitEffect_ = false;
         model_->SetMaterialColor(Vector4(1.0f, 0.0f, 0.0f, 1.0f));
     }
@@ -244,7 +244,7 @@ void Boss::DrawImGui()
 }
 
 void Boss::RequestBulletSpawn(const Vector3& position, const Vector3& velocity) {
-    pendingBullets_.push_back({position, velocity});
+    pendingBullets_.push_back({ position, velocity });
 }
 
 std::vector<Boss::BulletSpawnRequest> Boss::ConsumePendingBullets() {

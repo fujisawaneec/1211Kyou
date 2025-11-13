@@ -236,27 +236,24 @@ void GameScene::Update()
     }
 
     // ゲームオーバーアニメーションEnterキーで再生
-    if (Input::GetInstance()->TriggerKey(DIK_RETURN))
-    {
+    if (Input::GetInstance()->TriggerKey(DIK_RETURN)) {
         StartOverAnim();
     }
 #endif
 
     // ゲーム開始演出終了後、ボスの一時停止を解除
-    if (animationController_->GetPlayState() != CameraAnimation::PlayState::PLAYING){
+    if (animationController_->GetPlayState() != CameraAnimation::PlayState::PLAYING) {
         isStart_ = true;
         boss_->SetIsPause(false);
     }
 
     // ゲームクリア判定
-    if (boss_->IsDead())
-    {
+    if (boss_->IsDead()) {
         SceneManager::GetInstance()->ChangeScene("clear", "Fade", 0.3f);
     }
 
     // ゲームオーバー判定
-    if (player_->IsDead())
-    {
+    if (player_->IsDead()) {
         StartOverAnim();
     }
 
@@ -311,8 +308,7 @@ void GameScene::Draw()
     skyBox_->Draw();
 
     //------------------シャドウマップの描画------------------//
-    if (ShadowRenderer::GetInstance()->IsEnabled())
-    {
+    if (ShadowRenderer::GetInstance()->IsEnabled()) {
         ShadowRenderer::GetInstance()->BeginShadowPass();
         ground_->Draw();
         player_->Draw();
@@ -396,8 +392,7 @@ void GameScene::DrawImGui()
 
 void GameScene::StartOverAnim()
 {
-    if (isOver_)
-    {
+    if (isOver_) {
         return;
     }
 
@@ -412,38 +407,33 @@ void GameScene::UpdateOverAnim()
 {
     if (isOver_) overAnimTimer_ += FrameTimer::GetInstance()->GetDeltaTime();
 
-    if (overAnimTimer_ > 2.0f && !isOver1Emit)
-    {
+    if (overAnimTimer_ > 2.0f && !isOver1Emit) {
         emitterManager_->CreateTemporaryEmitterFrom("over1", "over1_temp", 0.5f);
         isOver1Emit = true;
     }
 
-    if (overAnimTimer_ > 2.8f && !isOver2Emit)
-    {
+    if (overAnimTimer_ > 2.8f && !isOver2Emit) {
         emitterManager_->CreateTemporaryEmitterFrom("over2", "over2_temp", 0.1f);
         isOver2Emit = true;
     }
 
-    if (overAnimTimer_ > 3.8f)
-    {
+    if (overAnimTimer_ > 3.8f) {
         SceneManager::GetInstance()->ChangeScene("over", "Fade", 0.3f);
     }
 }
 
 void GameScene::UpdateCameraMode()
 {
-    if (player_->IsDead() || !isStart_)
-    {
+    if (player_->IsDead() || !isStart_) {
         return;
     }
 
-    if (boss_->GetPhase() == 1)
-    {
+    if (boss_->GetPhase() == 1) {
         cameraMode_ = false;
         // フェーズ1: 動的制限を解除（ステージ全体を移動可能）
         player_->ClearDynamicBounds();
-    } else if (boss_->GetPhase() == 2)
-    {
+    }
+    else if (boss_->GetPhase() == 2) {
         cameraMode_ = true;
         // フェーズ2: ボス中心の戦闘エリアに移動制限
         Vector3 bossPos = boss_->GetTransform().translate;
@@ -453,7 +443,8 @@ void GameScene::UpdateCameraMode()
 
     if (cameraMode_) {
         cameraManager_->ActivateController("ThirdPerson");
-    } else {
+    }
+    else {
         cameraManager_->ActivateController("TopDown");
     }
 
@@ -469,12 +460,11 @@ void GameScene::UpdateInput()
 #ifdef  _DEBUG
         && !Object3dBasic::GetInstance()->GetDebug()
 #endif
-        )
-    {
+        ) {
         inputHandler_->Update();
 
-    } else
-    {
+    }
+    else {
         inputHandler_->ResetInputs();
     }
 }
@@ -530,7 +520,8 @@ void GameScene::UpdateBossBorder()
             emitterManager_->SetEmitterActive("boss_border_back", true);
 
             borderEmittersActive_ = true;
-        } else if (!shouldShowBorder && borderEmittersActive_) {
+        }
+        else if (!shouldShowBorder && borderEmittersActive_) {
             // フェーズ1に戻った時：境界線を無効化
             emitterManager_->SetEmitterActive("boss_border_left", false);
             emitterManager_->SetEmitterActive("boss_border_right", false);
@@ -538,7 +529,8 @@ void GameScene::UpdateBossBorder()
             emitterManager_->SetEmitterActive("boss_border_back", false);
 
             borderEmittersActive_ = false;
-        } else if (borderEmittersActive_) {
+        }
+        else if (borderEmittersActive_) {
             // フェーズ2継続中：ボスの移動に追従
             Vector3 bossPos = Vector3(boss_->GetTransform().translate.x, 0.f, boss_->GetTransform().translate.z);
 

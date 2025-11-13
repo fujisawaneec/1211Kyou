@@ -41,7 +41,7 @@ bool CameraAnimationController::IsActive() const {
 
     // アニメーション再生中または編集中の場合もアクティブ
     return animation->GetPlayState() == CameraAnimation::PlayState::PLAYING ||
-           animation->IsEditingKeyframe();
+        animation->IsEditingKeyframe();
 }
 
 void CameraAnimationController::Activate() {
@@ -75,7 +75,8 @@ void CameraAnimationController::SetAnimationTarget(const Transform* target, bool
         for (auto& pair : animations_) {
             pair.second->SetTarget(target);
         }
-    } else {
+    }
+    else {
         // 現在のアニメーションのみにターゲットを設定
         auto* animation = GetCurrentAnimation();
         if (animation) {
@@ -146,7 +147,7 @@ void CameraAnimationController::SetAnimationStartMode(CameraAnimation::StartMode
 }
 
 void CameraAnimationController::SetAnimationStartModeByName(const std::string& animationName,
-                                                           CameraAnimation::StartMode mode, float blendDuration) {
+    CameraAnimation::StartMode mode, float blendDuration) {
     auto it = animations_.find(animationName);
     if (it != animations_.end()) {
         it->second->SetStartMode(mode);
