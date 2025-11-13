@@ -37,6 +37,12 @@ public:
     /// <returns>状態名</returns>
     virtual const char* GetName() const = 0;
 
+    /// <summary>
+    /// 状態タイマーの取得
+    /// </summary>
+    /// <returns>状態タイマー</returns>
+    float GetStateTimer() const { return stateTimer_; }
+
 protected:
     /// <summary>
     /// 状態タイマー

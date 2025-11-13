@@ -202,43 +202,161 @@ void Boss::DrawImGui()
 {
 #ifdef _DEBUG
 
-    // ボスの状態
-    ImGui::Text("=== Boss Status ===");
-    ImGui::Text("HP: %.1f", hp_);
-    ImGui::Text("Phase: %d", phase_);
-    ImGui::Text("Position: (%.2f, %.2f, %.2f)", transform_.translate.x, transform_.translate.y, transform_.translate.z);
-    ImGui::Text("Rotation: (%.2f, %.2f, %.2f)", transform_.rotate.x, transform_.rotate.y, transform_.rotate.z);
-    ImGui::Text("Scale: (%.2f, %.2f, %.2f)", transform_.scale.x, transform_.scale.y, transform_.scale.z);
+    // ===== セクション1: 基本ステータス =====
+    ImGui::SeparatorText("Basic Status");
 
-    // フェーズ切り替えボタン（デバッグ用）
-    ImGui::Separator();
-    ImGui::Text("=== Debug Controls ===");
-    if (ImGui::Button("Set Phase 1")) {
-        SetPhase(1);
-        hp_ = kMaxHp_;  // HPも回復
+    // HP表示（数値 + プログレスバー）
+    ImGui::Text("HP: %.1f / %.1f (%.1f%%)", hp_, kMaxHp_, (hp_ / kMaxHp_) * 100.0f);
+    ImGui::ProgressBar(hp_ / kMaxHp_, ImVec2(-1.0f, 0.0f), "");
+
+    // ライフ、フェーズ
+    ImGui::Text("Life: %d", life_);
+    ImGui::Text("Phase: %d", phase_);
+
+    // 状態フラグ（警告は赤色でハイライト）
+    if (isDead_) {
+        ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Dead: YES");
+    } else {
+        ImGui::Text("Dead: NO");
     }
     ImGui::SameLine();
-    if (ImGui::Button("Set Phase 2")) {
+    if (isPause_) {
+        ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Paused: YES");
+    } else {
+        ImGui::Text("Paused: NO");
+    }
+
+    ImGui::Text("Ready to Change Phase: %s", isReadyToChangePhase_ ? "YES" : "NO");
+
+    // ===== セクション2: 状態マシン =====
+    ImGui::SeparatorText("State Machine");
+    if (stateMachine_) {
+        const std::string& stateName = stateMachine_->GetCurrentStateName();
+
+        // 状態名を色分け（Idle=青、Dash=黄色、Shoot=オレンジ）
+        ImVec4 stateColor;
+        if (stateName == "Idle") {
+            stateColor = ImVec4(0.5f, 0.5f, 1.0f, 1.0f);  // 青
+        } else if (stateName == "Dash") {
+            stateColor = ImVec4(1.0f, 1.0f, 0.0f, 1.0f);  // 黄色
+        } else if (stateName == "Shoot") {
+            stateColor = ImVec4(1.0f, 0.6f, 0.0f, 1.0f);  // オレンジ
+        } else {
+            stateColor = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);  // 白（デフォルト）
+        }
+
+        ImGui::Text("Current State: ");
+        ImGui::SameLine();
+        ImGui::TextColored(stateColor, "%s", stateName.c_str());
+
+        BossStateBase* currentState = stateMachine_->GetCurrentState();
+        if (currentState) {
+            float stateTimer = currentState->GetStateTimer();
+            ImGui::Text("State Timer: %.2f sec", stateTimer);
+
+            // 状態タイマーのプログレスバー（想定最大時間5秒）
+            float maxDuration = 5.0f;
+            float progress = std::min<float>(stateTimer / maxDuration, 1.0f);
+            ImGui::ProgressBar(progress, ImVec2(-1.0f, 0.0f), "");
+        }
+    }
+
+    // ===== セクション5: 座標情報（折りたたみ可能） =====
+    if (ImGui::CollapsingHeader("Transform")) {
+        ImGui::Text("Position: (%.2f, %.2f, %.2f)",
+            transform_.translate.x, transform_.translate.y, transform_.translate.z);
+        ImGui::Text("Rotation: (%.2f, %.2f, %.2f)",
+            transform_.rotate.x, transform_.rotate.y, transform_.rotate.z);
+        ImGui::Text("Scale: (%.2f, %.2f, %.2f)",
+            transform_.scale.x, transform_.scale.y, transform_.scale.z);
+    }
+
+    // ===== セクション6: コライダー（折りたたみ可能） =====
+    if (ImGui::CollapsingHeader("Collider")) {
+        if (bodyCollider_) {
+            ImGui::Text("Active: %s", bodyCollider_->IsActive() ? "Yes" : "No");
+            ImGui::Text("Type ID: %d (Enemy)", bodyCollider_->GetTypeID());
+
+            Vector3 offset = bodyCollider_->GetOffset();
+            ImGui::Text("Offset: (%.2f, %.2f, %.2f)", offset.x, offset.y, offset.z);
+
+            Vector3 size = bodyCollider_->GetSize();
+            ImGui::Text("Size: (%.2f, %.2f, %.2f)", size.x, size.y, size.z);
+
+            Vector3 center = bodyCollider_->GetCenter();
+            ImGui::Text("Center: (%.2f, %.2f, %.2f)", center.x, center.y, center.z);
+        }
+    }
+
+    // ===== セクション7: デバッグコントロール =====
+    ImGui::SeparatorText("Debug Controls");
+
+    // HP操作
+    float tempHp = hp_;
+    if (ImGui::SliderFloat("Set HP", &tempHp, 0.0f, kMaxHp_)) {
+        hp_ = std::clamp(tempHp, 0.0f, kMaxHp_);
+    }
+
+    // フェーズ切り替え
+    ImVec2 buttonSize(ImGui::GetContentRegionAvail().x * 0.48f, 0);
+    if (ImGui::Button("Set Phase 1", buttonSize)) {
+        SetPhase(1);
+        hp_ = kMaxHp_;
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("Set Phase 2", buttonSize)) {
         SetPhase(2);
-        hp_ = 100.0f;  // フェーズ2のHP
+        hp_ = 100.0f;
     }
 
-    // Collider情報
-    ImGui::Separator();
-    ImGui::Text("=== Collider Info ===");
-    if (bodyCollider_) {
-        ImGui::Text("Collider Active: %s", bodyCollider_->IsActive() ? "Yes" : "No");
-        ImGui::Text("Type ID: %d (Enemy)", bodyCollider_->GetTypeID());
+    // 状態強制遷移
+    ImGui::Spacing();
+    ImGui::Text("Force State Transition:");
 
-        Vector3 offset = bodyCollider_->GetOffset();
-        ImGui::Text("Offset: (%.2f, %.2f, %.2f)", offset.x, offset.y, offset.z);
+    if (stateMachine_) {
+        // プルダウンメニューで状態を選択
+        static int selectedStateIndex = 0;
+        const char* stateNames[] = { "Idle", "Dash", "Shoot" };
 
-        Vector3 size = bodyCollider_->GetSize();
-        ImGui::Text("Size: (%.2f, %.2f, %.2f)", size.x, size.y, size.z);
+        ImGui::Combo("Select State", &selectedStateIndex, stateNames, IM_ARRAYSIZE(stateNames));
 
-        Vector3 center = bodyCollider_->GetCenter();
-        ImGui::Text("Center: (%.2f, %.2f, %.2f)", center.x, center.y, center.z);
+        // 選択された状態に遷移するボタン
+        ImVec2 fullButtonSize(ImGui::GetContentRegionAvail().x, 0);
+        if (ImGui::Button("Force Transition", fullButtonSize)) {
+            stateMachine_->ChangeState(stateNames[selectedStateIndex]);
+        }
     }
+
+    // 一時停止トグル
+    ImGui::Spacing();
+    ImGui::Checkbox("Pause Boss", &isPause_);
+
+    // 死亡/復活コントロール
+    ImGui::Spacing();
+    ImVec2 fullButtonSize(ImGui::GetContentRegionAvail().x * 0.48f, 0);
+
+    // Killボタン（赤色）
+    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.8f, 0.2f, 0.2f, 1.0f));
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(1.0f, 0.3f, 0.3f, 1.0f));
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.6f, 0.1f, 0.1f, 1.0f));
+    if (ImGui::Button("Kill Boss", fullButtonSize)) {
+        isDead_ = true;
+    }
+    ImGui::PopStyleColor(3);
+
+    ImGui::SameLine();
+
+    // Reviveボタン（緑色）
+    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.2f, 0.8f, 0.2f, 1.0f));
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.3f, 1.0f, 0.3f, 1.0f));
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.1f, 0.6f, 0.1f, 1.0f));
+    if (ImGui::Button("Revive Boss", fullButtonSize)) {
+        isDead_ = false;
+        hp_ = kMaxHp_;
+        life_ = 1;
+        SetPhase(1);
+    }
+    ImGui::PopStyleColor(3);
 
 #endif
 }
