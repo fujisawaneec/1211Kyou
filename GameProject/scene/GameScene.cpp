@@ -125,9 +125,6 @@ void GameScene::Initialize()
     // ゲーム開始時の演出が終わるまで一時停止状態に設定
     boss_->SetIsPause(true);
 
-    // 弾のオブジェクトプールを初期化（最大50発）
-    bossBullets_.reserve(50);
-
     // カメラマネージャーの初期化
     cameraManager_ = CameraManager::GetInstance();
     cameraManager_->Initialize((*Object3dBasic::GetInstance()->GetCamera()));
@@ -245,6 +242,7 @@ void GameScene::Update()
     }
 #endif
 
+    // ゲーム開始演出終了後、ボスの一時停止を解除
     if (animationController_->GetPlayState() != CameraAnimation::PlayState::PLAYING){
         isStart_ = true;
         boss_->SetIsPause(false);
@@ -566,4 +564,3 @@ void GameScene::CreateBossBullet()
         bossBullets_.push_back(std::move(bullet));
     }
 }
-

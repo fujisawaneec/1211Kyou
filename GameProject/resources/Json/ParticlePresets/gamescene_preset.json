@@ -18,15 +18,15 @@
         1.0
       ],
       "frequency": 0.019999999552965164,
-      "frequencyTime": 0.003367999568581581,
+      "frequencyTime": 0.014955509454011917,
       "isActive": true,
       "isEmitting": true,
       "isNormalize": false,
       "isRandomRotateZ": false,
       "isTemporary": false,
       "lifeTimeRange": [
-        1.0,
-        3.0
+        4.0,
+        4.0
       ],
       "particleCount": 30,
       "position": [
@@ -80,15 +80,15 @@
         1.0
       ],
       "frequency": 0.019999999552965164,
-      "frequencyTime": 0.00337926484644413,
+      "frequencyTime": 0.014966782182455063,
       "isActive": true,
       "isEmitting": true,
       "isNormalize": false,
       "isRandomRotateZ": false,
-      "isTemporary": true,
+      "isTemporary": false,
       "lifeTimeRange": [
-        1.0,
-        3.0
+        4.0,
+        4.0
       ],
       "particleCount": 30,
       "position": [
@@ -142,15 +142,15 @@
         1.0
       ],
       "frequency": 0.019999999552965164,
-      "frequencyTime": 0.00219024159014225,
+      "frequencyTime": 0.013777878135442734,
       "isActive": true,
       "isEmitting": true,
       "isNormalize": false,
       "isRandomRotateZ": false,
-      "isTemporary": true,
+      "isTemporary": false,
       "lifeTimeRange": [
-        1.0,
-        3.0
+        4.0,
+        4.0
       ],
       "particleCount": 30,
       "position": [
@@ -204,15 +204,15 @@
         1.0
       ],
       "frequency": 0.019999999552965164,
-      "frequencyTime": 0.011318933218717575,
+      "frequencyTime": 0.0029063671827316284,
       "isActive": true,
       "isEmitting": true,
       "isNormalize": false,
       "isRandomRotateZ": false,
-      "isTemporary": true,
+      "isTemporary": false,
       "lifeTimeRange": [
-        1.0,
-        3.0
+        4.0,
+        4.0
       ],
       "particleCount": 30,
       "position": [
@@ -268,9 +268,9 @@
       ],
       "particleCount": 200,
       "position": [
-        48.71884536743164,
+        -40.5,
         2.5,
-        39.703556060791016
+        -120.0
       ],
       "radius": 0.10000000149011612,
       "scaleRangeX": [
@@ -321,9 +321,9 @@
       ],
       "particleCount": 1000,
       "position": [
-        48.71884536743164,
+        -40.5,
         2.5,
-        39.703556060791016
+        -120.0
       ],
       "radius": 0.10000000149011612,
       "scaleRangeX": [
