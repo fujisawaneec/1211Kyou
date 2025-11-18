@@ -40,12 +40,11 @@ void BossBulletCollider::OnCollisionEnter(Collider* other) {
 }
 
 void BossBulletCollider::OnCollisionStay(Collider* other) {
-    // BossBulletは一度の衝突で消えるため、Stayは基本的に使用しない
-    // 必要に応じて実装可能
+
 }
 
 void BossBulletCollider::OnCollisionExit(Collider* other) {
-    // 衝突終了処理（必要に応じて実装）
+    // 衝突終了処理
     if (other->GetOwner() == hitPlayer_) {
         hitPlayer_ = nullptr;
     }

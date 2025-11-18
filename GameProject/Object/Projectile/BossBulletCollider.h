@@ -53,23 +53,15 @@ public:
     Player* GetHitPlayer() const { return hitPlayer_; }
 
 private:
-    /// <summary>
-    /// 所有者（BossBullet）への参照
-    /// </summary>
+    // 所有者（BossBullet）への参照
     BossBullet* owner_ = nullptr;
 
-    /// <summary>
-    /// ヒット済みターゲット（多重ヒット防止用）
-    /// </summary>
+    // ヒット済みターゲット（多重ヒット防止用）
     std::unordered_set<void*> hitTargets_;
 
-    /// <summary>
-    /// 現在ヒットしているプレイヤー
-    /// </summary>
+    // 現在ヒットしているプレイヤー
     Player* hitPlayer_ = nullptr;
 
-    /// <summary>
-    /// ダメージを与えたかどうか
-    /// </summary>
+    // ダメージを与えたかどうか
     bool hasDealtDamage_ = false;
 };

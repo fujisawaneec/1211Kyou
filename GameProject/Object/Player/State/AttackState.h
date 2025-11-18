@@ -29,7 +29,7 @@ private:
 	AttackPhase phase_ = SearchTarget;                ///< 現在の攻撃フェーズ
 	class Boss* targetEnemy_ = nullptr;               ///< 攻撃対象のボス
 	float searchTimer_ = 0.0f;                        ///< SearchTarget待機時間
-	float maxSearchTime_ = 0.1f;                      ///< 最大検索時間（0.1秒 = 6フレーム@60fps）
+	float maxSearchTime_ = 0.1f;                      ///< 最大検索時間
 	float moveTimer_ = 0.0f;                          ///< 移動タイマー
 	float maxMoveTime_ = 0.1f;                        ///< 最大移動時間
 
@@ -37,7 +37,7 @@ private:
 	float attackDuration_ = 0.1f;                     ///< 攻撃持続時間
 	int comboCount_ = 0;                              ///< 現在のコンボ数
 	int maxCombo_ = 2;                                ///< 最大コンボ数
-	float comboWindow_ = 1.f;                        ///< コンボ受付時間
+	float comboWindow_ = 1.f;                         ///< コンボ受付時間
 	bool canCombo_ = false;                           ///< コンボ可能フラグ
 
 	/// <summary>

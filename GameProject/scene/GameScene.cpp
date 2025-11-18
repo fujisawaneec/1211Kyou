@@ -484,14 +484,14 @@ void GameScene::UpdateInput()
 
 void GameScene::UpdateProjectiles(float deltaTime)
 {
-    // 全ての弾を更新
+    // ボスの弾の更新
     for (auto& bullet : bossBullets_) {
         if (bullet && bullet->IsActive()) {
             bullet->Update(deltaTime);
         }
     }
 
-    // 非アクティブな弾を削除（オブジェクトプールとして再利用可能）
+    // 非アクティブなボスの弾を削除
     bossBullets_.erase(
         std::remove_if(bossBullets_.begin(), bossBullets_.end(),
             [](const std::unique_ptr<BossBullet>& bullet) {
@@ -513,20 +513,9 @@ void GameScene::UpdateBossBorder()
         bool shouldShowBorder = (boss_->GetPhase() == 2);
 
         if (shouldShowBorder && !borderEmittersActive_) {
-            // フェーズ2突入時：境界線を有効化
             Vector3 bossPos = boss_->GetTransform().translate;
 
-            // 4辺の境界線を配置（ボスを中心に40x40の正方形）
-            emitterManager_->SetEmitterPosition("boss_border_left",
-                bossPos + Vector3(-20.0f, 0.0f, 0.0f));
-            emitterManager_->SetEmitterPosition("boss_border_right",
-                bossPos + Vector3(20.0f, 0.0f, 0.0f));
-            emitterManager_->SetEmitterPosition("boss_border_front",
-                bossPos + Vector3(0.0f, 0.0f, 20.0f));
-            emitterManager_->SetEmitterPosition("boss_border_back",
-                bossPos + Vector3(0.0f, 0.0f, -20.0f));
-
-            // エミッターを有効化
+            // フェーズ2突入時：境界線を有効化
             emitterManager_->SetEmitterActive("boss_border_left", true);
             emitterManager_->SetEmitterActive("boss_border_right", true);
             emitterManager_->SetEmitterActive("boss_border_front", true);
@@ -543,7 +532,8 @@ void GameScene::UpdateBossBorder()
 
             borderEmittersActive_ = false;
         }
-        else if (borderEmittersActive_) {
+
+        if (borderEmittersActive_) {
             // フェーズ2継続中：ボスの移動に追従
             Vector3 bossPos = Vector3(boss_->GetTransform().translate.x, 0.f, boss_->GetTransform().translate.z);
 
