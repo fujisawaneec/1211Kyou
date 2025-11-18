@@ -1,0 +1,26 @@
+{
+    "animation_name": "clear_anim",
+    "blend_duration": 0.699999988079071,
+    "duration": 0.0,
+    "keyframes": [
+        {
+            "coordinateType": "WORLD",
+            "fov": 0.7853981852531433,
+            "interpolation": "LINEAR",
+            "position": [
+                0.0,
+                5.0,
+                -10.0
+            ],
+            "rotation": [
+                0.20000000298023224,
+                0.0,
+                0.0
+            ],
+            "time": 0.0
+        }
+    ],
+    "loop": false,
+    "play_speed": 1.0,
+    "start_mode": 1
+}

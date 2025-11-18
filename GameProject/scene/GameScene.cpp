@@ -271,12 +271,12 @@ void GameScene::Update()
     toTitleSprite_->Update();
     cameraManager_->Update(FrameTimer::GetInstance()->GetDeltaTime());
 
+    // ボスからの弾生成リクエストを処理
+    CreateBossBullet();
+    
     // プロジェクタイルの更新
     float deltaTime = FrameTimer::GetInstance()->GetDeltaTime();
     UpdateProjectiles(deltaTime);
-
-    // ボスからの弾生成リクエストを処理
-    CreateBossBullet();
 
     // プレイヤーの位置にエミッターをセット
     Vector3 playerPos = { .x = player_->GetTransform().translate.x,
@@ -450,8 +450,7 @@ void GameScene::UpdateCameraMode()
         cameraMode_ = true;
         // フェーズ2: ボス中心の戦闘エリアに移動制限
         Vector3 bossPos = boss_->GetTransform().translate;
-        float battleAreaSize = 20.0f;  // 戦闘エリアのサイズ（片側）
-        player_->SetDynamicBoundsFromCenter(bossPos, battleAreaSize, battleAreaSize);
+        player_->SetDynamicBoundsFromCenter(bossPos, battleAreaSize_, battleAreaSize_);
     }
 
     if (cameraMode_) {
@@ -538,15 +537,13 @@ void GameScene::UpdateBossBorder()
             Vector3 bossPos = Vector3(boss_->GetTransform().translate.x, 0.f, boss_->GetTransform().translate.z);
 
             emitterManager_->SetEmitterPosition("boss_border_left",
-                bossPos + Vector3(0.0f, 0.0f, -20.0f));
+                bossPos + Vector3(0.0f, 0.0f, -battleAreaSize_));
             emitterManager_->SetEmitterPosition("boss_border_right",
-                bossPos + Vector3(0.0f, 0.0f, 20.0f));
+                bossPos + Vector3(0.0f, 0.0f, battleAreaSize_));
             emitterManager_->SetEmitterPosition("boss_border_front",
-                bossPos + Vector3(-20.0f, 0.0f, 0.0f));
+                bossPos + Vector3(-battleAreaSize_, 0.0f, 0.0f));
             emitterManager_->SetEmitterPosition("boss_border_back",
-                bossPos + Vector3(20.0f, 0.0f, 0.0f));
-
-            boss_->SetTranslate(Vector3(boss_->GetTransform().translate.x, boss_->GetTransform().translate.y, boss_->GetTransform().translate.z - 0.01f));
+                bossPos + Vector3(battleAreaSize_, 0.0f, 0.0f));
         }
     }
 }

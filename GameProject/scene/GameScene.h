@@ -126,5 +126,7 @@ private: // メンバ変数
     // ボスフェーズ2境界線パーティクル管理
     bool borderEmittersActive_ = false;                         // 境界線エミッターアクティブ状態
 
+    float battleAreaSize_ = 20.0f;                               // 戦闘エリアのサイズ（片側）
+
     bool isDebug_ = false;                                      // デバッグモードフラグ
 };
