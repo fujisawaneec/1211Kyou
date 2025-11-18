@@ -3,7 +3,7 @@
 #include "BossStateMachine.h"
 #include "../../Player/Player.h"
 #include "Vector3.h"
-#include <random>
+#include "RandomEngine.h"
 #include <cmath>
 
 // 静的メンバー変数の初期化
@@ -17,12 +17,14 @@ void BossIdleState::Enter(Boss* boss) {
     stateTimer_ = 0.0f;
 
     // フェーズに応じて待機時間を調整
+    RandomEngine* rng = RandomEngine::GetInstance();
+
     if (boss->GetPhase() == 1) {
         // フェーズ1: 少し長めの待機
-        idleDuration_ = 2.0f + static_cast<float>(rand() % 1000) / 1000.0f; // 2.0～3.0秒
+        idleDuration_ = rng->GetFloat(1.3f, 2.0f);
     } else {
-        // フェーズ2: より短い待機（より激しい戦闘）
-        idleDuration_ = 1.0f + static_cast<float>(rand() % 500) / 1000.0f; // 1.0～1.5秒
+        // フェーズ2: より短い待機
+        idleDuration_ = rng->GetFloat(0.8f, 1.5f);
     }
 
     // 次のアクションを決定（交互に実行）

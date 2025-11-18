@@ -2,7 +2,7 @@
 #include "../Boss.h"
 #include "BossStateMachine.h"
 #include "../../Player/Player.h"
-#include <random>
+#include "RandomEngine.h"
 #include <algorithm>
 
 BossDashState::BossDashState() {
@@ -16,17 +16,13 @@ void BossDashState::Enter(Boss* boss) {
     startPosition_ = boss->GetTransform().translate;
 
     // ランダムな方向を生成
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_real_distribution<float> angleDist(0.0f, 2.0f * 3.14159f);
+    RandomEngine* rng = RandomEngine::GetInstance();
 
-    float randomAngle = angleDist(gen);
-    dashDirection_ = Vector3(cosf(randomAngle), 0.0f, sinf(randomAngle));
-    dashDirection_ = dashDirection_.Normalize();
+    // XZ平面上のランダムな方向を取得（Y=0で正規化済み）
+    dashDirection_ = rng->GetRandomDirectionXZ();
 
-    // ダッシュ距離を計算
-    std::uniform_real_distribution<float> distDist(10.0f, 50.0f);
-    float dashDistance = distDist(gen);
+    // ランダムなダッシュ距離を取得
+    float dashDistance = rng->GetFloat(10.0f, 50.0f);
 
     // 目標位置を計算
     targetPosition_ = startPosition_ + dashDirection_ * dashDistance;

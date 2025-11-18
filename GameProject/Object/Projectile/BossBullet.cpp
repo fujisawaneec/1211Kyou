@@ -4,7 +4,7 @@
 #include "ModelManager.h"
 #include "Object3d.h"
 #include "CollisionManager.h"
-#include <random>
+#include "RandomEngine.h"
 
 BossBullet::BossBullet() {
     // 弾のパラメータ設定
@@ -12,14 +12,12 @@ BossBullet::BossBullet() {
     lifeTime_ = 5.0f;
 
     // ランダムな回転速度を設定
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_real_distribution<float> rotDist(-10.0f, 10.0f);
+    RandomEngine* rng = RandomEngine::GetInstance();
 
     rotationSpeed_ = Vector3(
-        rotDist(gen),
-        rotDist(gen),
-        rotDist(gen)
+        rng->GetFloat(-10.0f, 10.0f),
+        rng->GetFloat(-10.0f, 10.0f),
+        rng->GetFloat(-10.0f, 10.0f)
     );
 }
 

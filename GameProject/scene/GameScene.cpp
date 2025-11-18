@@ -157,10 +157,13 @@ void GameScene::Initialize()
     animationController_->SwitchAnimation("game_start");
     animationController_->Play();
 
-    // game_overアニメーションの読み込みと設定
+    // オーバー演出アニメーションの読み込みと設定
     animationController_->LoadAnimationFromFile("over_anim");
     animationController_->SetAnimationTargetByName("over_anim", player_->GetTransformPtr());
 
+    // クリア演出アニメーションの読み込みと設定
+    animationController_->LoadAnimationFromFile("clear_anim");
+    animationController_->SetAnimationTargetByName("clear_anim", boss_->GetTransformPtr());
 
     // 衝突マスクの設定（どのタイプ同士が衝突判定を行うか）
     collisionManager->SetCollisionMask(

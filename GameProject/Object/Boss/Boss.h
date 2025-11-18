@@ -156,6 +156,12 @@ public:
     Transform& GetWorldTransform() { return transform_; }
 
     /// <summary>
+    /// 座標変換情報のポインタを取得
+    /// </summary>
+    /// <returns>座標変換情報への非constポインタ</returns>
+    Transform* GetTransformPtr() { return &transform_; }
+
+    /// <summary>
     /// ステートマシンを取得
     /// </summary>
     /// <returns>ステートマシンのポインタ</returns>
