@@ -472,7 +472,7 @@ void GameScene::UpdateClearAnim()
         emitterManager_->SetEmitterRadius("clear_slash", currentSlashRadius_);
 
         if (currentSlashCount_ < kSlashEmitterMaxCount_ || currentSlashRadius_ < kSlashEmitterMaxRadius_) {
-            currentSlashCount_ += 2;
+            currentSlashCount_ += 1;
             currentSlashRadius_ += 0.05f;
         }
         else {
