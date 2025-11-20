@@ -11,7 +11,6 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "02_Engine", "Engine\TakoEngine\project\TakoEngine.vcxproj", "{5667D840-F080-4F39-B016-FD2C1B9375E7}"
 	ProjectSection(ProjectDependencies) = postProject
 		{371B9FA9-4C90-4AC6-A123-ACED756D6C77} = {371B9FA9-4C90-4AC6-A123-ACED756D6C77}
-		{FFA51982-471D-4530-909E-C8FB8FE4F342} = {FFA51982-471D-4530-909E-C8FB8FE4F342}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DirectXTex", "Engine\TakoEngine\project\externals\DirectXTex\DirectXTex_Desktop_2022_Win10.vcxproj", "{371B9FA9-4C90-4AC6-A123-ACED756D6C77}"
