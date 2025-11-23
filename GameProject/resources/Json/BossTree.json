@@ -1,0 +1,162 @@
+{
+  "links": [
+    {
+      "id": 30000,
+      "sourceNodeId": 10000,
+      "sourcePinId": 20001,
+      "targetNodeId": 10001,
+      "targetPinId": 20002
+    },
+    {
+      "id": 30001,
+      "sourceNodeId": 10000,
+      "sourcePinId": 20001,
+      "targetNodeId": 10002,
+      "targetPinId": 20003
+    },
+    {
+      "id": 30002,
+      "sourceNodeId": 10002,
+      "sourcePinId": 20004,
+      "targetNodeId": 10003,
+      "targetPinId": 20005
+    },
+    {
+      "id": 30003,
+      "sourceNodeId": 10002,
+      "sourcePinId": 20004,
+      "targetNodeId": 10006,
+      "targetPinId": 20009
+    },
+    {
+      "id": 30004,
+      "sourceNodeId": 10003,
+      "sourcePinId": 20006,
+      "targetNodeId": 10004,
+      "targetPinId": 20007
+    },
+    {
+      "id": 30005,
+      "sourceNodeId": 10003,
+      "sourcePinId": 20006,
+      "targetNodeId": 10005,
+      "targetPinId": 20008
+    },
+    {
+      "id": 30006,
+      "sourceNodeId": 10006,
+      "sourcePinId": 20010,
+      "targetNodeId": 10007,
+      "targetPinId": 20011
+    },
+    {
+      "id": 30007,
+      "sourceNodeId": 10006,
+      "sourcePinId": 20010,
+      "targetNodeId": 10008,
+      "targetPinId": 20012
+    }
+  ],
+  "metadata": {
+    "created": "2025-11-24T06:23:10",
+    "modified": "2025-11-24T06:23:10",
+    "name": "Boss Behavior Tree"
+  },
+  "nodes": [
+    {
+      "displayName": "MainLoop",
+      "id": 10000,
+      "parameters": null,
+      "position": {
+        "x": 400.0,
+        "y": 100.0
+      },
+      "type": "BTSequence"
+    },
+    {
+      "displayName": "Idle",
+      "id": 10001,
+      "parameters": null,
+      "position": {
+        "x": 250.0,
+        "y": 250.0
+      },
+      "type": "BTBossIdle"
+    },
+    {
+      "displayName": "ActionSelector",
+      "id": 10002,
+      "parameters": null,
+      "position": {
+        "x": 550.0,
+        "y": 250.0
+      },
+      "type": "BTSelector"
+    },
+    {
+      "displayName": "DashSequence",
+      "id": 10003,
+      "parameters": null,
+      "position": {
+        "x": 350.0,
+        "y": 400.0
+      },
+      "type": "BTSequence"
+    },
+    {
+      "displayName": "DashCondition",
+      "id": 10004,
+      "parameters": {
+        "actionType": 0
+      },
+      "position": {
+        "x": 250.0,
+        "y": 550.0
+      },
+      "type": "BTActionSelector"
+    },
+    {
+      "displayName": "DashAction",
+      "id": 10005,
+      "parameters": null,
+      "position": {
+        "x": 450.0,
+        "y": 550.0
+      },
+      "type": "BTBossDash"
+    },
+    {
+      "displayName": "ShootSequence",
+      "id": 10006,
+      "parameters": null,
+      "position": {
+        "x": 750.0,
+        "y": 400.0
+      },
+      "type": "BTSequence"
+    },
+    {
+      "displayName": "ShootCondition",
+      "id": 10007,
+      "parameters": {
+        "actionType": 1
+      },
+      "position": {
+        "x": 650.0,
+        "y": 550.0
+      },
+      "type": "BTActionSelector"
+    },
+    {
+      "displayName": "ShootAction",
+      "id": 10008,
+      "parameters": null,
+      "position": {
+        "x": 850.0,
+        "y": 550.0
+      },
+      "type": "BTBossShoot"
+    }
+  ],
+  "version": "1.0"
+}

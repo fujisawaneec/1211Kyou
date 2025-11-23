@@ -39,6 +39,18 @@ public:
     /// </summary>
     void Reset() override;
 
+    /// <summary>
+    /// アクションタイプを取得
+    /// </summary>
+    /// <returns>期待するアクションタイプ</returns>
+    ActionType GetActionType() const { return expectedType_; }
+
+    /// <summary>
+    /// アクションタイプを設定
+    /// </summary>
+    /// <param name="type">新しいアクションタイプ</param>
+    void SetActionType(ActionType type) { expectedType_ = type; }
+
 private:
     // 期待するアクションタイプ
     ActionType expectedType_;

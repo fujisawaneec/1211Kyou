@@ -16,6 +16,7 @@
 
 #ifdef _DEBUG
 #include "ImGuiManager.h"
+#include "BossNodeEditor/BossNodeEditor.h"
 #endif
 
 Boss::Boss()
@@ -80,6 +81,14 @@ void Boss::Initialize()
     if (useBehaviorTree_) {
         // ビヘイビアツリーの初期化
         behaviorTree_ = std::make_unique<BossBehaviorTree>(this, player_);
+
+#ifdef _DEBUG
+        // ノードエディタの初期化
+        nodeEditor_ = std::make_unique<BossNodeEditor>();
+        nodeEditor_->Initialize();
+        // 現在のビヘイビアツリーをエディタにインポート（後で実装）
+        // nodeEditor_->ImportFromBehaviorTree(behaviorTree_.get());
+#endif
     } else {
         // ステートマシンの初期化（互換性のため残す）
         stateMachine_ = std::make_unique<BossStateMachine>();
@@ -325,6 +334,38 @@ void Boss::DrawImGui()
         }
     }
 
+    // ビヘイビアツリーエディタ表示ボタン
+    if (useBehaviorTree_ && nodeEditor_) {
+        ImGui::SameLine();
+        if (ImGui::Button("Node Editor")) {
+            showNodeEditor_ = !showNodeEditor_;
+            nodeEditor_->SetVisible(showNodeEditor_);
+        }
+
+        // エディタのツリーを適用
+        ImGui::SameLine();
+        if (ImGui::Button("Apply Tree")) {
+            if (behaviorTree_ && nodeEditor_->ApplyToBehaviorTree(behaviorTree_.get())) {
+                ImGui::Text("Tree applied successfully!");
+            }
+        }
+
+        // JSONから読み込み
+        ImGui::SameLine();
+        if (ImGui::Button("Load JSON")) {
+            if (nodeEditor_->LoadFromJSON("resources/Json/BossTree.json")) {
+                ImGui::Text("JSON loaded successfully!");
+            }
+        }
+
+        // デフォルトツリー生成
+        ImGui::SameLine();
+        if (ImGui::Button("Create Default Tree")) {
+            nodeEditor_->CreateDefaultTree();
+            ImGui::Text("Default tree created!");
+        }
+    }
+
     // HP操作
     float tempHp = hp_;
     if (ImGui::SliderFloat("Set HP", &tempHp, 0.0f, kMaxHp_)) {
@@ -395,6 +436,11 @@ void Boss::DrawImGui()
         SetPhase(1);
     }
     ImGui::PopStyleColor(3);
+
+    // ノードエディタの更新
+    if (nodeEditor_ && showNodeEditor_) {
+        nodeEditor_->Update();
+    }
 
 #endif
 }

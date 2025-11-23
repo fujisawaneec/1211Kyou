@@ -176,6 +176,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Object\Boss\BossBehaviorTree\Actions\BTBossShoot.cpp" />
     <ClCompile Include="Object\Boss\BossBehaviorTree\BossBehaviorTree.cpp" />
     <ClCompile Include="Object\Boss\BossBehaviorTree\Conditions\BTActionSelector.cpp" />
+    <ClCompile Include="Object\Boss\BossNodeEditor\BossNodeEditor.cpp" />
+    <ClCompile Include="Object\Boss\BossNodeEditor\BossNodeFactory.cpp" />
     <ClCompile Include="Object\Boss\States\BossDashState.cpp" />
     <ClCompile Include="Object\Boss\States\BossIdleState.cpp" />
     <ClCompile Include="Object\Boss\States\BossShootState.cpp" />
@@ -203,6 +205,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
   <ItemGroup>
     <ProjectReference Include="..\Engine\TakoEngine\project\externals\DirectXTex\DirectXTex_Desktop_2022_Win10.vcxproj">
       <Project>{371b9fa9-4c90-4ac6-a123-aced756d6c77}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\Engine\TakoEngine\project\externals\imgui-node-editor\imgui-node-editor.vcxproj">
+      <Project>{0517d071-8cdd-4f0b-bdc1-05fcf6331bcc}</Project>
     </ProjectReference>
     <ProjectReference Include="..\Engine\TakoEngine\project\externals\imgui\imgui.vcxproj" Condition="'$(Configuration)'=='Debug'">
       <Project>{ffa51982-471d-4530-909e-c8fb8fe4f342}</Project>
@@ -239,6 +244,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Object\Boss\BossBehaviorTree\Actions\BTBossShoot.h" />
     <ClInclude Include="Object\Boss\BossBehaviorTree\BossBehaviorTree.h" />
     <ClInclude Include="Object\Boss\BossBehaviorTree\Conditions\BTActionSelector.h" />
+    <ClInclude Include="Object\Boss\BossNodeEditor\BossNodeEditor.h" />
+    <ClInclude Include="Object\Boss\BossNodeEditor\BossNodeFactory.h" />
     <ClInclude Include="Object\Boss\States\BossDashState.h" />
     <ClInclude Include="Object\Boss\States\BossIdleState.h" />
     <ClInclude Include="Object\Boss\States\BossShootState.h" />

@@ -78,6 +78,9 @@
     <Filter Include="Object\Boss\BossBehaviorTree\Conditions">
       <UniqueIdentifier>{4b1eb71d-c76e-4ef5-83ed-9bdace6a3b5c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Object\Boss\BossNodeEditor">
+      <UniqueIdentifier>{25c158da-6b5c-4fac-9f5e-e540c569d30e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MyGame\MyGame.cpp">
@@ -212,6 +215,12 @@
     </ClCompile>
     <ClCompile Include="Object\Boss\BossBehaviorTree\BossBehaviorTree.cpp">
       <Filter>Object\Boss\BossBehaviorTree</Filter>
+    </ClCompile>
+    <ClCompile Include="Object\Boss\BossNodeEditor\BossNodeEditor.cpp">
+      <Filter>Object\Boss\BossNodeEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="Object\Boss\BossNodeEditor\BossNodeFactory.cpp">
+      <Filter>Object\Boss\BossNodeEditor</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -367,6 +376,12 @@
     </ClInclude>
     <ClInclude Include="Object\Boss\BossBehaviorTree\BossBehaviorTree.h">
       <Filter>Object\Boss\BossBehaviorTree</Filter>
+    </ClInclude>
+    <ClInclude Include="Object\Boss\BossNodeEditor\BossNodeEditor.h">
+      <Filter>Object\Boss\BossNodeEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="Object\Boss\BossNodeEditor\BossNodeFactory.h">
+      <Filter>Object\Boss\BossNodeEditor</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

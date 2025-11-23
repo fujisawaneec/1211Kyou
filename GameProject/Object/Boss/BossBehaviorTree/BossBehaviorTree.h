@@ -46,6 +46,24 @@ public:
     /// <returns>現在実行中のノード名</returns>
     const std::string& GetCurrentNodeName() const;
 
+    /// <summary>
+    /// ルートノードの取得（エディタ用）
+    /// </summary>
+    /// <returns>ルートノード</returns>
+    BTNodePtr GetRootNode() const { return rootNode_; }
+
+    /// <summary>
+    /// ルートノードを外部から設定
+    /// </summary>
+    /// <param name="rootNode">新しいルートノード</param>
+    void SetRootNode(BTNodePtr rootNode);
+
+    /// <summary>
+    /// ブラックボードの取得（ノード初期化用）
+    /// </summary>
+    /// <returns>ブラックボード</returns>
+    BTBlackboard* GetBlackboard() const { return blackboard_.get(); }
+
 private:
     /// <summary>
     /// ビヘイビアツリーの構築

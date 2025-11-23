@@ -100,3 +100,15 @@ BTNodePtr BossBehaviorTree::BuildActionTree() {
 
     return rootSequence;
 }
+
+/// <summary>
+/// ルートノードを外部から設定
+/// </summary>
+void BossBehaviorTree::SetRootNode(BTNodePtr rootNode) {
+    if (rootNode) {
+        rootNode_ = rootNode;
+        // 既存のツリーをリセット
+        Reset();
+        currentNodeName_ = "External Tree";
+    }
+}

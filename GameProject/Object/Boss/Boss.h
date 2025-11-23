@@ -12,6 +12,7 @@ class OBBCollider;
 class Object3d;
 class BossStateMachine;
 class BossBehaviorTree;
+class BossNodeEditor;
 class Player;
 class BossShootState;
 
@@ -231,6 +232,14 @@ private:
 
     // 使用するAIシステム（true: ビヘイビアツリー, false: ステートマシン）
     bool useBehaviorTree_ = true;
+
+#ifdef _DEBUG
+    // ビヘイビアツリーノードエディタ
+    std::unique_ptr<BossNodeEditor> nodeEditor_;
+
+    // ノードエディタの表示フラグ
+    bool showNodeEditor_ = false;
+#endif
 
     // プレイヤーへの参照
     Player* player_ = nullptr;
