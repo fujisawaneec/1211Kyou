@@ -334,35 +334,34 @@ void Boss::DrawImGui()
         }
     }
 
-    // ビヘイビアツリーエディタ表示ボタン
-    if (useBehaviorTree_ && nodeEditor_) {
+    // ビヘイビアツリーの制御
+    if (useBehaviorTree_ && behaviorTree_) {
+        // JSONから直接ビヘイビアツリーに読み込み（デバッグ・リリース共通）
         ImGui::SameLine();
-        if (ImGui::Button("Node Editor")) {
-            showNodeEditor_ = !showNodeEditor_;
-            nodeEditor_->SetVisible(showNodeEditor_);
-        }
-
-        // エディタのツリーを適用
-        ImGui::SameLine();
-        if (ImGui::Button("Apply Tree")) {
-            if (behaviorTree_ && nodeEditor_->ApplyToBehaviorTree(behaviorTree_.get())) {
-                ImGui::Text("Tree applied successfully!");
+        if (ImGui::Button("Load Tree from JSON")) {
+            if (behaviorTree_->LoadFromJSON("resources/Json/BossTree.json")) {
+                ImGui::Text("Tree loaded successfully!");
+                // デバッグビルドの場合、エディタにも反映
+                if (nodeEditor_) {
+                    nodeEditor_->ImportFromBehaviorTree(behaviorTree_.get());
+                }
             }
         }
 
-        // JSONから読み込み
-        ImGui::SameLine();
-        if (ImGui::Button("Load JSON")) {
-            if (nodeEditor_->LoadFromJSON("resources/Json/BossTree.json")) {
-                ImGui::Text("JSON loaded successfully!");
+        // デバッグビルド専用：ノードエディタ機能
+        if (nodeEditor_) {
+            ImGui::SameLine();
+            if (ImGui::Button("Node Editor")) {
+                showNodeEditor_ = !showNodeEditor_;
+                nodeEditor_->SetVisible(showNodeEditor_);
             }
-        }
 
-        // デフォルトツリー生成
-        ImGui::SameLine();
-        if (ImGui::Button("Create Default Tree")) {
-            nodeEditor_->CreateDefaultTree();
-            ImGui::Text("Default tree created!");
+            // デフォルトツリー生成
+            ImGui::SameLine();
+            if (ImGui::Button("Create Default Tree")) {
+                nodeEditor_->CreateDefaultTree();
+                ImGui::Text("Default tree created!");
+            }
         }
     }
 

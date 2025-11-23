@@ -2,6 +2,8 @@
 #include "../../../BehaviorTree/Core/BTNode.h"
 #include "../../../BehaviorTree/Core/BTBlackboard.h"
 #include <memory>
+#include <json.hpp>
+#include <unordered_set>
 
 class Boss;
 class Player;
@@ -64,6 +66,13 @@ public:
     /// <returns>ブラックボード</returns>
     BTBlackboard* GetBlackboard() const { return blackboard_.get(); }
 
+    /// <summary>
+    /// JSONファイルからツリーを読み込み
+    /// </summary>
+    /// <param name="filepath">JSONファイルのパス</param>
+    /// <returns>成功したらtrue</returns>
+    bool LoadFromJSON(const std::string& filepath);
+
 private:
     /// <summary>
     /// ビヘイビアツリーの構築
@@ -75,6 +84,26 @@ private:
     /// </summary>
     /// <returns>構築したノード</returns>
     BTNodePtr BuildActionTree();
+
+    /// <summary>
+    /// ノードタイプからインスタンスを作成
+    /// </summary>
+    /// <param name="nodeType">ノードタイプ文字列</param>
+    /// <returns>作成したノード</returns>
+    BTNodePtr CreateNodeByType(const std::string& nodeType);
+
+    /// <summary>
+    /// JSONからノードツリーを再帰的に構築
+    /// </summary>
+    /// <param name="nodeJson">ノードのJSON</param>
+    /// <param name="nodeMap">全ノードのマップ</param>
+    /// <param name="links">リンク情報</param>
+    /// <param name="visitedNodes">訪問済みノードセット</param>
+    /// <returns>構築したノード</returns>
+    BTNodePtr BuildNodeFromJSON(const nlohmann::json& nodeJson,
+                                const std::unordered_map<int, nlohmann::json>& nodeMap,
+                                const std::vector<nlohmann::json>& links,
+                                std::unordered_set<int>& visitedNodes);
 
     // ルートノード
     BTNodePtr rootNode_;

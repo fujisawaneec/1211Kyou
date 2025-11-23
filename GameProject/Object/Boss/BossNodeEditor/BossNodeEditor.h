@@ -122,12 +122,6 @@ public:
     /// <param name="tree">インポート元のツリー</param>
     void ImportFromBehaviorTree(BossBehaviorTree* tree);
 
-    /// <summary>
-    /// 構築したツリーをBossBehaviorTreeに適用
-    /// </summary>
-    /// <param name="behaviorTree">適用先のBehaviorTree</param>
-    /// <returns>成功したらtrue</returns>
-    bool ApplyToBehaviorTree(BossBehaviorTree* behaviorTree);
 
     /// <summary>
     /// 現在実行中のノードをハイライト表示（デバッグ用）
@@ -203,9 +197,6 @@ private:
 
     // ImportFromBehaviorTree用ヘルパー
     int ImportNodeRecursive(const BTNodePtr& btNode, const ImVec2& position, int depth);
-
-    // 依存関係設定
-    void SetupNodeDependencies(BTNodePtr node, BTBlackboard* blackboard);
 
     // ノード・ピンIDマッピング管理
     std::unordered_map<BTNode*, int> runtimeNodeToEditorId_;

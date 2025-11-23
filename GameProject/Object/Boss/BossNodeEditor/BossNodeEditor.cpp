@@ -95,7 +95,7 @@ void BossNodeEditor::Update() {
         HandleLinkCreation();
         HandleDeletion();
 
-        // コンテキストメニュー（一時的に無効化）
+        // コンテキストメニュー
         // DrawContextMenu();
 
         ed::End();
@@ -1287,58 +1287,6 @@ int BossNodeEditor::ImportNodeRecursive(const BTNodePtr& btNode, const ImVec2& p
     ed::SetNodePosition(nodeId, position);
 
     return nodeId;
-}
-
-/// <summary>
-/// 構築したツリーをBossBehaviorTreeに適用
-/// </summary>
-bool BossNodeEditor::ApplyToBehaviorTree(BossBehaviorTree* behaviorTree) {
-    if (!behaviorTree) {
-        ImGui::LogText("[BossNodeEditor] BehaviorTree is null");
-        return false;
-    }
-
-    // 現在のエディタ内容からランタイムツリーを構築
-    BTNodePtr runtimeTree = BuildRuntimeTree();
-    if (!runtimeTree) {
-        ImGui::LogText("[BossNodeEditor] Failed to build runtime tree");
-        return false;
-    }
-
-    // ブラックボードを取得
-    BTBlackboard* blackboard = behaviorTree->GetBlackboard();
-    if (!blackboard) {
-        ImGui::LogText("[BossNodeEditor] Blackboard is null");
-        return false;
-    }
-
-    // 依存関係を設定（Boss/Player参照をノードに設定）
-    SetupNodeDependencies(runtimeTree, blackboard);
-
-    // BehaviorTreeに適用
-    behaviorTree->SetRootNode(runtimeTree);
-
-    ImGui::LogText("[BossNodeEditor] Successfully applied tree to BossBehaviorTree");
-    return true;
-}
-
-/// <summary>
-/// ノードの依存関係を設定（Boss/Player参照）
-/// </summary>
-void BossNodeEditor::SetupNodeDependencies(BTNodePtr node, BTBlackboard* blackboard) {
-    if (!node || !blackboard) return;
-
-    // Boss/Player参照が必要なノードタイプを判定
-    // 注：実際のノードタイプに応じて実装を調整する必要がある
-
-    // コンポジットノードの場合は子ノードも処理
-    auto composite = std::dynamic_pointer_cast<BTComposite>(node);
-    if (composite) {
-        const auto& children = composite->GetChildren();
-        for (auto& child : children) {
-            SetupNodeDependencies(child, blackboard);
-        }
-    }
 }
 
 /// <summary>
