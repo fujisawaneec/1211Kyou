@@ -12,6 +12,7 @@
 #include "States/BossIdleState.h"
 #include "States/BossDashState.h"
 #include "States/BossShootState.h"
+#include "BossBehaviorTree/BossBehaviorTree.h"
 
 #ifdef _DEBUG
 #include "ImGuiManager.h"
@@ -75,17 +76,23 @@ void Boss::Initialize()
     // CollisionManagerに登録
     CollisionManager::GetInstance()->AddCollider(bodyCollider_.get());
 
-    // ステートマシンの初期化
-    stateMachine_ = std::make_unique<BossStateMachine>();
-    stateMachine_->Initialize(this);
+    // ビヘイビアツリーを使用する場合
+    if (useBehaviorTree_) {
+        // ビヘイビアツリーの初期化
+        behaviorTree_ = std::make_unique<BossBehaviorTree>(this, player_);
+    } else {
+        // ステートマシンの初期化（互換性のため残す）
+        stateMachine_ = std::make_unique<BossStateMachine>();
+        stateMachine_->Initialize(this);
 
-    // 各状態を追加
-    stateMachine_->AddState("Idle", std::make_unique<BossIdleState>());
-    stateMachine_->AddState("Dash", std::make_unique<BossDashState>());
-    stateMachine_->AddState("Shoot", std::make_unique<BossShootState>());
+        // 各状態を追加
+        stateMachine_->AddState("Idle", std::make_unique<BossIdleState>());
+        stateMachine_->AddState("Dash", std::make_unique<BossDashState>());
+        stateMachine_->AddState("Shoot", std::make_unique<BossShootState>());
 
-    // 初期状態をIdleに設定
-    stateMachine_->ChangeState("Idle");
+        // 初期状態をIdleに設定
+        stateMachine_->ChangeState("Idle");
+    }
 }
 
 void Boss::Finalize()
@@ -124,9 +131,15 @@ void Boss::Update(float deltaTime)
     // フェーズとライフの更新
     UpdatePhaseAndLive();
 
-    // ステートマシンの更新
-    if (stateMachine_ && !isDead_ && !isPause_) {
-        stateMachine_->Update(deltaTime);
+    // AIシステムの更新
+    if (!isDead_ && !isPause_) {
+        if (useBehaviorTree_ && behaviorTree_) {
+            // ビヘイビアツリーの更新
+            behaviorTree_->Update(deltaTime);
+        } else if (stateMachine_) {
+            // ステートマシンの更新（互換性のため残す）
+            stateMachine_->Update(deltaTime);
+        }
     }
 
     // ヒットエフェクトの更新
@@ -291,6 +304,27 @@ void Boss::DrawImGui()
     // ===== セクション7: デバッグコントロール =====
     ImGui::SeparatorText("Debug Controls");
 
+    // AIシステム選択
+    ImGui::Text("AI System:");
+    if (ImGui::RadioButton("Behavior Tree", useBehaviorTree_)) {
+        useBehaviorTree_ = true;
+        if (!behaviorTree_ && player_) {
+            behaviorTree_ = std::make_unique<BossBehaviorTree>(this, player_);
+        }
+    }
+    ImGui::SameLine();
+    if (ImGui::RadioButton("State Machine", !useBehaviorTree_)) {
+        useBehaviorTree_ = false;
+        if (!stateMachine_) {
+            stateMachine_ = std::make_unique<BossStateMachine>();
+            stateMachine_->Initialize(this);
+            stateMachine_->AddState("Idle", std::make_unique<BossIdleState>());
+            stateMachine_->AddState("Dash", std::make_unique<BossDashState>());
+            stateMachine_->AddState("Shoot", std::make_unique<BossShootState>());
+            stateMachine_->ChangeState("Idle");
+        }
+    }
+
     // HP操作
     float tempHp = hp_;
     if (ImGui::SliderFloat("Set HP", &tempHp, 0.0f, kMaxHp_)) {
@@ -313,8 +347,12 @@ void Boss::DrawImGui()
     ImGui::Spacing();
     ImGui::Text("Force State Transition:");
 
-    if (stateMachine_) {
-        // プルダウンメニューで状態を選択
+    if (useBehaviorTree_) {
+        // ビヘイビアツリー使用時
+        ImGui::TextColored(ImVec4(0.5f, 1.0f, 0.5f, 1.0f), "Using Behavior Tree");
+        ImGui::Text("(State transitions are automatic)");
+    } else if (stateMachine_) {
+        // ステートマシン使用時
         static int selectedStateIndex = 0;
         const char* stateNames[] = { "Idle", "Dash", "Shoot" };
 
@@ -369,4 +407,11 @@ std::vector<Boss::BulletSpawnRequest> Boss::ConsumePendingBullets() {
     auto result = std::move(pendingBullets_);
     pendingBullets_.clear();
     return result;
+}
+
+void Boss::SetPlayer(Player* player) {
+    player_ = player;
+    if (behaviorTree_) {
+        behaviorTree_->SetPlayer(player);
+    }
 }

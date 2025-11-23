@@ -154,6 +154,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="BehaviorTree\Composites\BTSelector.cpp" />
+    <ClCompile Include="BehaviorTree\Composites\BTSequence.cpp" />
+    <ClCompile Include="BehaviorTree\Core\BTComposite.cpp" />
     <ClCompile Include="CameraAnimation\CameraAnimation.cpp" />
     <ClCompile Include="CameraSystem\CameraAnimationController.cpp" />
     <ClCompile Include="CameraSystem\CameraDebugUI.cpp" />
@@ -168,6 +171,11 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MyGame\MyGame.cpp" />
     <ClCompile Include="Object\Boss\Boss.cpp" />
+    <ClCompile Include="Object\Boss\BossBehaviorTree\Actions\BTBossDash.cpp" />
+    <ClCompile Include="Object\Boss\BossBehaviorTree\Actions\BTBossIdle.cpp" />
+    <ClCompile Include="Object\Boss\BossBehaviorTree\Actions\BTBossShoot.cpp" />
+    <ClCompile Include="Object\Boss\BossBehaviorTree\BossBehaviorTree.cpp" />
+    <ClCompile Include="Object\Boss\BossBehaviorTree\Conditions\BTActionSelector.cpp" />
     <ClCompile Include="Object\Boss\States\BossDashState.cpp" />
     <ClCompile Include="Object\Boss\States\BossIdleState.cpp" />
     <ClCompile Include="Object\Boss\States\BossShootState.cpp" />
@@ -204,6 +212,11 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BehaviorTree\Composites\BTSelector.h" />
+    <ClInclude Include="BehaviorTree\Composites\BTSequence.h" />
+    <ClInclude Include="BehaviorTree\Core\BTBlackboard.h" />
+    <ClInclude Include="BehaviorTree\Core\BTComposite.h" />
+    <ClInclude Include="BehaviorTree\Core\BTNode.h" />
     <ClInclude Include="CameraAnimation\CameraAnimation.h" />
     <ClInclude Include="CameraAnimation\CameraKeyframe.h" />
     <ClInclude Include="CameraSystem\CameraAnimationController.h" />
@@ -221,6 +234,11 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Input\InputHandler.h" />
     <ClInclude Include="MyGame\MyGame.h" />
     <ClInclude Include="Object\Boss\Boss.h" />
+    <ClInclude Include="Object\Boss\BossBehaviorTree\Actions\BTBossDash.h" />
+    <ClInclude Include="Object\Boss\BossBehaviorTree\Actions\BTBossIdle.h" />
+    <ClInclude Include="Object\Boss\BossBehaviorTree\Actions\BTBossShoot.h" />
+    <ClInclude Include="Object\Boss\BossBehaviorTree\BossBehaviorTree.h" />
+    <ClInclude Include="Object\Boss\BossBehaviorTree\Conditions\BTActionSelector.h" />
     <ClInclude Include="Object\Boss\States\BossDashState.h" />
     <ClInclude Include="Object\Boss\States\BossIdleState.h" />
     <ClInclude Include="Object\Boss\States\BossShootState.h" />

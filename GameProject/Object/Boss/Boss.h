@@ -11,6 +11,7 @@ class Sprite;
 class OBBCollider;
 class Object3d;
 class BossStateMachine;
+class BossBehaviorTree;
 class Player;
 class BossShootState;
 
@@ -135,7 +136,7 @@ public:
     /// プレイヤーの参照を設定
     /// </summary>
     /// <param name="player">プレイヤーのポインタ</param>
-    void SetPlayer(Player* player) { player_ = player; }
+    void SetPlayer(Player* player);
 
     /// <summary>
     /// 一時行動停止フラグを設定
@@ -222,8 +223,14 @@ private:
     // ボスの座標変換情報（位置、回転、スケール）
     Transform transform_{};
 
-    // ステートマシン
+    // ステートマシン（デバッグ用に残す）
     std::unique_ptr<BossStateMachine> stateMachine_;
+
+    // ビヘイビアツリー
+    std::unique_ptr<BossBehaviorTree> behaviorTree_;
+
+    // 使用するAIシステム（true: ビヘイビアツリー, false: ステートマシン）
+    bool useBehaviorTree_ = true;
 
     // プレイヤーへの参照
     Player* player_ = nullptr;
