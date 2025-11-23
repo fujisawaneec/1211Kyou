@@ -342,9 +342,9 @@ void Boss::DrawImGui()
             if (behaviorTree_->LoadFromJSON("resources/Json/BossTree.json")) {
                 ImGui::Text("Tree loaded successfully!");
                 // デバッグビルドの場合、エディタにも反映
-                if (nodeEditor_) {
-                    nodeEditor_->ImportFromBehaviorTree(behaviorTree_.get());
-                }
+                //if (nodeEditor_) {
+                //    nodeEditor_->ImportFromBehaviorTree(behaviorTree_.get());
+                //}
             }
         }
 
