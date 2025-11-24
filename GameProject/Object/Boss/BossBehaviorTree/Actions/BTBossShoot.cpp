@@ -10,6 +10,7 @@ BTBossShoot::BTBossShoot() {
 BTNodeStatus BTBossShoot::Execute(BTBlackboard* blackboard) {
     Boss* boss = blackboard->GetBoss();
     if (!boss) {
+        status_ = BTNodeStatus::Failure;
         return BTNodeStatus::Failure;
     }
 
@@ -42,10 +43,12 @@ BTNodeStatus BTBossShoot::Execute(BTBlackboard* blackboard) {
         isFirstExecute_ = true;
         elapsedTime_ = 0.0f;
         hasFired_ = false;
+        status_ = BTNodeStatus::Success;
         return BTNodeStatus::Success;
     }
 
     // まだ射撃処理中
+    status_ = BTNodeStatus::Running;
     return BTNodeStatus::Running;
 }
 

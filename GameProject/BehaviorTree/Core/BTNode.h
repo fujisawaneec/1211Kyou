@@ -47,7 +47,6 @@ public:
     /// </summary>
     virtual void Reset() {
         status_ = BTNodeStatus::Failure;
-        isRunning_ = false;
     }
 
     /// <summary>
@@ -72,14 +71,11 @@ public:
     /// 実行中かどうか
     /// </summary>
     /// <returns>実行中の場合true</returns>
-    bool IsRunning() const { return isRunning_; }
+    bool IsRunning() const { return status_ == BTNodeStatus::Running; }
 
 protected:
     // 現在の状態
     BTNodeStatus status_ = BTNodeStatus::Failure;
-
-    // 実行中フラグ
-    bool isRunning_ = false;
 
     // ノード名
     std::string name_ = "BTNode";

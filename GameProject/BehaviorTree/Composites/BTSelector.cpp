@@ -23,7 +23,6 @@ BTNodeStatus BTSelector::Execute(BTBlackboard* blackboard) {
             // 実行中なら現在のインデックスを記憶
             currentChildIndex_ = i;
             status_ = BTNodeStatus::Running;
-            isRunning_ = true;
             return status_;
         }
         // Failureの場合は次の子ノードへ
@@ -32,6 +31,5 @@ BTNodeStatus BTSelector::Execute(BTBlackboard* blackboard) {
     // 全ての子ノードが失敗
     currentChildIndex_ = 0;
     status_ = BTNodeStatus::Failure;
-    isRunning_ = false;
     return status_;
 }

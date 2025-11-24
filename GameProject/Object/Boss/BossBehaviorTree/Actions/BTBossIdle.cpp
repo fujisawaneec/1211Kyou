@@ -12,6 +12,7 @@ BTBossIdle::BTBossIdle() {
 BTNodeStatus BTBossIdle::Execute(BTBlackboard* blackboard) {
     Boss* boss = blackboard->GetBoss();
     if (!boss) {
+        status_ = BTNodeStatus::Failure;
         return BTNodeStatus::Failure;
     }
 
@@ -37,10 +38,12 @@ BTNodeStatus BTBossIdle::Execute(BTBlackboard* blackboard) {
     // 待機時間が経過したら成功を返す
     if (elapsedTime_ >= idleDuration_) {
         isFirstExecute_ = true;  // 次回実行時のためにリセット
+        status_ = BTNodeStatus::Success;
         return BTNodeStatus::Success;
     }
 
     // まだ待機中
+    status_ = BTNodeStatus::Running;
     return BTNodeStatus::Running;
 }
 

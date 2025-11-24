@@ -14,9 +14,11 @@ BTNodeStatus BTActionSelector::Execute(BTBlackboard* blackboard) {
 
     // 期待するタイプと一致すれば成功
     if (currentType == static_cast<int>(expectedType_)) {
+        status_ = BTNodeStatus::Success;
         return BTNodeStatus::Success;
     }
 
+    status_ = BTNodeStatus::Failure;
     return BTNodeStatus::Failure;
 }
 

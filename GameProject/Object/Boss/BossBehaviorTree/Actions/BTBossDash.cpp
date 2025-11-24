@@ -12,6 +12,7 @@ BTBossDash::BTBossDash() {
 BTNodeStatus BTBossDash::Execute(BTBlackboard* blackboard) {
     Boss* boss = blackboard->GetBoss();
     if (!boss) {
+        status_ = BTNodeStatus::Failure;
         return BTNodeStatus::Failure;
     }
 
@@ -37,10 +38,12 @@ BTNodeStatus BTBossDash::Execute(BTBlackboard* blackboard) {
         // リセットして成功を返す
         isFirstExecute_ = true;
         elapsedTime_ = 0.0f;
+        status_ = BTNodeStatus::Success;
         return BTNodeStatus::Success;
     }
 
     // まだダッシュ中
+    status_ = BTNodeStatus::Running;
     return BTNodeStatus::Running;
 }
 
