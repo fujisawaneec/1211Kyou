@@ -33,8 +33,14 @@ void BossBehaviorTree::Update(float deltaTime) {
     // ブラックボードに経過時間を設定
     blackboard_->SetDeltaTime(deltaTime);
 
+    // 実行前に実行中ノード情報をクリア
+    currentRunningNode_ = nullptr;
+
     // ルートノードを実行
     BTNodeStatus status = rootNode_->Execute(blackboard_.get());
+
+    // 実行中ノードを検索
+    FindRunningNodeRecursive(rootNode_);
 
     // 完了したらリセット
     if (status != BTNodeStatus::Running) {
@@ -299,4 +305,29 @@ BTNodePtr BossBehaviorTree::BuildNodeFromJSON(
     }
 
     return node;
+}
+
+/// <summary>
+/// 実行中のノードを再帰的に検索
+/// </summary>
+void BossBehaviorTree::FindRunningNodeRecursive(const BTNodePtr& node) {
+    if (!node || !node->IsRunning()) {
+        return;
+    }
+
+    // 現在実行中のノードを更新
+    currentRunningNode_ = node;
+
+    // コンポジットノードの場合、子ノードも探索
+    auto composite = std::dynamic_pointer_cast<BTComposite>(node);
+    if (composite) {
+        const auto& children = composite->GetChildren();
+        for (const auto& child : children) {
+            if (child && child->IsRunning()) {
+                // 実行中の子ノードを再帰的に探索
+                FindRunningNodeRecursive(child);
+                break;  // 最初に見つかった実行中の子ノードのみ処理
+            }
+        }
+    }
 }

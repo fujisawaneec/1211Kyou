@@ -7,6 +7,8 @@
 #include <vector>
 #include <memory>
 #include <unordered_map>
+#include <unordered_set>
+#include <deque>
 #include <string>
 #include <json.hpp>
 #include "../../../BehaviorTree/Core/BTNode.h"
@@ -158,6 +160,7 @@ private:
     bool isVisible_;
     bool firstFrame_;
     int highlightedNodeId_;  // 現在ハイライト中のノードID（実行デバッグ用）
+    float highlightStartTime_;  // ハイライト開始時刻（パルスエフェクト用）
 
     // 内部処理
     void DrawNodes();

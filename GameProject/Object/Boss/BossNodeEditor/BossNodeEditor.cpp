@@ -28,7 +28,8 @@ BossNodeEditor::BossNodeEditor()
     , nextLinkId_(30000)    // BossNodeEditor専用: 30000番台
     , isVisible_(false)
     , firstFrame_(true)
-    , highlightedNodeId_(-1) {
+    , highlightedNodeId_(-1)
+    , highlightStartTime_(0.0f) {
 }
 
 /// <summary>
@@ -50,6 +51,8 @@ void BossNodeEditor::Initialize() {
 
     // エディタコンテキストの作成
     editorContext_ = ed::CreateEditor(editorConfig_);
+
+    LoadFromJSON("resources/Json/BossTree.json");
 }
 
 /// <summary>
@@ -127,6 +130,7 @@ void BossNodeEditor::Clear() {
     nextLinkId_ = 30000;    // BossNodeEditor専用: 30000番台
 
     highlightedNodeId_ = -1;
+    highlightStartTime_ = 0.0f;
     firstFrame_ = true;
 }
 
@@ -203,8 +207,13 @@ void BossNodeEditor::DrawToolbar() {
 
     // ドロップダウンリスト
     if (!allNodeTypes.empty()) {
+        // 範囲チェック: 静的変数が範囲外の場合はリセット
+        if (selectedNodeTypeIndex >= static_cast<int>(allDisplayNames.size())) {
+            selectedNodeTypeIndex = 0;
+        }
+
         // 現在選択されているノードの表示名
-        const char* previewValue = selectedNodeTypeIndex < allDisplayNames.size()
+        const char* previewValue = selectedNodeTypeIndex < static_cast<int>(allDisplayNames.size())
             ? allDisplayNames[selectedNodeTypeIndex].c_str()
             : "Select Node Type...";
 
@@ -251,6 +260,10 @@ void BossNodeEditor::DrawNodes() {
 /// 個別ノードの描画
 /// </summary>
 void BossNodeEditor::DrawNode(const EditorNode& node) {
+    // デフォルトのスタイル数を追跡
+    int pushedColors = 2;  // NodeBg, NodeBorder
+    int pushedVars = 2;    // NodeRounding, NodeBorderWidth
+
     // ノードの基本色を設定（少し暗めに）
     ImVec4 nodeColor = ImVec4(
         node.color.x * 0.7f,
@@ -259,16 +272,41 @@ void BossNodeEditor::DrawNode(const EditorNode& node) {
         1.0f
     );
 
-    ed::PushStyleColor(ed::StyleColor_NodeBg, ImColor(nodeColor));
-    ed::PushStyleColor(ed::StyleColor_NodeBorder, ImColor(80, 80, 80));
-    ed::PushStyleVar(ed::StyleVar_NodeRounding, 5.0f);
-    ed::PushStyleVar(ed::StyleVar_NodeBorderWidth, 1.5f);
+    // 実行中ノードのパルスエフェクト計算
+    bool isHighlighted = (node.id == highlightedNodeId_);
 
-    // ハイライト処理
-    if (node.id == highlightedNodeId_) {
-        ed::PushStyleColor(ed::StyleColor_NodeBorder, ImColor(255, 200, 100));
-        ed::PushStyleVar(ed::StyleVar_NodeBorderWidth, 3.0f);
+    float pulseIntensity = 0.0f;
+    float borderWidth = 1.5f;
+    ImVec4 borderColor = ImVec4(0.31f, 0.31f, 0.31f, 1.0f); // ImColor(80, 80, 80)
+
+    if (isHighlighted) {
+        // 実行中ノード: パルスエフェクト
+        float elapsed = static_cast<float>(ImGui::GetTime()) - highlightStartTime_;
+        pulseIntensity = (sinf(elapsed * 6.0f) + 1.0f) * 0.5f; // 0.0～1.0で振動
+
+        // ボーダー色を時間経過で変化（オレンジ～黄色）
+        borderColor = ImVec4(
+            1.0f,
+            0.6f + pulseIntensity * 0.3f,
+            0.2f + pulseIntensity * 0.3f,
+            1.0f
+        );
+        borderWidth = 2.5f + pulseIntensity * 1.5f; // 2.5～4.0で変化
+
+        // ノード背景色も少し明るく
+        nodeColor = ImVec4(
+            node.color.x * 0.7f + pulseIntensity * 0.1f,
+            node.color.y * 0.7f + pulseIntensity * 0.1f,
+            node.color.z * 0.7f + pulseIntensity * 0.1f,
+            1.0f
+        );
     }
+
+    // スタイルを適用
+    ed::PushStyleColor(ed::StyleColor_NodeBg, ImColor(nodeColor));
+    ed::PushStyleColor(ed::StyleColor_NodeBorder, ImColor(borderColor));
+    ed::PushStyleVar(ed::StyleVar_NodeRounding, 5.0f);
+    ed::PushStyleVar(ed::StyleVar_NodeBorderWidth, borderWidth);
 
     ed::BeginNode(node.id);
 
@@ -346,8 +384,8 @@ void BossNodeEditor::DrawNode(const EditorNode& node) {
 
         int pinCount = static_cast<int>(node.outputPinIds.size());
 
-        if (pinCount == 1) {
-            // 単一ピンは中央配置
+        if (pinCount == 1 && !node.outputPinIds.empty()) {
+            // 単一ピンは中央配置（範囲チェック追加）
             const EditorPin* pin = FindPinById(node.outputPinIds[0]);
             if (pin) {
                 float textWidth = ImGui::CalcTextSize("Output").x;
@@ -355,11 +393,11 @@ void BossNodeEditor::DrawNode(const EditorNode& node) {
                 ImGui::SameLine(0, 0);
                 DrawPin(*pin);
             }
-        } else {
-            // 複数ピンは横並び
+        } else if (pinCount > 1 && node.outputPinIds.size() >= static_cast<size_t>(pinCount)) {
+            // 複数ピンは横並び（範囲チェック追加）
             float spacing = nodeWidth / (pinCount + 1);
 
-            for (int i = 0; i < pinCount; i++) {
+            for (int i = 0; i < pinCount && i < static_cast<int>(node.outputPinIds.size()); i++) {
                 const EditorPin* pin = FindPinById(node.outputPinIds[i]);
                 if (pin) {
                     float offset = spacing * (i + 1) - 20; // ピン幅を考慮
@@ -380,12 +418,7 @@ void BossNodeEditor::DrawNode(const EditorNode& node) {
 
     ed::EndNode();
 
-    // ハイライト処理のクリーンアップ
-    if (node.id == highlightedNodeId_) {
-        ed::PopStyleVar();
-        ed::PopStyleColor();
-    }
-
+    // Push/Popの対応を正しく保つ（常に2色、2変数）
     ed::PopStyleVar(2);
     ed::PopStyleColor(2);
 
@@ -906,7 +939,7 @@ void BossNodeEditor::ImportFromBehaviorTree(BossBehaviorTree* tree) {
 }
 
 /// <summary>
-/// 現在実行中のノードをハイライト表示
+/// 現在実行中のノードをハイライト表示（パルスエフェクト付き）
 /// </summary>
 void BossNodeEditor::HighlightRunningNode(const BTNodePtr& nodePtr) {
     if (!nodePtr) {
@@ -916,7 +949,11 @@ void BossNodeEditor::HighlightRunningNode(const BTNodePtr& nodePtr) {
 
     EditorNode* editorNode = FindNodeByRuntimeNode(nodePtr);
     if (editorNode) {
-        highlightedNodeId_ = editorNode->id;
+        // ハイライトノードを更新
+        if (highlightedNodeId_ != editorNode->id) {
+            highlightedNodeId_ = editorNode->id;
+            highlightStartTime_ = static_cast<float>(ImGui::GetTime());
+        }
     }
 }
 

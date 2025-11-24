@@ -73,6 +73,12 @@ public:
     /// <returns>成功したらtrue</returns>
     bool LoadFromJSON(const std::string& filepath);
 
+    /// <summary>
+    /// 現在実行中のノードを取得
+    /// </summary>
+    /// <returns>実行中のノード（なければnullptr）</returns>
+    BTNodePtr GetCurrentRunningNode() const { return currentRunningNode_; }
+
 private:
     /// <summary>
     /// ビヘイビアツリーの構築
@@ -105,6 +111,12 @@ private:
                                 const std::vector<nlohmann::json>& links,
                                 std::unordered_set<int>& visitedNodes);
 
+    /// <summary>
+    /// 実行中のノードを再帰的に検索
+    /// </summary>
+    /// <param name="node">検索開始ノード</param>
+    void FindRunningNodeRecursive(const BTNodePtr& node);
+
     // ルートノード
     BTNodePtr rootNode_;
 
@@ -113,4 +125,7 @@ private:
 
     // 現在のノード名（デバッグ用）
     std::string currentNodeName_;
+
+    // 実行中ノード追跡用
+    BTNodePtr currentRunningNode_;
 };

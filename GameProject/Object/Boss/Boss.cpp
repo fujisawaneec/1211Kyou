@@ -145,6 +145,16 @@ void Boss::Update(float deltaTime)
         if (useBehaviorTree_ && behaviorTree_) {
             // ビヘイビアツリーの更新
             behaviorTree_->Update(deltaTime);
+
+#ifdef _DEBUG
+            // エディタが有効な場合、実行中のノードをハイライト
+            if (nodeEditor_ && showNodeEditor_) {
+                BTNodePtr currentNode = behaviorTree_->GetCurrentRunningNode();
+                if (currentNode) {
+                    nodeEditor_->HighlightRunningNode(currentNode);
+                }
+            }
+#endif
         } else if (stateMachine_) {
             // ステートマシンの更新（互換性のため残す）
             stateMachine_->Update(deltaTime);
@@ -354,6 +364,15 @@ void Boss::DrawImGui()
             if (ImGui::Button("Node Editor")) {
                 showNodeEditor_ = !showNodeEditor_;
                 nodeEditor_->SetVisible(showNodeEditor_);
+            }
+
+            // エディタのツリーをBehaviorTreeに適用
+            ImGui::SameLine();
+            if (ImGui::Button("Apply Editor Tree")) {
+                BTNodePtr runtimeTree = nodeEditor_->BuildRuntimeTree();
+                if (runtimeTree && behaviorTree_) {
+                    behaviorTree_->SetRootNode(runtimeTree);
+                }
             }
 
             // デフォルトツリー生成
