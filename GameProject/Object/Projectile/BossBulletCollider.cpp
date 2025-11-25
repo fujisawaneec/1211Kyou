@@ -27,8 +27,10 @@ void BossBulletCollider::OnCollisionEnter(Collider* other) {
             hitTargets_.insert(targetPtr);
 
             // プレイヤーにダメージを与える
-            float currentHp = player->GetHp();
-            player->SetHp(currentHp - owner_->GetDamage());
+            if (!player->IsInvincible()) {
+                float currentHp = player->GetHp();
+                player->SetHp(currentHp - owner_->GetDamage());
+            }
             hasDealtDamage_ = true;
 
             // 弾を非アクティブ化

@@ -133,6 +133,12 @@ public: // メンバ関数
     void SetHp(float hp) { hp_ = hp; if (hp_ < 0.f) hp_ = 0.f; }
 
     /// <summary>
+    /// 無敵フラグを設定
+    /// </summary>
+    /// <param name="isInvincible">新しい無敵フラグの値</param>
+    void SetInvincible(bool isInvincible) { isInvincible_ = isInvincible; }
+
+    /// <summary>
     /// 入力ハンドラを設定
     /// </summary>
     void SetInputHandler(InputHandler* inputHandler) { inputHandlerPtr_ = inputHandler; }
@@ -166,6 +172,12 @@ public: // メンバ関数
     /// </summary>
     /// <returns>true: 死亡, false: 生存</returns>
     bool IsDead() const { return isDead_; }
+
+    /// <summary>
+    /// 無敵フラグを取得
+    /// </summary>
+    /// <returns>true: 無敵, false: 通常状態</returns>
+    bool IsInvincible() const{ return isInvincible_; }
 
     /// <summary>
     /// 座標変換情報を取得
@@ -275,6 +287,8 @@ private: // メンバ変数
 
     bool mode_ = false;               ///< true: ThirdPersonMode, false: TopDownMode
     bool isDisModelDebugInfo_ = false;///< モデルデバッグ情報の表示
+
+    bool isInvincible_ = false;       ///< 無敵フラグ
 
     // システム
     std::unique_ptr<PlayerStateMachine> stateMachine_;

@@ -269,6 +269,7 @@ void Player::DrawImGui()
             ImGui::Text("Health");
             ImGui::SliderFloat("HP", &hp_, 0.0f, 200.0f, "%.1f");
             ImGui::ProgressBar(hp_ / 100.0f, ImVec2(-1, 0), "");
+            ImGui::Checkbox("Invincible", &isInvincible_);
 
             ImGui::Separator();
 

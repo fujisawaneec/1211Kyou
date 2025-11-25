@@ -94,8 +94,9 @@ void BossBullet::Finalize() {
         emitterManager_->CreateTemporaryEmitterFrom(
             explodeEmitterName_,
             explodeEmitterName_ + "temp",
-            0.2f);
+            0.5f);
         emitterManager_->RemoveEmitter(bulletEmitterName_);
+        emitterManager_->RemoveEmitter(explodeEmitterName_);
     }
 }
 
