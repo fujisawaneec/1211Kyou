@@ -466,12 +466,6 @@
     <FxCompile Include="resources\shaders\InitParticle.CS.hlsl">
       <Filter>Shader\Particle</Filter>
     </FxCompile>
-    <FxCompile Include="resources\shaders\Particle.PS.hlsl">
-      <Filter>Shader\Particle</Filter>
-    </FxCompile>
-    <FxCompile Include="resources\shaders\Particle.VS.hlsl">
-      <Filter>Shader\Particle</Filter>
-    </FxCompile>
     <FxCompile Include="resources\shaders\UpdateParticle.CS.hlsl">
       <Filter>Shader\Particle</Filter>
     </FxCompile>
