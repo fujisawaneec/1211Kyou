@@ -150,4 +150,15 @@ private: // メンバ変数
     float currentSlashRadius_ = 2.f;                            // 現在の斬撃発生半径
 
     bool isDebug_ = false;                                      // デバッグモードフラグ
+
+    // ダッシュエフェクト補間用
+    Vector3 dashEmitterPosition_{};                              // エミッターの補間位置
+    bool previousIsDashing_ = false;                             // 前フレームのダッシュ状態
+    bool dashEmitterActive_ = false;                             // エミッターのアクティブ状態
+
+    /// <summary>
+    /// ダッシュエフェクトエミッターの更新（Lerp補間）
+    /// </summary>
+    /// <param name="deltaTime">フレーム間の経過時間</param>
+    void UpdateDashEmitter(float deltaTime);
 };

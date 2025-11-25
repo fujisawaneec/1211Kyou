@@ -23,7 +23,13 @@
 #include "CameraSystem/TopDownController.h"
 #include "CameraSystem/CameraAnimationController.h"
 #include "../Object/Projectile/BossBullet.h"
+#include "GlobalVariables.h"
+#include "Vec3Func.h"
 #include <algorithm>
+#include <cmath>
+
+#include "Object/Player/State/PlayerState.h"
+#include "Object/Player/State/PlayerStateMachine.h"
 
 // Debug includes
 #ifdef _DEBUG
@@ -179,17 +185,19 @@ void GameScene::Initialize()
     // シーンのエミッターをまとめて読み込む
     emitterManager_->LoadScenePreset("gamescene_preset");
 
-    // ボスフェーズ2用の境界線エミッターの読み込み
-    // 4辺の境界線を作成（左右前後）
-    emitterManager_->LoadPreset("boss_vertical_border", "boss_border_front");
-    emitterManager_->LoadPreset("boss_vertical_border", "boss_border_back");
-    emitterManager_->LoadPreset("boss_horizontal_border", "boss_border_left");
-    emitterManager_->LoadPreset("boss_horizontal_border", "boss_border_right");
-    // 初期状態は無効化（ボスフェーズ2まで非表示）
+    // ボスフェーズ2用の境界線初期状態は無効化（ボスフェーズ2まで非表示）
     emitterManager_->SetEmitterActive("boss_border_left", false);
     emitterManager_->SetEmitterActive("boss_border_right", false);
     emitterManager_->SetEmitterActive("boss_border_front", false);
     emitterManager_->SetEmitterActive("boss_border_back", false);
+
+    // ダッシュエフェクトパラメータの登録
+    GlobalVariables* gv = GlobalVariables::GetInstance();
+    gv->CreateGroup("DashEffect");
+    gv->AddItem("DashEffect", "LerpSpeed", 35.0f);
+
+    // ダッシュエミッター位置を初期化
+    dashEmitterPosition_ = player_->GetTranslate();
 }
 
 void GameScene::Finalize()
@@ -279,10 +287,12 @@ void GameScene::Update()
     float deltaTime = FrameTimer::GetInstance()->GetDeltaTime();
     UpdateProjectiles(deltaTime);
 
-    // プレイヤーの位置にオーバー演出エミッターとダッシュエミッターををセット
+    // プレイヤーの位置にオーバー演出エミッターをセット
     emitterManager_->SetEmitterPosition("over1", player_->GetTranslate());
     emitterManager_->SetEmitterPosition("over2", player_->GetTranslate());
-    emitterManager_->SetEmitterPosition("player_dash", player_->GetTranslate());
+
+    // ダッシュエミッターのLerp補間処理
+    UpdateDashEmitter(deltaTime);
 
     // ボスの位置にクリア演出エミッターをセット
     emitterManager_->SetEmitterPosition("clear_slash", boss_->GetTranslate());
@@ -613,4 +623,51 @@ void GameScene::CreateBossBullet()
         bullet->Initialize(request.position, request.velocity);
         bossBullets_.push_back(std::move(bullet));
     }
+}
+
+void GameScene::UpdateDashEmitter(float deltaTime)
+{
+    // ダッシュ状態の判定
+    bool isDashing = false;
+    if (player_ && player_->GetStateMachine() && player_->GetStateMachine()->GetCurrentState()) {
+        isDashing = (player_->GetStateMachine()->GetCurrentState()->GetName() == "Dash");
+    }
+
+    // ダッシュ開始時: エミッター有効化 & 位置リセット
+    if (isDashing && !previousIsDashing_) {
+        emitterManager_->SetEmitterActive("player_dash", true);
+        dashEmitterActive_ = true;
+        dashEmitterPosition_ = player_->GetTranslate();
+    }
+
+    // エミッターがアクティブな間は補間を継続（ダッシュ終了後も追いつくまで続ける）
+    if (dashEmitterActive_) {
+        // GlobalVariablesから補間速度を取得
+        float lerpSpeed = GlobalVariables::GetInstance()->GetValueFloat("DashEffect", "LerpSpeed");
+
+        // フレームレート非依存の指数減衰補間
+        // t = 1 - e^(-speed * dt) で、どのFPSでも同じ視覚的結果
+        float t = 1.0f - std::exp(-lerpSpeed * deltaTime);
+
+        // エミッター位置をプレイヤー位置に向かって補間
+        dashEmitterPosition_ = Vec3::Lerp(dashEmitterPosition_, player_->GetTranslate(), t);
+
+        // エミッター位置を更新
+        emitterManager_->SetEmitterPosition("player_dash", dashEmitterPosition_);
+
+        // ダッシュ終了後、エミッターがプレイヤー位置に十分近づいたら無効化
+        if (!isDashing) {
+            Vector3 diff = player_->GetTranslate() - dashEmitterPosition_;
+            float distanceSquared = diff.x * diff.x + diff.y * diff.y + diff.z * diff.z;
+            const float threshold = 0.65f;  // 閾値
+
+            if (distanceSquared < threshold * threshold) {
+                emitterManager_->SetEmitterActive("player_dash", false);
+                dashEmitterActive_ = false;
+            }
+        }
+    }
+
+    // 状態を保存
+    previousIsDashing_ = isDashing;
 }
