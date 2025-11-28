@@ -253,7 +253,6 @@ void CameraAnimationCurveEditor::DrawCurveProperties() {
 
     // ズーム・パン
     ImGui::DragFloat("Zoom X", &zoomX_, 0.01f, 0.1f, 10.0f);
-    ImGui::SameLine();
     ImGui::DragFloat("Zoom Y", &zoomY_, 0.01f, 0.1f, 10.0f);
 
     // 範囲設定
