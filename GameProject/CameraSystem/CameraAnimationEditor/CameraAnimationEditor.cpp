@@ -612,7 +612,7 @@ void CameraAnimationEditor::DrawInspectorPanel() {
 
     // 座標系タイプ選択
     const char* coordTypes[] = { "World", "Target Relative" };
-    ImGui::Combo("Coordinate Type", &coordTypeIndex, coordTypes, 2);
+    ImGui::Combo("Coordinate Type##AddFrame", &coordTypeIndex, coordTypes, 2);
 
     // TARGET_RELATIVEモード選択時の警告
     if (coordTypeIndex == 1 && !targetTransform_) {
@@ -699,7 +699,7 @@ void CameraAnimationEditor::DrawInspectorPanel() {
       // 座標系タイプ
       const char* coordTypes[] = { "World", "Target Relative" };
       int currentCoordType = static_cast<int>(kf.coordinateType);
-      if (ImGui::Combo("Coordinate Type", &currentCoordType, coordTypes, 2)) {
+      if (ImGui::Combo("Coordinate Type##FrameParam", &currentCoordType, coordTypes, 2)) {
         kf.coordinateType = static_cast<CameraKeyframe::CoordinateType>(currentCoordType);
         changed = true;
       }
