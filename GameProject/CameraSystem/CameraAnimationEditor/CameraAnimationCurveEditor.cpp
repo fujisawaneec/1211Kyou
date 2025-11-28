@@ -226,16 +226,18 @@ void CameraAnimationCurveEditor::DrawEasingPresets() {
 
     const char* easingNames[] = { "Linear", "Ease In", "Ease Out", "Ease In-Out" };
 
-    for (int i = 0; i < 4; ++i) {
-        if (i > 0) ImGui::SameLine();
+    // ドロップダウンメニュー（選択のみ、適用はボタンで行う）
+    ImGui::PushItemWidth(120.0f);
+    ImGui::Combo("##EasingPreset", &selectedEasingIndex_, easingNames, 4);
+    ImGui::PopItemWidth();
 
-        if (ImGui::Button(easingNames[i])) {
-            // 選択中のキーフレームに適用
-            if (selectedKeyPoint_ >= 0 && selectedKeyPoint_ < static_cast<int>(animation_->GetKeyframeCount())) {
-                CameraKeyframe kf = animation_->GetKeyframe(selectedKeyPoint_);
-                kf.interpolation = static_cast<CameraKeyframe::InterpolationType>(i);
-                animation_->EditKeyframe(selectedKeyPoint_, kf);
-            }
+    // 適用ボタン
+    ImGui::SameLine();
+    if (ImGui::Button("Apply")) {
+        if (selectedKeyPoint_ >= 0 && selectedKeyPoint_ < static_cast<int>(animation_->GetKeyframeCount())) {
+            CameraKeyframe kf = animation_->GetKeyframe(selectedKeyPoint_);
+            kf.interpolation = static_cast<CameraKeyframe::InterpolationType>(selectedEasingIndex_);
+            animation_->EditKeyframe(selectedKeyPoint_, kf);
         }
     }
 }

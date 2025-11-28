@@ -187,6 +187,7 @@ private:
 
     // 選択状態
     int selectedKeyPoint_ = -1;                  ///< 選択中のキーポイント
+    int selectedEasingIndex_ = 0;                ///< 選択中のイージングプリセットインデックス
     HandleType selectedHandle_ = HandleType::NONE; ///< 選択中のハンドル
     bool isDragging_ = false;                    ///< ドラッグ中か
     ImVec2 dragStartPos_;                         ///< ドラッグ開始位置
