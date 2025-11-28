@@ -14,9 +14,9 @@ CameraAnimationCurveEditor::CameraAnimationCurveEditor() {
     curveColors_[static_cast<int>(CurveType::ROTATION_Z)] = IM_COL32(100, 200, 255, 255);
     curveColors_[static_cast<int>(CurveType::FOV)] = IM_COL32(255, 255, 100, 255);
 
-    // 初期状態では位置カーブのみ表示
+    // 初期状態ではPOSITION_Xのみ表示（タブ選択で切り替わる）
     for (int i = 0; i < static_cast<int>(CurveType::COUNT); ++i) {
-        curveVisible_[i] = (i < 3);  // POSITION_X/Y/Zのみ
+        curveVisible_[i] = (i == 0);  // POSITION_Xのみ
     }
 }
 
@@ -43,6 +43,10 @@ void CameraAnimationCurveEditor::Draw(const std::vector<int>& selectedKeyframes)
             if (ImGui::BeginTabItem(curveNames[i])) {
                 selectedTab = i;
                 activeCurve_ = static_cast<CurveType>(i);
+                // 選択されたカーブのみ可視に設定
+                for (int j = 0; j < static_cast<int>(CurveType::COUNT); ++j) {
+                    curveVisible_[j] = (j == i);
+                }
                 ImGui::EndTabItem();
             }
         }
