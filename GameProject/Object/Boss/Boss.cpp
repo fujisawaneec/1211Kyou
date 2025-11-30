@@ -86,8 +86,10 @@ void Boss::Initialize()
         // ノードエディタの初期化
         nodeEditor_ = std::make_unique<BossNodeEditor>();
         nodeEditor_->Initialize();
-        // 現在のビヘイビアツリーをエディタにインポート（後で実装）
-        // nodeEditor_->ImportFromBehaviorTree(behaviorTree_.get());
+        BTNodePtr runtimeTree = nodeEditor_->BuildRuntimeTree();
+        if (runtimeTree && behaviorTree_) {
+            behaviorTree_->SetRootNode(runtimeTree);
+        }
 #endif
     } else {
         // ステートマシンの初期化（互換性のため残す）
@@ -351,10 +353,6 @@ void Boss::DrawImGui()
         if (ImGui::Button("Load Tree from JSON")) {
             if (behaviorTree_->LoadFromJSON("resources/Json/BossTree.json")) {
                 ImGui::Text("Tree loaded successfully!");
-                // デバッグビルドの場合、エディタにも反映
-                //if (nodeEditor_) {
-                //    nodeEditor_->ImportFromBehaviorTree(behaviorTree_.get());
-                //}
             }
         }
 

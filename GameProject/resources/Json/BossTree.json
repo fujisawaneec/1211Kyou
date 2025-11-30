@@ -58,8 +58,8 @@
     }
   ],
   "metadata": {
-    "created": "2025-11-30T22:42:09",
-    "modified": "2025-11-30T22:42:09",
+    "created": "2025-11-30T23:59:52",
+    "modified": "2025-11-30T23:59:52",
     "name": "Boss Behavior Tree"
   },
   "nodes": [
@@ -77,7 +77,7 @@
       "displayName": "Idle",
       "id": 10001,
       "parameters": {
-        "idleDuration": 1.6141917705535889
+        "idleDuration": 1.0
       },
       "position": {
         "x": 250.0,
@@ -121,8 +121,8 @@
       "displayName": "DashAction",
       "id": 10005,
       "parameters": {
-        "dashDuration": 0.5557485222816467,
-        "dashSpeed": 60.0
+        "dashDuration": 0.12563887238502502,
+        "dashSpeed": 350.0
       },
       "position": {
         "x": 450.0,
@@ -156,9 +156,10 @@
       "displayName": "ShootAction",
       "id": 10008,
       "parameters": {
-        "bulletSpeed": 100.0,
+        "bulletSpeed": 150.0,
         "chargeTime": 0.0,
-        "spreadAngle": 0.5061454772949219
+        "recoveryTime": 0.5,
+        "spreadAngle": 0.2617993950843811
       },
       "position": {
         "x": 850.0,

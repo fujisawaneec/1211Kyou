@@ -18,8 +18,7 @@ BossBehaviorTree::BossBehaviorTree(Boss* boss, Player* player) {
     blackboard_->SetPlayer(player);
     blackboard_->SetInt("ActionCounter", 0);
 
-    // ツリーの構築
-    //BuildTree();
+    // ツリーを読み込み
     LoadFromJSON("resources/Json/BossTree.json");
 }
 

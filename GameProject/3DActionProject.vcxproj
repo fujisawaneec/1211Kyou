@@ -176,7 +176,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Object\Boss\BossBehaviorTree\Actions\BTBossShoot.cpp" />
     <ClCompile Include="Object\Boss\BossBehaviorTree\BossBehaviorTree.cpp" />
     <ClCompile Include="Object\Boss\BossBehaviorTree\Conditions\BTActionSelector.cpp" />
-    <ClCompile Include="Object\Boss\BossNodeEditor\BossNodeEditor.cpp" />
+    <ClCompile Include="Object\Boss\BossNodeEditor\BossNodeEditor.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="Object\Boss\BossNodeEditor\BossNodeFactory.cpp" />
     <ClCompile Include="Object\Boss\BossNodeEditor\BossNodeInspectors.cpp" />
     <ClCompile Include="Object\Boss\States\BossDashState.cpp" />
@@ -242,7 +244,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Object\Boss\BossBehaviorTree\Actions\BTBossShoot.h" />
     <ClInclude Include="Object\Boss\BossBehaviorTree\BossBehaviorTree.h" />
     <ClInclude Include="Object\Boss\BossBehaviorTree\Conditions\BTActionSelector.h" />
-    <ClInclude Include="Object\Boss\BossNodeEditor\BossNodeEditor.h" />
+    <ClInclude Include="Object\Boss\BossNodeEditor\BossNodeEditor.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="Object\Boss\BossNodeEditor\BossNodeFactory.h" />
     <ClInclude Include="Object\Boss\BossNodeEditor\BossNodeInspectors.h" />
     <ClInclude Include="Object\Boss\States\BossDashState.h" />
