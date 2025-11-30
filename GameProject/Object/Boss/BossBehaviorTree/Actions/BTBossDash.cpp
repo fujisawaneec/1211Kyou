@@ -92,13 +92,6 @@ void BTBossDash::InitializeDash(Boss* boss) {
 }
 
 void BTBossDash::UpdateDashMovement(Boss* boss, float deltaTime) {
-    // フェーズ2では速度を下げる
-    if (boss->GetPhase() == 2) {
-        dashSpeed_ = 30.0f;
-    } else {
-        dashSpeed_ = 60.0f;
-    }
-
     if (elapsedTime_ < dashDuration_) {
         // ダッシュ中の移動
         float t = elapsedTime_ / dashDuration_;

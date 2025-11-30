@@ -39,6 +39,8 @@ public:
     void SetBulletSpeed(float speed) { bulletSpeed_ = speed; }
     float GetSpreadAngle() const { return spreadAngle_; }
     void SetSpreadAngle(float angle) { spreadAngle_ = angle; }
+    float GetRecoveryTime() const { return recoveryTime_; }
+    void SetRecoveryTime(float time) { recoveryTime_ = time; }
 
 private:
     /// <summary>

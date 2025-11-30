@@ -259,7 +259,7 @@ BTNodePtr BossBehaviorTree::BuildNodeFromJSON(
     }
 
     // パラメータを適用
-    if (nodeJson.contains("parameters")) {
+    if (nodeJson.contains("parameters") && !nodeJson["parameters"].is_null()) {
         nlohmann::json params = nodeJson["parameters"];
 
         // BTActionSelectorの場合
@@ -270,7 +270,31 @@ BTNodePtr BossBehaviorTree::BuildNodeFromJSON(
                 actionSelector->SetActionType(static_cast<BTActionSelector::ActionType>(actionType));
             }
         }
-        // 今後、他のノードタイプのパラメータもここに追加
+        // BTBossIdleの場合
+        else if (nodeType == "BTBossIdle") {
+            auto idleNode = std::dynamic_pointer_cast<BTBossIdle>(node);
+            if (idleNode && params.contains("idleDuration")) {
+                idleNode->SetIdleDuration(params["idleDuration"]);
+            }
+        }
+        // BTBossDashの場合
+        else if (nodeType == "BTBossDash") {
+            auto dashNode = std::dynamic_pointer_cast<BTBossDash>(node);
+            if (dashNode) {
+                if (params.contains("dashSpeed")) dashNode->SetDashSpeed(params["dashSpeed"]);
+                if (params.contains("dashDuration")) dashNode->SetDashDuration(params["dashDuration"]);
+            }
+        }
+        // BTBossShootの場合
+        else if (nodeType == "BTBossShoot") {
+            auto shootNode = std::dynamic_pointer_cast<BTBossShoot>(node);
+            if (shootNode) {
+                if (params.contains("chargeTime")) shootNode->SetChargeTime(params["chargeTime"]);
+                if (params.contains("bulletSpeed")) shootNode->SetBulletSpeed(params["bulletSpeed"]);
+                if (params.contains("spreadAngle")) shootNode->SetSpreadAngle(params["spreadAngle"]);
+                if (params.contains("recoveryTime")) shootNode->SetRecoveryTime(params["recoveryTime"]);
+            }
+        }
     }
 
     // 表示名を設定（オプション）

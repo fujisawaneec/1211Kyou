@@ -51,11 +51,6 @@ private:
     /// <param name="deltaTime">経過時間</param>
     void LookAtPlayer(Boss* boss, float deltaTime);
 
-    /// <summary>
-    /// 待機時間を決定する
-    /// </summary>
-    /// <param name="boss">ボス</param>
-    void DetermineIdleDuration(Boss* boss);
 
     // 待機時間（次の行動までの時間）
     float idleDuration_ = 2.0f;

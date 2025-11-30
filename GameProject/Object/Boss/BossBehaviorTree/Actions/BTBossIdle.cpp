@@ -2,7 +2,6 @@
 #include "../../Boss.h"
 #include "../../../Player/Player.h"
 #include "Vector3.h"
-#include "RandomEngine.h"
 #include <cmath>
 
 BTBossIdle::BTBossIdle() {
@@ -21,7 +20,6 @@ BTNodeStatus BTBossIdle::Execute(BTBlackboard* blackboard) {
     // 初回実行時の初期化
     if (isFirstExecute_) {
         elapsedTime_ = 0.0f;
-        DetermineIdleDuration(boss);
         isFirstExecute_ = false;
 
         // 次のアクションカウンターをインクリメント
@@ -95,14 +93,3 @@ void BTBossIdle::LookAtPlayer(Boss* boss, float deltaTime) {
     }
 }
 
-void BTBossIdle::DetermineIdleDuration(Boss* boss) {
-    RandomEngine* rng = RandomEngine::GetInstance();
-
-    if (boss->GetPhase() == 1) {
-        // フェーズ1: 少し長めの待機
-        idleDuration_ = rng->GetFloat(1.3f, 2.0f);
-    } else {
-        // フェーズ2: より短い待機
-        idleDuration_ = rng->GetFloat(0.8f, 1.5f);
-    }
-}

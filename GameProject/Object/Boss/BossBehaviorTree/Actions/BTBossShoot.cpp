@@ -63,20 +63,8 @@ void BTBossShoot::InitializeShoot(Boss* boss) {
     // タイマーリセット
     elapsedTime_ = 0.0f;
 
-    // フェーズに応じてパラメータ調整
-    if (boss->GetPhase() == 2) {
-        // フェーズ2: より速い弾、短い硬直
-        bulletSpeed_ = 20.0f;
-        chargeTime_ = 0.5f;
-        recoveryTime_ = 0.3f;
-        totalDuration_ = chargeTime_ + recoveryTime_;
-    } else {
-        // フェーズ1: 通常パラメータ
-        bulletSpeed_ = 100.0f;
-        chargeTime_ = 0.5f;
-        recoveryTime_ = 0.5f;
-        totalDuration_ = chargeTime_ + recoveryTime_;
-    }
+    // totalDurationを計算
+    totalDuration_ = chargeTime_ + recoveryTime_;
 }
 
 void BTBossShoot::AimAtPlayer(Boss* boss, float deltaTime) {

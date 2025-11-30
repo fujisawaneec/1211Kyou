@@ -48,6 +48,12 @@ bool BTBossShootInspector::DrawUI() {
         changed = true;
     }
 
+    float recoveryTime = node_->GetRecoveryTime();
+    if (ImGui::DragFloat("Recovery Time##shoot", &recoveryTime, 0.05f, 0.0f, 3.0f)) {
+        node_->SetRecoveryTime(recoveryTime);
+        changed = true;
+    }
+
     float bulletSpeed = node_->GetBulletSpeed();
     if (ImGui::DragFloat("Bullet Speed##shoot", &bulletSpeed, 1.0f, 5.0f, 100.0f)) {
         node_->SetBulletSpeed(bulletSpeed);
@@ -66,6 +72,7 @@ bool BTBossShootInspector::DrawUI() {
 nlohmann::json BTBossShootInspector::ExtractParams() const {
     return {
         {"chargeTime", node_->GetChargeTime()},
+        {"recoveryTime", node_->GetRecoveryTime()},
         {"bulletSpeed", node_->GetBulletSpeed()},
         {"spreadAngle", node_->GetSpreadAngle()}
     };
@@ -73,6 +80,7 @@ nlohmann::json BTBossShootInspector::ExtractParams() const {
 
 void BTBossShootInspector::ApplyParams(const nlohmann::json& params) {
     if (params.contains("chargeTime")) node_->SetChargeTime(params["chargeTime"]);
+    if (params.contains("recoveryTime")) node_->SetRecoveryTime(params["recoveryTime"]);
     if (params.contains("bulletSpeed")) node_->SetBulletSpeed(params["bulletSpeed"]);
     if (params.contains("spreadAngle")) node_->SetSpreadAngle(params["spreadAngle"]);
 }
