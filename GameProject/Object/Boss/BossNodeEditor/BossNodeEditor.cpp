@@ -6,6 +6,7 @@
 #include "../../../BehaviorTree/Core/BTComposite.h"
 #include "../../../BehaviorTree/Core/BTBlackboard.h"
 #include "../BossBehaviorTree/Conditions/BTActionSelector.h"
+#include "DebugUIManager.h"
 #include <imgui_internal.h>
 #include <algorithm>
 #include <queue>
@@ -773,7 +774,9 @@ bool BossNodeEditor::LoadFromJSON(const std::string& filepath) {
     try {
         std::ifstream file(filepath);
         if (!file.is_open()) {
-            ImGui::LogText("[BossNodeEditor] Failed to open file for reading: %s", filepath.c_str());
+            DebugUIManager::GetInstance()->AddLog(
+                "[BossNodeEditor] Failed to open file for reading: " + filepath,
+                DebugUIManager::LogType::Error);
             return false;
         }
 
@@ -783,7 +786,9 @@ bool BossNodeEditor::LoadFromJSON(const std::string& filepath) {
 
         // バージョンチェック
         if (!json.contains("version") || json["version"] != "1.0") {
-            ImGui::LogText("[BossNodeEditor] Unsupported file version");
+            DebugUIManager::GetInstance()->AddLog(
+                "[BossNodeEditor] Unsupported file version",
+                DebugUIManager::LogType::Error);
             return false;
         }
 
@@ -868,13 +873,18 @@ bool BossNodeEditor::LoadFromJSON(const std::string& filepath) {
             }
         }
 
-        ImGui::LogText("[BossNodeEditor] Successfully loaded from: %s", filepath.c_str());
-        ImGui::LogText("[BossNodeEditor] Loaded %d nodes and %d links",
-            (int)nodes_.size(), (int)links_.size());
+        DebugUIManager::GetInstance()->AddLog(
+            "[BossNodeEditor] Successfully loaded from: " + filepath,
+            DebugUIManager::LogType::Info);
+        DebugUIManager::GetInstance()->AddLog(
+            "[BossNodeEditor] Loaded " + std::to_string(nodes_.size()) + " nodes and " + std::to_string(links_.size()) + " links",
+            DebugUIManager::LogType::Info);
         return true;
     }
     catch (const std::exception& e) {
-        ImGui::LogText("[BossNodeEditor] Failed to load JSON: %s", e.what());
+        DebugUIManager::GetInstance()->AddLog(
+            "[BossNodeEditor] Failed to load JSON: " + std::string(e.what()),
+            DebugUIManager::LogType::Error);
         return false;
     }
 }
@@ -942,19 +952,25 @@ bool BossNodeEditor::SaveToJSON(const std::string& filepath) {
         // ファイルに書き出し
         std::ofstream file(filepath);
         if (!file.is_open()) {
-            ImGui::LogText("[BossNodeEditor] Failed to open file for writing: %s", filepath.c_str());
+            DebugUIManager::GetInstance()->AddLog(
+                "[BossNodeEditor] Failed to open file for writing: " + filepath,
+                DebugUIManager::LogType::Error);
             return false;
         }
 
         file << json.dump(2); // インデント2で整形
         file.close();
 
-        ImGui::LogText("[BossNodeEditor] Successfully saved to: %s", filepath.c_str());
+        DebugUIManager::GetInstance()->AddLog(
+            "[BossNodeEditor] Successfully saved to: " + filepath,
+            DebugUIManager::LogType::Info);
         return true;
     }
     catch (const std::exception& e) {
         // エラーログ
-        ImGui::LogText("[BossNodeEditor] Failed to save JSON: %s", e.what());
+        DebugUIManager::GetInstance()->AddLog(
+            "[BossNodeEditor] Failed to save JSON: " + std::string(e.what()),
+            DebugUIManager::LogType::Error);
         return false;
     }
 }
@@ -994,15 +1010,21 @@ void BossNodeEditor::ImportFromBehaviorTree(BossBehaviorTree* tree) {
     // ルートノードを取得
     BTNodePtr rootNode = tree->GetRootNode();
     if (!rootNode) {
-        ImGui::LogText("[BossNodeEditor] No root node found in BossBehaviorTree");
+        DebugUIManager::GetInstance()->AddLog(
+            "[BossNodeEditor] No root node found in BossBehaviorTree",
+            DebugUIManager::LogType::Error);
         return;
     }
 
     // ノードを再帰的にインポート
     ImportNodeRecursive(rootNode, ImVec2(400, 100), 0);
 
-    ImGui::LogText("[BossNodeEditor] Successfully imported BossBehaviorTree");
-    ImGui::LogText("[BossNodeEditor] Imported %d nodes", (int)nodes_.size());
+    DebugUIManager::GetInstance()->AddLog(
+        "[BossNodeEditor] Successfully imported BossBehaviorTree",
+        DebugUIManager::LogType::Info);
+    DebugUIManager::GetInstance()->AddLog(
+        "[BossNodeEditor] Imported " + std::to_string(nodes_.size()) + " nodes",
+        DebugUIManager::LogType::Info);
 }
 
 /// <summary>
@@ -1308,7 +1330,9 @@ int BossNodeEditor::ImportNodeRecursive(const BTNodePtr& btNode, const ImVec2& p
     // ノードタイプを取得
     std::string nodeType = BossNodeFactory::GetNodeType(btNode);
     if (nodeType.empty()) {
-        ImGui::LogText("[BossNodeEditor] Unknown node type during import");
+        DebugUIManager::GetInstance()->AddLog(
+            "[BossNodeEditor] Unknown node type during import",
+            DebugUIManager::LogType::Warning);
         return -1;
     }
 
@@ -1503,7 +1527,9 @@ void BossNodeEditor::CreateDefaultTree() {
     // 自動的にJSONに保存
     SaveToJSON("resources/Json/BossTree.json");
 
-    ImGui::LogText("[BossNodeEditor] Default tree created and saved to BossTree.json");
+    DebugUIManager::GetInstance()->AddLog(
+        "[BossNodeEditor] Default tree created and saved to BossTree.json",
+        DebugUIManager::LogType::Info);
 }
 
 #endif // _DEBUG
