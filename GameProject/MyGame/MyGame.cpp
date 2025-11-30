@@ -55,7 +55,7 @@ void MyGame::Initialize()
   TextureManager::GetInstance()->LoadTexture("gameClear_Text.png");
   TextureManager::GetInstance()->LoadTexture("gameOver_Text.png");
 
-  spriteBasicOnresizeId = winApp_->RegisterOnResizeFunc(std::bind(&SpriteBasic::OnResize, SpriteBasic::GetInstance(), std::placeholders::_1));
+  spriteBasicOnresizeId_ = winApp_->RegisterOnResizeFunc(std::bind(&SpriteBasic::OnResize, SpriteBasic::GetInstance(), std::placeholders::_1));
 
   // GPUパーティクルの初期化
   GPUParticle::GetInstance()->Initialize(dx12_, defaultCamera_);
@@ -63,7 +63,7 @@ void MyGame::Initialize()
 
 void MyGame::Finalize()
 {
-  winApp_->UnregisterOnResizeFunc(spriteBasicOnresizeId);
+  winApp_->UnregisterOnResizeFunc(spriteBasicOnresizeId_);
 
   // GPUパーティクルの解放
   GPUParticle::GetInstance()->Finalize();
@@ -99,7 +99,7 @@ void MyGame::Update()
   //　サウンドの更新
   Audio::GetInstance()->Update();
 
-  // ゲームパッドの状態をリスレッシュ
+  // ゲームパッドの状態をリフレッシュ
   Input::GetInstance()->RefreshGamePadState();
 }
 

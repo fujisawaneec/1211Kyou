@@ -32,5 +32,5 @@ public: // メンバ関数
 
 private: // メンバ変数
 
-  uint32_t spriteBasicOnresizeId = 0;
+  uint32_t spriteBasicOnresizeId_ = 0;
 };
