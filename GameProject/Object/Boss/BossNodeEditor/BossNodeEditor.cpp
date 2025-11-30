@@ -999,6 +999,10 @@ bool BossNodeEditor::SaveToJSON(const std::string& filepath) {
             json["links"].push_back(linkJson);
         }
 
+        // ディレクトリが存在しない場合は作成
+        std::filesystem::path filePath(filepath);
+        std::filesystem::create_directories(filePath.parent_path());
+
         // ファイルに書き出し
         std::ofstream file(filepath);
         if (!file.is_open()) {

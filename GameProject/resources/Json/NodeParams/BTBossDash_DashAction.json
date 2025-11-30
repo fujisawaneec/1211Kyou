@@ -1,0 +1,8 @@
+{
+    "displayName": "DashAction",
+    "nodeType": "BTBossDash",
+    "parameters": {
+        "dashDuration": 0.5,
+        "dashSpeed": 60.0
+    }
+}
