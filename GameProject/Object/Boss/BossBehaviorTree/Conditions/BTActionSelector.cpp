@@ -1,5 +1,9 @@
 #include "BTActionSelector.h"
 
+#ifdef _DEBUG
+#include <imgui.h>
+#endif
+
 BTActionSelector::BTActionSelector(ActionType type)
     : expectedType_(type) {
     name_ = (type == ActionType::Dash) ? "ActionSelector(Dash)" : "ActionSelector(Shoot)";
@@ -25,3 +29,22 @@ BTNodeStatus BTActionSelector::Execute(BTBlackboard* blackboard) {
 void BTActionSelector::Reset() {
     BTNode::Reset();
 }
+
+nlohmann::json BTActionSelector::ExtractParameters() const {
+    return {{"actionType", static_cast<int>(expectedType_)}};
+}
+
+#ifdef _DEBUG
+bool BTActionSelector::DrawImGui() {
+    bool changed = false;
+
+    int actionType = static_cast<int>(expectedType_);
+    const char* items[] = { "Dash", "Shoot" };
+    if (ImGui::Combo("Action Type##selector", &actionType, items, IM_ARRAYSIZE(items))) {
+        expectedType_ = static_cast<ActionType>(actionType);
+        changed = true;
+    }
+
+    return changed;
+}
+#endif

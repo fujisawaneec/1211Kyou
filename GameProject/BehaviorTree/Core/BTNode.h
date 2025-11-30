@@ -89,6 +89,23 @@ public:
         (void)params;
     }
 
+    /// <summary>
+    /// パラメータをJSONとして抽出（保存用）
+    /// </summary>
+    /// <returns>パラメータJSON</returns>
+    virtual nlohmann::json ExtractParameters() const {
+        // デフォルトは空のJSONを返す（パラメータを持たないノード用）
+        return {};
+    }
+
+#ifdef _DEBUG
+    /// <summary>
+    /// ImGuiでパラメータ編集UIを描画
+    /// </summary>
+    /// <returns>パラメータ変更があればtrue</returns>
+    virtual bool DrawImGui() { return false; }
+#endif
+
 protected:
     // 現在の状態
     BTNodeStatus status_ = BTNodeStatus::Failure;

@@ -4,6 +4,10 @@
 #include "Vector3.h"
 #include <cmath>
 
+#ifdef _DEBUG
+#include <imgui.h>
+#endif
+
 BTBossIdle::BTBossIdle() {
     name_ = "BossIdle";
 }
@@ -93,3 +97,18 @@ void BTBossIdle::LookAtPlayer(Boss* boss, float deltaTime) {
     }
 }
 
+nlohmann::json BTBossIdle::ExtractParameters() const {
+    return {{"idleDuration", idleDuration_}};
+}
+
+#ifdef _DEBUG
+bool BTBossIdle::DrawImGui() {
+    bool changed = false;
+
+    if (ImGui::DragFloat("Idle Duration##idle", &idleDuration_, 0.1f, 0.0f, 10.0f)) {
+        changed = true;
+    }
+
+    return changed;
+}
+#endif

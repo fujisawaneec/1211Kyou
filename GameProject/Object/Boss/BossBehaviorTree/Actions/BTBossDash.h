@@ -51,6 +51,18 @@ public:
         }
     }
 
+    /// <summary>
+    /// パラメータをJSONとして抽出
+    /// </summary>
+    nlohmann::json ExtractParameters() const override;
+
+#ifdef _DEBUG
+    /// <summary>
+    /// ImGuiでパラメータ編集UIを描画
+    /// </summary>
+    bool DrawImGui() override;
+#endif
+
 private:
     /// <summary>
     /// ダッシュパラメータの初期化

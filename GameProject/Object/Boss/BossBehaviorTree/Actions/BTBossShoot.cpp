@@ -3,6 +3,10 @@
 #include "../../../Player/Player.h"
 #include <cmath>
 
+#ifdef _DEBUG
+#include <imgui.h>
+#endif
+
 BTBossShoot::BTBossShoot() {
     name_ = "BossShoot";
 }
@@ -144,3 +148,33 @@ Vector3 BTBossShoot::CalculateBulletDirection(const Vector3& baseDirection, floa
     rotatedDirection = rotatedDirection.Normalize();
     return rotatedDirection;
 }
+
+nlohmann::json BTBossShoot::ExtractParameters() const {
+    return {
+        {"chargeTime", chargeTime_},
+        {"recoveryTime", recoveryTime_},
+        {"bulletSpeed", bulletSpeed_},
+        {"spreadAngle", spreadAngle_}
+    };
+}
+
+#ifdef _DEBUG
+bool BTBossShoot::DrawImGui() {
+    bool changed = false;
+
+    if (ImGui::DragFloat("Charge Time##shoot", &chargeTime_, 0.05f, 0.0f, 3.0f)) {
+        changed = true;
+    }
+    if (ImGui::DragFloat("Recovery Time##shoot", &recoveryTime_, 0.05f, 0.0f, 3.0f)) {
+        changed = true;
+    }
+    if (ImGui::DragFloat("Bullet Speed##shoot", &bulletSpeed_, 1.0f, 5.0f, 100.0f)) {
+        changed = true;
+    }
+    if (ImGui::SliderAngle("Spread Angle##shoot", &spreadAngle_, 0.0f, 45.0f)) {
+        changed = true;
+    }
+
+    return changed;
+}
+#endif

@@ -743,12 +743,9 @@ void BossNodeEditor::DrawNodeInspector() {
     ImGui::Separator();
     ImGui::Text("Parameters");
 
-    // インスペクターでパラメータ編集
+    // ノード自身のDrawImGuiでパラメータ編集
     if (node->runtimeNode) {
-        auto inspector = CreateNodeInspector(node->runtimeNode);
-        if (inspector) {
-            inspector->DrawUI();
-        } else {
+        if (!node->runtimeNode->DrawImGui()) {
             ImGui::TextDisabled("No editable parameters");
         }
     } else {
@@ -1266,9 +1263,7 @@ void BossNodeEditor::BuildRuntimeTreeRecursive(int nodeId, BTNodePtr& outNode) {
 /// </summary>
 nlohmann::json BossNodeEditor::ExtractNodeParameters(const EditorNode& node) {
     if (!node.runtimeNode) return {};
-
-    auto inspector = CreateNodeInspector(node.runtimeNode);
-    return inspector ? inspector->ExtractParams() : nlohmann::json{};
+    return node.runtimeNode->ExtractParameters();
 }
 
 /// <summary>
@@ -1276,11 +1271,7 @@ nlohmann::json BossNodeEditor::ExtractNodeParameters(const EditorNode& node) {
 /// </summary>
 void BossNodeEditor::ApplyNodeParameters(EditorNode& node, const nlohmann::json& params) {
     if (!node.runtimeNode || params.empty()) return;
-
-    auto inspector = CreateNodeInspector(node.runtimeNode);
-    if (inspector) {
-        inspector->ApplyParams(params);
-    }
+    node.runtimeNode->ApplyParameters(params);
 }
 
 /// <summary>

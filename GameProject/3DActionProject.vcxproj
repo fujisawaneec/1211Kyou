@@ -181,7 +181,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="Object\Boss\BossNodeEditor\BossNodeFactory.cpp" />
-    <ClCompile Include="Object\Boss\BossNodeEditor\BossNodeInspectors.cpp" />
     <ClCompile Include="Object\Player\MeleeAttackCollider.cpp" />
     <ClCompile Include="Object\Player\Player.cpp" />
     <ClCompile Include="Object\Player\State\AttackState.cpp" />
@@ -246,7 +245,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="Object\Boss\BossNodeEditor\BossNodeFactory.h" />
-    <ClInclude Include="Object\Boss\BossNodeEditor\BossNodeInspectors.h" />
     <ClInclude Include="Object\Player\MeleeAttackCollider.h" />
     <ClInclude Include="Object\Player\Player.h" />
     <ClInclude Include="Object\Player\State\AttackState.h" />

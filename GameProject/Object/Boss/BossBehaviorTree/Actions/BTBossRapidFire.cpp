@@ -3,6 +3,10 @@
 #include "../../../Player/Player.h"
 #include <cmath>
 
+#ifdef _DEBUG
+#include <imgui.h>
+#endif
+
 BTBossRapidFire::BTBossRapidFire() {
     name_ = "BossRapidFire";
 }
@@ -134,3 +138,37 @@ Vector3 BTBossRapidFire::CalculateDirectionToPlayer(Boss* boss) {
 
     return toPlayer;
 }
+
+nlohmann::json BTBossRapidFire::ExtractParameters() const {
+    return {
+        {"chargeTime", chargeTime_},
+        {"bulletCount", bulletCount_},
+        {"fireInterval", fireInterval_},
+        {"bulletSpeed", bulletSpeed_},
+        {"recoveryTime", recoveryTime_}
+    };
+}
+
+#ifdef _DEBUG
+bool BTBossRapidFire::DrawImGui() {
+    bool changed = false;
+
+    if (ImGui::DragFloat("Charge Time##rapidfire", &chargeTime_, 0.05f, 0.0f, 3.0f)) {
+        changed = true;
+    }
+    if (ImGui::DragInt("Bullet Count##rapidfire", &bulletCount_, 1, 1, 20)) {
+        changed = true;
+    }
+    if (ImGui::DragFloat("Fire Interval##rapidfire", &fireInterval_, 0.01f, 0.05f, 1.0f)) {
+        changed = true;
+    }
+    if (ImGui::DragFloat("Bullet Speed##rapidfire", &bulletSpeed_, 1.0f, 5.0f, 100.0f)) {
+        changed = true;
+    }
+    if (ImGui::DragFloat("Recovery Time##rapidfire", &recoveryTime_, 0.05f, 0.0f, 3.0f)) {
+        changed = true;
+    }
+
+    return changed;
+}
+#endif

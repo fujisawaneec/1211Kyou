@@ -44,8 +44,8 @@
     }
   ],
   "metadata": {
-    "created": "2025-12-01T02:44:47",
-    "modified": "2025-12-01T02:44:47",
+    "created": "2025-12-01T03:06:20",
+    "modified": "2025-12-01T03:06:20",
     "name": "Boss Behavior Tree"
   },
   "nodes": [
@@ -85,7 +85,7 @@
       "displayName": "DashAction",
       "id": 10003,
       "parameters": {
-        "dashDuration": 0.16467982530593872,
+        "dashDuration": 0.0501839816570282,
         "dashSpeed": 200.0
       },
       "position": {

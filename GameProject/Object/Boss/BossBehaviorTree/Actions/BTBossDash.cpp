@@ -5,6 +5,10 @@
 #include <algorithm>
 #include <cmath>
 
+#ifdef _DEBUG
+#include <imgui.h>
+#endif
+
 BTBossDash::BTBossDash() {
     name_ = "BossDash";
 }
@@ -125,3 +129,25 @@ Vector3 BTBossDash::ClampToArea(const Vector3& position) {
 
     return clampedPos;
 }
+
+nlohmann::json BTBossDash::ExtractParameters() const {
+    return {
+        {"dashSpeed", dashSpeed_},
+        {"dashDuration", dashDuration_}
+    };
+}
+
+#ifdef _DEBUG
+bool BTBossDash::DrawImGui() {
+    bool changed = false;
+
+    if (ImGui::DragFloat("Speed##dash", &dashSpeed_, 1.0f, 10.0f, 200.0f)) {
+        changed = true;
+    }
+    if (ImGui::DragFloat("Duration##dash", &dashDuration_, 0.05f, 0.1f, 3.0f)) {
+        changed = true;
+    }
+
+    return changed;
+}
+#endif
