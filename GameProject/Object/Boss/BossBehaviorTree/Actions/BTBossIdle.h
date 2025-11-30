@@ -43,6 +43,16 @@ public:
     /// <returns>待機時間</returns>
     float GetIdleDuration() const { return idleDuration_; }
 
+    /// <summary>
+    /// JSONからパラメータを適用
+    /// </summary>
+    /// <param name="params">パラメータJSON</param>
+    void ApplyParameters(const nlohmann::json& params) override {
+        if (params.contains("idleDuration")) {
+            idleDuration_ = params["idleDuration"];
+        }
+    }
+
 private:
     /// <summary>
     /// プレイヤーの方向を向く処理

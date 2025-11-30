@@ -42,6 +42,25 @@ public:
     float GetRecoveryTime() const { return recoveryTime_; }
     void SetRecoveryTime(float time) { recoveryTime_ = time; }
 
+    /// <summary>
+    /// JSONからパラメータを適用
+    /// </summary>
+    /// <param name="params">パラメータJSON</param>
+    void ApplyParameters(const nlohmann::json& params) override {
+        if (params.contains("chargeTime")) {
+            chargeTime_ = params["chargeTime"];
+        }
+        if (params.contains("bulletSpeed")) {
+            bulletSpeed_ = params["bulletSpeed"];
+        }
+        if (params.contains("spreadAngle")) {
+            spreadAngle_ = params["spreadAngle"];
+        }
+        if (params.contains("recoveryTime")) {
+            recoveryTime_ = params["recoveryTime"];
+        }
+    }
+
 private:
     /// <summary>
     /// 射撃パラメータの初期化

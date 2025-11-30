@@ -38,6 +38,19 @@ public:
     float GetDashDuration() const { return dashDuration_; }
     void SetDashDuration(float duration) { dashDuration_ = duration; }
 
+    /// <summary>
+    /// JSONからパラメータを適用
+    /// </summary>
+    /// <param name="params">パラメータJSON</param>
+    void ApplyParameters(const nlohmann::json& params) override {
+        if (params.contains("dashSpeed")) {
+            dashSpeed_ = params["dashSpeed"];
+        }
+        if (params.contains("dashDuration")) {
+            dashDuration_ = params["dashDuration"];
+        }
+    }
+
 private:
     /// <summary>
     /// ダッシュパラメータの初期化

@@ -51,6 +51,16 @@ public:
     /// <param name="type">新しいアクションタイプ</param>
     void SetActionType(ActionType type) { expectedType_ = type; }
 
+    /// <summary>
+    /// JSONからパラメータを適用
+    /// </summary>
+    /// <param name="params">パラメータJSON</param>
+    void ApplyParameters(const nlohmann::json& params) override {
+        if (params.contains("actionType")) {
+            expectedType_ = static_cast<ActionType>(params["actionType"].get<int>());
+        }
+    }
+
 private:
     // 期待するアクションタイプ
     ActionType expectedType_;

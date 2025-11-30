@@ -2,6 +2,7 @@
 #include <memory>
 #include <vector>
 #include <string>
+#include <json.hpp>
 
 class BTBlackboard;
 
@@ -72,6 +73,21 @@ public:
     /// </summary>
     /// <returns>実行中の場合true</returns>
     bool IsRunning() const { return status_ == BTNodeStatus::Running; }
+
+    /// <summary>
+    /// コンポジットノード（子ノードを持てる）かどうか
+    /// </summary>
+    /// <returns>コンポジットノードの場合true</returns>
+    virtual bool IsComposite() const { return false; }
+
+    /// <summary>
+    /// JSONからパラメータを適用
+    /// </summary>
+    /// <param name="params">パラメータJSON</param>
+    virtual void ApplyParameters(const nlohmann::json& params) {
+        // デフォルトは何もしない（パラメータを持たないノード用）
+        (void)params;
+    }
 
 protected:
     // 現在の状態

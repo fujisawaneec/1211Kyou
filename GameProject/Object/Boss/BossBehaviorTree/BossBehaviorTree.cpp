@@ -257,43 +257,9 @@ BTNodePtr BossBehaviorTree::BuildNodeFromJSON(
         return nullptr;
     }
 
-    // パラメータを適用
+    // パラメータを適用（ポリモーフィズムで各ノードが自己処理）
     if (nodeJson.contains("parameters") && !nodeJson["parameters"].is_null()) {
-        nlohmann::json params = nodeJson["parameters"];
-
-        // BTActionSelectorの場合
-        if (nodeType == "BTActionSelector" && params.contains("actionType")) {
-            auto actionSelector = std::dynamic_pointer_cast<BTActionSelector>(node);
-            if (actionSelector) {
-                int actionType = params["actionType"];
-                actionSelector->SetActionType(static_cast<BTActionSelector::ActionType>(actionType));
-            }
-        }
-        // BTBossIdleの場合
-        else if (nodeType == "BTBossIdle") {
-            auto idleNode = std::dynamic_pointer_cast<BTBossIdle>(node);
-            if (idleNode && params.contains("idleDuration")) {
-                idleNode->SetIdleDuration(params["idleDuration"]);
-            }
-        }
-        // BTBossDashの場合
-        else if (nodeType == "BTBossDash") {
-            auto dashNode = std::dynamic_pointer_cast<BTBossDash>(node);
-            if (dashNode) {
-                if (params.contains("dashSpeed")) dashNode->SetDashSpeed(params["dashSpeed"]);
-                if (params.contains("dashDuration")) dashNode->SetDashDuration(params["dashDuration"]);
-            }
-        }
-        // BTBossShootの場合
-        else if (nodeType == "BTBossShoot") {
-            auto shootNode = std::dynamic_pointer_cast<BTBossShoot>(node);
-            if (shootNode) {
-                if (params.contains("chargeTime")) shootNode->SetChargeTime(params["chargeTime"]);
-                if (params.contains("bulletSpeed")) shootNode->SetBulletSpeed(params["bulletSpeed"]);
-                if (params.contains("spreadAngle")) shootNode->SetSpreadAngle(params["spreadAngle"]);
-                if (params.contains("recoveryTime")) shootNode->SetRecoveryTime(params["recoveryTime"]);
-            }
-        }
+        node->ApplyParameters(nodeJson["parameters"]);
     }
 
     // 表示名を設定（オプション）
@@ -302,8 +268,7 @@ BTNodePtr BossBehaviorTree::BuildNodeFromJSON(
     }
 
     // コンポジットノードの場合、子ノードを追加
-    bool isComposite = (nodeType == "BTSelector" || nodeType == "BTSequence");
-    if (isComposite) {
+    if (node->IsComposite()) {
         auto compositeNode = std::dynamic_pointer_cast<BTComposite>(node);
         if (compositeNode) {
             // このノードの子ノードIDを収集

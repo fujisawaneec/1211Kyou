@@ -48,6 +48,12 @@ public:
     size_t GetChildCount() const { return children_.size(); }
 
     /// <summary>
+    /// コンポジットノードかどうか
+    /// </summary>
+    /// <returns>常にtrue</returns>
+    bool IsComposite() const override { return true; }
+
+    /// <summary>
     /// ノードのリセット
     /// </summary>
     void Reset() override;
