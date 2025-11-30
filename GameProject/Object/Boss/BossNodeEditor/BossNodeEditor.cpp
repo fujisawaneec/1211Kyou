@@ -763,71 +763,7 @@ void BossNodeEditor::DrawNodeInspector() {
         ImGui::TextDisabled("No runtime node");
     }
 
-    // パラメータ保存・読み込みボタン
-    ImGui::Separator();
-    if (node->runtimeNode) {
-        auto inspector = CreateNodeInspector(node->runtimeNode);
-        if (inspector) {
-            if (ImGui::Button("Save Params##inspector")) {
-                SaveNodeParamsToFile(node, inspector.get());
-            }
-            ImGui::SameLine();
-            if (ImGui::Button("Load Params##inspector")) {
-                LoadNodeParamsFromFile(node, inspector.get());
-            }
-        }
-    }
-
     ImGui::End();
-}
-
-/// <summary>
-/// ノードパラメータをJSONファイルに保存
-/// </summary>
-void BossNodeEditor::SaveNodeParamsToFile(EditorNode* node, IBTNodeInspector* inspector) {
-    if (!node || !inspector) return;
-
-    // 保存先パス（自動命名）
-    std::string filename = "resources/Json/NodeParams/" + node->nodeType + "_" + node->displayName + ".json";
-
-    // ディレクトリが存在しない場合は作成
-    std::filesystem::path filePath(filename);
-    std::filesystem::create_directories(filePath.parent_path());
-
-    nlohmann::json json;
-    json["nodeType"] = node->nodeType;
-    json["displayName"] = node->displayName;
-    json["parameters"] = inspector->ExtractParams();
-
-    std::ofstream file(filename);
-    if (file.is_open()) {
-        file << json.dump(4);
-        file.close();
-    }
-}
-
-/// <summary>
-/// ノードパラメータをJSONファイルから読み込み
-/// </summary>
-void BossNodeEditor::LoadNodeParamsFromFile(EditorNode* node, IBTNodeInspector* inspector) {
-    if (!node || !inspector) return;
-
-    // 読み込みパス（自動命名）
-    std::string filename = "resources/Json/NodeParams/" + node->nodeType + "_" + node->displayName + ".json";
-
-    std::ifstream file(filename);
-    if (!file.is_open()) return;
-
-    nlohmann::json json;
-    file >> json;
-    file.close();
-
-    // ノードタイプが一致する場合のみ適用
-    if (json.contains("nodeType") && json["nodeType"] == node->nodeType) {
-        if (json.contains("parameters")) {
-            inspector->ApplyParams(json["parameters"]);
-        }
-    }
 }
 
 /// <summary>

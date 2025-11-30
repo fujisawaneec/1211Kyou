@@ -1,9 +1,0 @@
-{
-    "displayName": "ShootAction",
-    "nodeType": "BTBossShoot",
-    "parameters": {
-        "bulletSpeed": 20.0,
-        "chargeTime": 0.5,
-        "spreadAngle": 0.26179999113082886
-    }
-}

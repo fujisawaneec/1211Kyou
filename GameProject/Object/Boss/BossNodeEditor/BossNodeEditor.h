@@ -175,8 +175,6 @@ private:
     void DrawContextMenu();
     void DrawNodeInspector();
     void DrawToolbar();
-    void SaveNodeParamsToFile(EditorNode* node, IBTNodeInspector* inspector);
-    void LoadNodeParamsFromFile(EditorNode* node, IBTNodeInspector* inspector);
 
     // ノード作成
     void CreateNode(const std::string& nodeType, const ImVec2& position);
