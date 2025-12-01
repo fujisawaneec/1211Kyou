@@ -1,4 +1,4 @@
-#ifdef _DEBUG
+// ===== 全ビルドで使用可能なコード =====
 
 #include "BossNodeFactory.h"
 
@@ -14,6 +14,66 @@
 #include "../BossBehaviorTree/Conditions/BTBossPhaseCondition.h"
 #include "../BossBehaviorTree/Conditions/BTBossHPCondition.h"
 #include "../BossBehaviorTree/Conditions/BTBossDistanceCondition.h"
+
+/// <summary>
+/// ノードの生成
+/// </summary>
+BTNodePtr BossNodeFactory::CreateNode(const std::string& nodeType) {
+    // Compositeノード
+    if (nodeType == "BTSelector") {
+        return std::make_shared<BTSelector>();
+    }
+    else if (nodeType == "BTSequence") {
+        return std::make_shared<BTSequence>();
+    }
+    else if (nodeType == "BTRandomSelector") {
+        return std::make_shared<BTRandomSelector>();
+    }
+    // Actionノード（Blackboard経由でBoss/Playerにアクセス）
+    else if (nodeType == "BTBossIdle") {
+        return std::make_shared<BTBossIdle>();
+    }
+    else if (nodeType == "BTBossDash") {
+        return std::make_shared<BTBossDash>();
+    }
+    else if (nodeType == "BTBossShoot") {
+        return std::make_shared<BTBossShoot>();
+    }
+    else if (nodeType == "BTBossRapidFire") {
+        return std::make_shared<BTBossRapidFire>();
+    }
+    // Conditionノード
+    else if (nodeType == "BTActionSelector") {
+        return std::make_shared<BTActionSelector>(BTActionSelector::ActionType::Dash);
+    }
+    else if (nodeType == "BTBossPhaseCondition") {
+        return std::make_shared<BTBossPhaseCondition>();
+    }
+    else if (nodeType == "BTBossHPCondition") {
+        return std::make_shared<BTBossHPCondition>();
+    }
+    else if (nodeType == "BTBossDistanceCondition") {
+        return std::make_shared<BTBossDistanceCondition>();
+    }
+
+    return nullptr;
+}
+
+/// <summary>
+/// Boss/Playerの依存関係を持つノードの生成
+/// </summary>
+BTNodePtr BossNodeFactory::CreateNodeWithDependencies(
+    const std::string& nodeType,
+    [[maybe_unused]] Boss* boss,
+    [[maybe_unused]] Player* player) {
+
+    // 現在は全ノードがBlackboard経由で参照するため、CreateNodeと同じ
+    return CreateNode(nodeType);
+}
+
+// ===== デバッグビルドのみのコード =====
+
+#ifdef _DEBUG
 
 #include <typeinfo>
 #include <algorithm>
@@ -146,102 +206,12 @@ std::vector<std::string> BossNodeFactory::GetNodeTypesByCategory(NodeCategory ca
 }
 
 /// <summary>
-/// ノードの生成
-/// </summary>
-BTNodePtr BossNodeFactory::CreateNode(const std::string& nodeType) {
-    // Compositeノード
-    if (nodeType == "BTSelector") {
-        return std::make_shared<BTSelector>();
-    }
-    else if (nodeType == "BTSequence") {
-        return std::make_shared<BTSequence>();
-    }
-    else if (nodeType == "BTRandomSelector") {
-        return std::make_shared<BTRandomSelector>();
-    }
-    // Actionノード（Boss/Player依存のため、ここでは生成しない）
-    else if (nodeType == "BTBossIdle" ||
-             nodeType == "BTBossDash" ||
-             nodeType == "BTBossShoot" ||
-             nodeType == "BTBossRapidFire") {
-        // これらはCreateNodeWithDependenciesを使う必要がある
-        return nullptr;
-    }
-    // Conditionノード
-    else if (nodeType == "BTActionSelector") {
-        // ActionSelectorも特定のアクションタイプが必要なため、ここでは基本的なものを作成
-        return std::make_shared<BTActionSelector>(BTActionSelector::ActionType::Dash);
-    }
-    else if (nodeType == "BTBossPhaseCondition") {
-        return std::make_shared<BTBossPhaseCondition>();
-    }
-    else if (nodeType == "BTBossHPCondition") {
-        return std::make_shared<BTBossHPCondition>();
-    }
-    else if (nodeType == "BTBossDistanceCondition") {
-        return std::make_shared<BTBossDistanceCondition>();
-    }
-
-    return nullptr;
-}
-
-/// <summary>
-/// Boss/Playerの依存関係を持つノードの生成
-/// </summary>
-BTNodePtr BossNodeFactory::CreateNodeWithDependencies(
-    const std::string& nodeType,
-    Boss* boss,
-    Player* player) {
-
-    // Compositeノード（依存関係なし）
-    if (nodeType == "BTSelector") {
-        return std::make_shared<BTSelector>();
-    }
-    else if (nodeType == "BTSequence") {
-        return std::make_shared<BTSequence>();
-    }
-    else if (nodeType == "BTRandomSelector") {
-        return std::make_shared<BTRandomSelector>();
-    }
-    // Actionノード（Boss/Player依存）
-    else if (nodeType == "BTBossIdle") {
-        return std::make_shared<BTBossIdle>();
-    }
-    else if (nodeType == "BTBossDash") {
-        return std::make_shared<BTBossDash>();
-    }
-    else if (nodeType == "BTBossShoot") {
-        return std::make_shared<BTBossShoot>();
-    }
-    else if (nodeType == "BTBossRapidFire") {
-        return std::make_shared<BTBossRapidFire>();
-    }
-    // Conditionノード
-    else if (nodeType == "BTActionSelector") {
-        // デフォルトでDashタイプを作成
-        return std::make_shared<BTActionSelector>(BTActionSelector::ActionType::Dash);
-    }
-    else if (nodeType == "BTBossPhaseCondition") {
-        return std::make_shared<BTBossPhaseCondition>();
-    }
-    else if (nodeType == "BTBossHPCondition") {
-        return std::make_shared<BTBossHPCondition>();
-    }
-    else if (nodeType == "BTBossDistanceCondition") {
-        return std::make_shared<BTBossDistanceCondition>();
-    }
-
-    return nullptr;
-}
-
-/// <summary>
 /// ノードタイプの取得（逆引き）
 /// </summary>
 std::string BossNodeFactory::GetNodeType(const BTNodePtr& node) {
     if (!node) return "";
 
     // RTTIを使用してタイプを判定
-    // 注意: この方法はtypeid().name()の結果がコンパイラ依存
     const std::type_info& typeInfo = typeid(*node);
 
     // 各タイプと比較

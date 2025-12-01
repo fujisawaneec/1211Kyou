@@ -8,6 +8,7 @@
 #include "Conditions/BTActionSelector.h"
 #include "../Boss.h"
 #include "../../Player/Player.h"
+#include "../BossNodeEditor/BossNodeFactory.h"
 #include <fstream>
 #include <unordered_map>
 
@@ -201,36 +202,6 @@ bool BossBehaviorTree::LoadFromJSON(const std::string& filepath) {
 }
 
 /// <summary>
-/// ノードタイプからインスタンスを作成
-/// </summary>
-BTNodePtr BossBehaviorTree::CreateNodeByType(const std::string& nodeType) {
-    // Compositeノード
-    if (nodeType == "BTSelector") {
-        return std::make_shared<BTSelector>();
-    }
-    else if (nodeType == "BTSequence") {
-        return std::make_shared<BTSequence>();
-    }
-    // Actionノード
-    else if (nodeType == "BTBossIdle") {
-        return std::make_shared<BTBossIdle>();
-    }
-    else if (nodeType == "BTBossDash") {
-        return std::make_shared<BTBossDash>();
-    }
-    else if (nodeType == "BTBossShoot") {
-        return std::make_shared<BTBossShoot>();
-    }
-    // Conditionノード
-    else if (nodeType == "BTActionSelector") {
-        // デフォルトでDashタイプ（後でパラメータで上書き）
-        return std::make_shared<BTActionSelector>(BTActionSelector::ActionType::Dash);
-    }
-
-    return nullptr;
-}
-
-/// <summary>
 /// JSONからノードツリーを再帰的に構築
 /// </summary>
 BTNodePtr BossBehaviorTree::BuildNodeFromJSON(
@@ -249,9 +220,9 @@ BTNodePtr BossBehaviorTree::BuildNodeFromJSON(
     }
     visitedNodes.insert(nodeId);
 
-    // ノードを作成
+    // ノードを作成（BossNodeFactoryを使用）
     std::string nodeType = nodeJson["type"];
-    BTNodePtr node = CreateNodeByType(nodeType);
+    BTNodePtr node = BossNodeFactory::CreateNode(nodeType);
 
     if (!node) {
         return nullptr;

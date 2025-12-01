@@ -1,12 +1,13 @@
 #pragma once
 
-#ifdef _DEBUG
-
 #include <string>
 #include <vector>
 #include <memory>
-#include <imgui.h>
 #include "../../../BehaviorTree/Core/BTNode.h"
+
+#ifdef _DEBUG
+#include <imgui.h>
+#endif
 
 class Boss;
 class Player;
@@ -17,6 +18,31 @@ class Player;
 /// </summary>
 class BossNodeFactory {
 public:
+    // ===== 全ビルドで使用可能 =====
+
+    /// <summary>
+    /// ノードの生成
+    /// </summary>
+    /// <param name="nodeType">ノードタイプ名（"BTSelector", "BTSequence"等）</param>
+    /// <returns>生成されたノード（失敗時はnullptr）</returns>
+    static BTNodePtr CreateNode(const std::string& nodeType);
+
+    /// <summary>
+    /// Boss/Playerの依存関係を持つノードの生成
+    /// </summary>
+    /// <param name="nodeType">ノードタイプ名</param>
+    /// <param name="boss">ボスのポインタ（必要な場合）</param>
+    /// <param name="player">プレイヤーのポインタ（必要な場合）</param>
+    /// <returns>生成されたノード（失敗時はnullptr）</returns>
+    static BTNodePtr CreateNodeWithDependencies(
+        const std::string& nodeType,
+        Boss* boss = nullptr,
+        Player* player = nullptr
+    );
+
+#ifdef _DEBUG
+    // ===== デバッグビルドのみ =====
+
     /// <summary>
     /// ノードカテゴリ
     /// </summary>
@@ -50,26 +76,6 @@ public:
     /// <param name="category">カテゴリ</param>
     /// <returns>該当カテゴリのノードタイプリスト</returns>
     static std::vector<std::string> GetNodeTypesByCategory(NodeCategory category);
-
-    /// <summary>
-    /// ノードの生成
-    /// </summary>
-    /// <param name="nodeType">ノードタイプ名（"BTSelector", "BTSequence"等）</param>
-    /// <returns>生成されたノード（失敗時はnullptr）</returns>
-    static BTNodePtr CreateNode(const std::string& nodeType);
-
-    /// <summary>
-    /// Boss/Playerの依存関係を持つノードの生成
-    /// </summary>
-    /// <param name="nodeType">ノードタイプ名</param>
-    /// <param name="boss">ボスのポインタ（必要な場合）</param>
-    /// <param name="player">プレイヤーのポインタ（必要な場合）</param>
-    /// <returns>生成されたノード（失敗時はnullptr）</returns>
-    static BTNodePtr CreateNodeWithDependencies(
-        const std::string& nodeType,
-        Boss* boss = nullptr,
-        Player* player = nullptr
-    );
 
     /// <summary>
     /// ノードタイプの取得（逆引き）
@@ -128,6 +134,5 @@ private:
     /// 初期化フラグ
     /// </summary>
     static bool initialized_;
-};
-
 #endif // _DEBUG
+};

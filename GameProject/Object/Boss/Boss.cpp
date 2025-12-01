@@ -73,8 +73,6 @@ void Boss::Initialize()
     // CollisionManagerに登録
     CollisionManager::GetInstance()->AddCollider(bodyCollider_.get());
 
-    // ビヘイビアツリーを使用する場合
-
     // ビヘイビアツリーの初期化
     behaviorTree_ = std::make_unique<BossBehaviorTree>(this, player_);
 

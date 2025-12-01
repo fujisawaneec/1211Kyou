@@ -92,13 +92,6 @@ private:
     BTNodePtr BuildActionTree();
 
     /// <summary>
-    /// ノードタイプからインスタンスを作成
-    /// </summary>
-    /// <param name="nodeType">ノードタイプ文字列</param>
-    /// <returns>作成したノード</returns>
-    BTNodePtr CreateNodeByType(const std::string& nodeType);
-
-    /// <summary>
     /// JSONからノードツリーを再帰的に構築
     /// </summary>
     /// <param name="nodeJson">ノードのJSON</param>
