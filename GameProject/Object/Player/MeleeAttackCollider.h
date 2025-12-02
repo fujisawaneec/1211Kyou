@@ -11,6 +11,12 @@ class Boss;
 /// プレイヤーの近接攻撃判定と敵へのダメージ処理を管理
 /// </summary>
 class MeleeAttackCollider : public OBBCollider {
+	//=========================================================================================
+	// 定数
+	//=========================================================================================
+private:
+    static constexpr float kAttackDamage = 10.0f;  ///< 攻撃ダメージ量
+
 private:
 	Player* player_ = nullptr;  ///< このコライダーを所有するプレイヤーへのポインタ
 	std::unordered_set<uint32_t> hitEnemies_;  ///< この攻撃で既にヒットした敵のIDセット（多重ヒット防止用）

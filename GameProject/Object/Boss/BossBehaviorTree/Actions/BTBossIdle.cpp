@@ -3,6 +3,7 @@
 #include "../../../Player/Player.h"
 #include "Vector3.h"
 #include <cmath>
+#include <numbers>
 
 #ifdef _DEBUG
 #include <imgui.h>
@@ -66,7 +67,7 @@ void BTBossIdle::LookAtPlayer(Boss* boss, float deltaTime) {
     Vector3 toPlayer = playerPos - bossPos;
     toPlayer.y = 0.0f;  // Y軸は無視
 
-    if (toPlayer.Length() > 0.01f) {
+    if (toPlayer.Length() > kDirectionEpsilon) {
         toPlayer.Normalize();
 
         // 向きたい角度を計算
@@ -76,16 +77,17 @@ void BTBossIdle::LookAtPlayer(Boss* boss, float deltaTime) {
         float currentAngle = boss->GetTransform().rotate.y;
 
         // 角度差を計算（-π～πの範囲に正規化）
+        constexpr float kPi = static_cast<float>(std::numbers::pi);
+        constexpr float kTwoPi = 2.0f * kPi;
         float angleDiff = targetAngle - currentAngle;
-        while (angleDiff > 3.14159265f) angleDiff -= 2.0f * 3.14159265f;
-        while (angleDiff < -3.14159265f) angleDiff += 2.0f * 3.14159265f;
+        while (angleDiff > kPi) angleDiff -= kTwoPi;
+        while (angleDiff < -kPi) angleDiff += kTwoPi;
 
         // スムーズに回転（回転速度を調整）
-        const float rotationSpeed = 5.0f;  // ラジアン/秒
-        float rotationAmount = angleDiff * rotationSpeed * deltaTime;
+        float rotationAmount = angleDiff * kRotationSpeed * deltaTime;
 
         // 回転量を制限（急激な回転を防ぐ）
-        const float maxRotationPerFrame = rotationSpeed * deltaTime;
+        float maxRotationPerFrame = kRotationSpeed * deltaTime;
         if (fabs(rotationAmount) > maxRotationPerFrame) {
             rotationAmount = (rotationAmount > 0) ? maxRotationPerFrame : -maxRotationPerFrame;
         }

@@ -163,7 +163,7 @@ void AttackState::ProcessExecuteAttack(Player* player, float deltaTime)
 float AttackState::GetStartAngle() const
 {
     // 偶数コンボ: 右側開始（-π/2）、奇数コンボ: 左側開始（π/2）
-    return (comboCount_ % 2 == 0) ? -1.5708f : 1.5708f;
+    return (comboCount_ % 2 == 0) ? -kBlockStartAngle : kBlockStartAngle;
 }
 
 void AttackState::UpdateBlockPosition(Player* player)
@@ -187,7 +187,7 @@ void AttackState::UpdateBlockPosition(Player* player)
     Transform blockTransform;
     blockTransform.translate = blockPos;
     blockTransform.rotate = { 0.0f, worldAngle, 0.0f };
-    blockTransform.scale = { 0.5f, 0.5f, 0.5f };
+    blockTransform.scale = { kBlockScale, kBlockScale, kBlockScale };
 
     block->SetTransform(blockTransform);
 }

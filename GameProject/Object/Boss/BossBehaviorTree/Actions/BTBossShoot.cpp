@@ -82,7 +82,7 @@ void BTBossShoot::AimAtPlayer(Boss* boss, float deltaTime) {
     Vector3 toPlayer = playerPos - bossPos;
     toPlayer.y = 0.0f; // Y軸は無視
 
-    if (toPlayer.Length() > 0.01f) {
+    if (toPlayer.Length() > kDirectionEpsilon) {
         toPlayer = toPlayer.Normalize();
         float angle = atan2f(toPlayer.x, toPlayer.z);
         boss->SetRotate(Vector3(0.0f, angle, 0.0f));
@@ -104,18 +104,18 @@ void BTBossShoot::FireBullets(Boss* boss) {
 
     // 水平方向のみで計算（Y成分は小さく保つ）
     float distance = sqrtf(toPlayer.x * toPlayer.x + toPlayer.z * toPlayer.z);
-    if (distance > 0.01f) {
+    if (distance > kDirectionEpsilon) {
         toPlayer = toPlayer.Normalize();
     }
 
-    // 3発の弾を生成リクエスト
-    for (int i = 0; i < 3; i++) {
-        // 発射角度を計算（-15度、0度、+15度）
+    // 弾を生成リクエスト
+    for (int i = 0; i < bulletCount_; i++) {
+        // 発射角度を計算（扇状に分散）
         float angleOffset = 0.0f;
-        if (i == 0) {
-            angleOffset = -spreadAngle_;  // 左側
-        } else if (i == 2) {
-            angleOffset = spreadAngle_;   // 右側
+        if (bulletCount_ > 1) {
+            // -spreadAngle_から+spreadAngle_の範囲に均等に分散
+            float t = static_cast<float>(i) / static_cast<float>(bulletCount_ - 1);
+            angleOffset = spreadAngle_ * (2.0f * t - 1.0f);
         }
 
         // 発射方向を計算
@@ -130,7 +130,7 @@ void BTBossShoot::FireBullets(Boss* boss) {
 }
 
 Vector3 BTBossShoot::CalculateBulletDirection(const Vector3& baseDirection, float angleOffset) {
-    if (std::abs(angleOffset) < 0.001f) {
+    if (std::abs(angleOffset) < kAngleEpsilon) {
         // オフセットがない場合はそのまま返す
         return baseDirection;
     }
@@ -172,6 +172,9 @@ bool BTBossShoot::DrawImGui() {
         changed = true;
     }
     if (ImGui::SliderAngle("Spread Angle##shoot", &spreadAngle_, 0.0f, 45.0f)) {
+        changed = true;
+    }
+    if (ImGui::DragInt("Bullet Count##shoot", &bulletCount_, 1, 1, 10)) {
         changed = true;
     }
 

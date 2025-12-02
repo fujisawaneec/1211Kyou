@@ -8,6 +8,13 @@ class Boss;
 /// ボスの待機アクションノード
 /// </summary>
 class BTBossIdle : public BTNode {
+    //=========================================================================================
+    // 定数
+    //=========================================================================================
+private:
+    static constexpr float kRotationSpeed = 5.0f;       ///< 回転速度（ラジアン/秒）
+    static constexpr float kDirectionEpsilon = 0.01f;   ///< 方向判定の閾値
+
 public:
     /// <summary>
     /// コンストラクタ

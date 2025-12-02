@@ -22,6 +22,13 @@ class BossShootState;
 /// </summary>
 class Boss
 {
+	//=========================================================================================
+	// 定数
+	//=========================================================================================
+private:
+    static constexpr float kInitialY = 2.5f;   ///< 初期Y座標
+	static constexpr float kInitialZ = 10.0f;  ///< 初期Z座標
+
 public:
     /// <summary>
     /// 弾生成リクエスト構造体

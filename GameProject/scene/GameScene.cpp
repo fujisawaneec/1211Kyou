@@ -85,9 +85,9 @@ void GameScene::Initialize()
     /// ================================== ///
 
     // シャドウマッピンの最大描画距離の設定
-    ShadowRenderer::GetInstance()->SetMaxShadowDistance(100.f);
+    ShadowRenderer::GetInstance()->SetMaxShadowDistance(kShadowMaxDistance);
     // 平行光源の方向の設定
-    Object3dBasic::GetInstance()->SetDirectionalLightDirection(Vector3(0.0f, -1.0f, -0.05f));
+    Object3dBasic::GetInstance()->SetDirectionalLightDirection(Vector3(0.0f, -1.0f, kDirectionalLightZ));
 
     // タイトルボタンテキストの初期化
     toTitleSprite_ = std::make_unique<Sprite>();
@@ -424,20 +424,19 @@ void GameScene::UpdateOverAnim()
     if (isOver_) overAnimTimer_ += FrameTimer::GetInstance()->GetDeltaTime();
 
     // オーバーアニメーション中のエミッター制御
-    if (overAnimTimer_ > 2.0f && !isOver1Emit_) {
+    if (overAnimTimer_ > kOverEmit1Time && !isOver1Emit_) {
         emitterManager_->CreateTemporaryEmitterFrom("over1", "over1_temp", 0.5f);
         isOver1Emit_ = true;
     }
 
-    if (overAnimTimer_ > 2.8f && !isOver2Emit_) {
+    if (overAnimTimer_ > kOverEmit2Time && !isOver2Emit_) {
         emitterManager_->CreateTemporaryEmitterFrom("over2", "over2_temp", 0.1f);
         isOver2Emit_ = true;
     }
 
     // プレイヤースケールの減少
     if (isOver2Emit_) {
-        float scaleDecreaseRate = 5.0f; // スケール減少速度
-        Vector3 newScale = player_->GetScale() - Vector3(scaleDecreaseRate, scaleDecreaseRate, scaleDecreaseRate) * FrameTimer::GetInstance()->GetDeltaTime();
+        Vector3 newScale = player_->GetScale() - Vector3(kScaleDecreaseRate, kScaleDecreaseRate, kScaleDecreaseRate) * FrameTimer::GetInstance()->GetDeltaTime();
         newScale.x = std::max<float>(newScale.x, 0.0f);
         newScale.y = std::max<float>(newScale.y, 0.0f);
         newScale.z = std::max<float>(newScale.z, 0.0f);
@@ -445,7 +444,7 @@ void GameScene::UpdateOverAnim()
     }
 
     // シーン遷移
-    if (overAnimTimer_ > 3.8f) {
+    if (overAnimTimer_ > kOverTotalTime) {
         SceneManager::GetInstance()->ChangeScene("over", "Fade", 0.3f);
     }
 }
@@ -492,8 +491,7 @@ void GameScene::UpdateClearAnim()
 
     // ボススケールの減少
     if (isClear2Emit_) {
-        float scaleDecreaseRate = 5.0f; // スケール減少速度
-        Vector3 newScale = boss_->GetScale() - Vector3(scaleDecreaseRate, scaleDecreaseRate, scaleDecreaseRate) * FrameTimer::GetInstance()->GetDeltaTime();
+        Vector3 newScale = boss_->GetScale() - Vector3(kScaleDecreaseRate, kScaleDecreaseRate, kScaleDecreaseRate) * FrameTimer::GetInstance()->GetDeltaTime();
         newScale.x = std::max<float>(newScale.x, 0.0f);
         newScale.y = std::max<float>(newScale.y, 0.0f);
         newScale.z = std::max<float>(newScale.z, 0.0f);
@@ -662,9 +660,8 @@ void GameScene::UpdateDashEmitter(float deltaTime)
         if (!isDashing) {
             Vector3 diff = player_->GetTranslate() - dashEmitterPosition_;
             float distanceSquared = diff.x * diff.x + diff.y * diff.y + diff.z * diff.z;
-            const float threshold = 0.65f;  // 閾値
 
-            if (distanceSquared < threshold * threshold) {
+            if (distanceSquared < kDashEmitterThreshold * kDashEmitterThreshold) {
                 emitterManager_->SetEmitterActive("player_dash", false);
                 dashEmitterActive_ = false;
             }

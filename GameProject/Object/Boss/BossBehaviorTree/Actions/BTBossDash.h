@@ -9,6 +9,17 @@ class Boss;
 /// ボスのダッシュアクションノード
 /// </summary>
 class BTBossDash : public BTNode {
+    //=========================================================================================
+    // 定数
+    //=========================================================================================
+private:
+    static constexpr float kDirectionEpsilon = 0.01f;  ///< 方向判定の閾値
+    static constexpr float kEasingCoeffA = 3.0f;       ///< イージング係数A
+    static constexpr float kEasingCoeffB = 2.0f;       ///< イージング係数B
+    static constexpr float kVibrationFreq = 50.0f;     ///< 振動周波数
+    static constexpr float kVibrationAmp = 0.05f;      ///< 振動振幅
+    static constexpr float kAreaMargin = 5.0f;         ///< エリア境界からのマージン
+
 public:
     /// <summary>
     /// コンストラクタ
@@ -104,4 +115,8 @@ private:
 
     // 初回実行フラグ
     bool isFirstExecute_ = true;
+
+    // ダッシュ距離範囲（ImGui調整用）
+    float minDistance_ = 10.0f;  ///< 最小ダッシュ距離
+    float maxDistance_ = 50.0f;  ///< 最大ダッシュ距離
 };

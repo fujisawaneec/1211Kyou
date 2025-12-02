@@ -18,7 +18,7 @@ void MeleeAttackCollider::OnCollisionEnter(Collider* other) {
         Boss* enemy = static_cast<Boss*>(other->GetOwner());
         if (enemy) {
 
-            enemy->OnHit(10.0f);
+            enemy->OnHit(kAttackDamage);
 
             if (!detectedEnemy_) {
                 detectedEnemy_ = enemy;
@@ -42,7 +42,7 @@ void MeleeAttackCollider::OnCollisionStay(Collider* other) {
             detectedEnemy_ = enemy;
             if (canDamage)
             {
-                enemy->OnHit(10.0f);
+                enemy->OnHit(kAttackDamage);
                 canDamage = false;
             }
         }

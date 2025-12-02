@@ -20,6 +20,20 @@ class Boss;
 /// </summary>
 class Player
 {
+	//=========================================================================================
+	// 定数
+	//=========================================================================================
+private:
+    static constexpr float kInitialY = 2.5f;
+	static constexpr float kInitialZ = -120.0f;
+	static constexpr float kMoveInputDeadzone = 0.1f;
+	static constexpr float kVelocityEpsilon = 0.01f;
+	static constexpr float kRotationLerpSpeed = 0.2f;
+	static constexpr float kAttackStartDistance = 4.0f;
+	static constexpr float kAttackMoveRotationLerp = 0.3f;
+	static constexpr float kBossLookatLerp = 1.15f;
+	static constexpr float kBoundaryDisabled = 9999.0f;
+
 public: // メンバ関数
     Player();
     ~Player();
@@ -288,13 +302,6 @@ public: // メンバ関数
     /// Bossをターゲットに設定
     /// </summary>
     void SetBoss(Boss* target) { targetEnemy_ = target; }
-
-public: // 定数
-    // ステージ全体の移動制限
-    static const float X_MIN;
-    static const float X_MAX;
-    static const float Z_MIN;
-    static const float Z_MAX;
 
 private: // メンバ変数
 

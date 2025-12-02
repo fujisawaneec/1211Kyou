@@ -1,26 +1,33 @@
 #include "BossBullet.h"
 #include "BossBulletCollider.h"
 #include "../../Object/Player/Player.h"
+#include "../../Config/GameConfig.h"
 #include "ModelManager.h"
 #include "Object3d.h"
 #include "CollisionManager.h"
 #include "EmitterManager.h"
 #include "RandomEngine.h"
+#include "GlobalVariables.h"
 
 uint32_t BossBullet::id = 0;
 
 BossBullet::BossBullet(EmitterManager* emittermanager) {
+    // GlobalVariables登録（初回のみ）
+    GlobalVariables* gv = GlobalVariables::GetInstance();
+    gv->CreateGroup("BossBullet");
+    gv->AddItem("BossBullet", "ColliderRadius", 1.0f);
+
     // 弾のパラメータ設定
-    damage_ = 10.0f;
-    lifeTime_ = 5.0f;
+    damage_ = kDamage;
+    lifeTime_ = kLifetime;
 
     // ランダムな回転速度を設定
     RandomEngine* rng = RandomEngine::GetInstance();
 
     rotationSpeed_ = Vector3(
-        rng->GetFloat(-10.0f, 10.0f),
-        rng->GetFloat(-10.0f, 10.0f),
-        rng->GetFloat(-10.0f, 10.0f)
+        rng->GetFloat(kRotationSpeedMin, kRotationSpeedMax),
+        rng->GetFloat(kRotationSpeedMin, kRotationSpeedMax),
+        rng->GetFloat(kRotationSpeedMin, kRotationSpeedMax)
     );
 
     // エミッターマネージャーの設定
@@ -38,7 +45,7 @@ BossBullet::BossBullet(EmitterManager* emittermanager) {
 
     id++;
 
-    if (id > 10000) {
+    if (id > kIdResetThreshold) {
         id = 0; // IDのリセット
     }
 }
@@ -55,7 +62,7 @@ void BossBullet::Initialize(const Vector3& position, const Vector3& velocity) {
     model_->Update();
 
     // スケールを設定（球体モデルのサイズ調整）
-    transform_.scale = Vector3(0.0f, 0.0f, 0.0f);
+    transform_.scale = Vector3(kInitialScale, kInitialScale, kInitialScale);
 
     // 弾の色を設定（赤っぽい色）
     //if (model_) {
@@ -72,8 +79,9 @@ void BossBullet::Initialize(const Vector3& position, const Vector3& velocity) {
     if (!collider_) {
         collider_ = std::make_unique<BossBulletCollider>(this);
     }
+    float colliderRadius = GlobalVariables::GetInstance()->GetValueFloat("BossBullet", "ColliderRadius");
     collider_->SetTransform(&transform_);
-    collider_->SetRadius(1.0f);  // 衝突判定の半径
+    collider_->SetRadius(colliderRadius);
     collider_->SetOffset(Vector3(0.0f, 0.0f, 0.0f));
     collider_->SetTypeID(static_cast<uint32_t>(CollisionTypeId::BOSS_ATTACK));
     collider_->SetOwner(this);
@@ -124,9 +132,9 @@ void BossBullet::Update(float deltaTime) {
 
     // エリア外に出たら非アクティブ化
     Vector3 pos = transform_.translate;
-    if (pos.x < Player::X_MIN || pos.x > Player::X_MAX ||
-        pos.z < Player::Z_MIN || pos.z > Player::Z_MAX ||
-        pos.y < -10.0f || pos.y > 50.0f) {
+    if (pos.x < GameConfig::kStageXMin || pos.x > GameConfig::kStageXMax ||
+        pos.z < GameConfig::kStageZMin || pos.z > GameConfig::kStageZMax ||
+        pos.y < kYBoundaryMin || pos.y > kYBoundaryMax) {
         isActive_ = false;
     }
 }

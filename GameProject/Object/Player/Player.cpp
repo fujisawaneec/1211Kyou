@@ -15,6 +15,8 @@
 #include "CollisionManager.h"
 #include "../../Collision/CollisionTypeIdDef.h"
 #include "../Boss/Boss.h"
+#include "../../Config/GameConfig.h"
+#include "GlobalVariables.h"
 
 #include "FrameTimer.h"
 #include "Sprite.h"
@@ -24,12 +26,6 @@
 #ifdef _DEBUG
 #include "ImGuiManager.h"
 #endif
-
-// Static const member initialization
-const float Player::X_MIN = -100.0f;
-const float Player::X_MAX = 100.0f;
-const float Player::Z_MIN = -140.0f;
-const float Player::Z_MAX = 60.0f;
 
 
 Player::Player()
@@ -47,11 +43,20 @@ Player::~Player()
 
 void Player::Initialize()
 {
+    // GlobalVariables登録
+    GlobalVariables* gv = GlobalVariables::GetInstance();
+    gv->CreateGroup("Player");
+    gv->AddItem("Player", "BodyColliderSize", 3.2f);
+    gv->AddItem("Player", "MeleeColliderX", 5.0f);
+    gv->AddItem("Player", "MeleeColliderY", 2.0f);
+    gv->AddItem("Player", "MeleeColliderZ", 17.0f);
+    gv->AddItem("Player", "MeleeColliderOffsetZ", 10.0f);
+
     model_ = std::make_unique<Object3d>();
     model_->Initialize();
     model_->SetModel("white_cube.gltf");
 
-    transform_.translate = Vector3(0.0f, 2.5f, -120.0f);
+    transform_.translate = Vector3(0.0f, kInitialY, kInitialZ);
     transform_.rotate = Vector3(0.0f, 0.0f, 0.0f);
     transform_.scale = Vector3(1.0f, 1.0f, 1.0f);
 
@@ -133,10 +138,10 @@ void Player::Update()
     LookAtBoss();
 
     // 実効的な制限を計算（静的制限と動的制限の交差）
-    float effectiveXMin = std::max<float>(X_MIN, dynamicXMin_);
-    float effectiveXMax = std::min<float>(X_MAX, dynamicXMax_);
-    float effectiveZMin = std::max<float>(Z_MIN, dynamicZMin_);
-    float effectiveZMax = std::min<float>(Z_MAX, dynamicZMax_);
+    float effectiveXMin = std::max<float>(GameConfig::kStageXMin, dynamicXMin_);
+    float effectiveXMax = std::min<float>(GameConfig::kStageXMax, dynamicXMax_);
+    float effectiveZMin = std::max<float>(GameConfig::kStageZMin, dynamicZMin_);
+    float effectiveZMax = std::min<float>(GameConfig::kStageZMax, dynamicZMax_);
 
     // 位置制限適用
     transform_.translate.x = std::min<float>(transform_.translate.x, effectiveXMax);
@@ -178,7 +183,7 @@ void Player::Move(float speedMultiplier)
     if (!inputHandlerPtr_) return;
 
     Vector2 moveDir = inputHandlerPtr_->GetMoveDirection();
-    if (moveDir.Length() < 0.1f) return;
+    if (moveDir.Length() < kMoveInputDeadzone) return;
 
     // 3Dベクトルに変換
     velocity_ = { moveDir.x, 0.0f, moveDir.y };
@@ -195,10 +200,10 @@ void Player::Move(float speedMultiplier)
     transform_.translate += velocity_;
 
     // 移動方向を向く
-    if (velocity_.Length() > 0.01f)
+    if (velocity_.Length() > kVelocityEpsilon)
     {
         targetAngle_ = std::atan2(velocity_.x, velocity_.z);
-        transform_.rotate.y = Vec3::LerpShortAngle(transform_.rotate.y, targetAngle_, 0.2f);
+        transform_.rotate.y = Vec3::LerpShortAngle(transform_.rotate.y, targetAngle_, kRotationLerpSpeed);
     }
 }
 
@@ -213,7 +218,7 @@ void Player::MoveToTarget(Boss* target, float deltaTime)
     direction.y = 0.0f;
 
     float distance = direction.Length();
-    if (distance > 4.0f) {
+    if (distance > kAttackStartDistance) {
         direction = direction.Normalize();
 
         // ターゲットに向かって移動
@@ -222,16 +227,23 @@ void Player::MoveToTarget(Boss* target, float deltaTime)
 
         // ターゲットの方向を向く
         targetAngle_ = std::atan2(direction.x, direction.z);
-        transform_.rotate.y = Vec3::LerpShortAngle(transform_.rotate.y, targetAngle_, 0.3f);
+        transform_.rotate.y = Vec3::LerpShortAngle(transform_.rotate.y, targetAngle_, kAttackMoveRotationLerp);
     }
 }
 
 void Player::SetupColliders()
 {
+    GlobalVariables* gv = GlobalVariables::GetInstance();
+    float bodySize = gv->GetValueFloat("Player", "BodyColliderSize");
+    float meleeX = gv->GetValueFloat("Player", "MeleeColliderX");
+    float meleeY = gv->GetValueFloat("Player", "MeleeColliderY");
+    float meleeZ = gv->GetValueFloat("Player", "MeleeColliderZ");
+    float meleeOffsetZ = gv->GetValueFloat("Player", "MeleeColliderOffsetZ");
+
     // 本体のCollider
     bodyCollider_ = std::make_unique<OBBCollider>();
     bodyCollider_->SetTransform(&transform_);
-    bodyCollider_->SetSize(Vector3(3.2f, 3.2f, 3.2f));
+    bodyCollider_->SetSize(Vector3(bodySize, bodySize, bodySize));
     bodyCollider_->SetOffset(Vector3(0.0f, 0.0f, 0.0f));
     bodyCollider_->SetTypeID(static_cast<uint32_t>(CollisionTypeId::PLAYER));
     bodyCollider_->SetOwner(this);
@@ -239,8 +251,8 @@ void Player::SetupColliders()
     // 攻撃範囲のCollider
     meleeAttackCollider_ = std::make_unique<MeleeAttackCollider>(this);
     meleeAttackCollider_->SetTransform(&transform_);
-    meleeAttackCollider_->SetSize(Vector3(5.f, 2.0f, 17.0f));
-    meleeAttackCollider_->SetOffset(Vector3(0.0f, 0.0f, 10.0f));
+    meleeAttackCollider_->SetSize(Vector3(meleeX, meleeY, meleeZ));
+    meleeAttackCollider_->SetOffset(Vector3(0.0f, 0.0f, meleeOffsetZ));
     meleeAttackCollider_->SetActive(false);
 
     // CollisionManagerに登録
@@ -276,7 +288,7 @@ void Player::LookAtBoss()
     float targetAngle = std::atan2(toTarget.x, toTarget.z);
 
     // スムーズに補間して回転
-    transform_.rotate.y = Vec3::LerpShortAngle(transform_.rotate.y, targetAngle, 1.15f);
+    transform_.rotate.y = Vec3::LerpShortAngle(transform_.rotate.y, targetAngle, kBossLookatLerp);
 }
 
 void Player::OnMeleeAttackHit(Collider* other)
@@ -599,8 +611,8 @@ void Player::SetDynamicBoundsFromCenter(const Vector3& center, float xRange, flo
 void Player::ClearDynamicBounds()
 {
     // 非常に大きな値に設定して実質的に無効化
-    dynamicXMin_ = -9999.0f;
-    dynamicXMax_ = 9999.0f;
-    dynamicZMin_ = -9999.0f;
-    dynamicZMax_ = 9999.0f;
+    dynamicXMin_ = -kBoundaryDisabled;
+    dynamicXMax_ = kBoundaryDisabled;
+    dynamicZMin_ = -kBoundaryDisabled;
+    dynamicZMax_ = kBoundaryDisabled;
 }

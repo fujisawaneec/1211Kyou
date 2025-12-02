@@ -7,6 +7,13 @@
 /// </summary>
 class AttackState : public PlayerState
 {
+	//=========================================================================================
+	// 定数
+	//=========================================================================================
+private:
+    static constexpr float kBlockStartAngle = 1.5708f;  ///< ブロック開始角度（π/2）
+	static constexpr float kBlockScale = 0.5f;          ///< ブロックのスケール
+
 public:
 	AttackState() : PlayerState("Attack") {}
 

@@ -9,6 +9,7 @@
 #include "Sprite.h"
 #include "WinApp.h"
 #include "BossBehaviorTree/BossBehaviorTree.h"
+#include "GlobalVariables.h"
 
 #ifdef _DEBUG
 #include "ImGuiManager.h"
@@ -25,12 +26,18 @@ Boss::~Boss()
 
 void Boss::Initialize()
 {
+    // GlobalVariables登録
+    GlobalVariables* gv = GlobalVariables::GetInstance();
+    gv->CreateGroup("Boss");
+    gv->AddItem("Boss", "BodyColliderSize", 3.2f);
+    gv->AddItem("Boss", "HitEffectDuration", 0.1f);
+
     model_ = std::make_unique<Object3d>();
     model_->Initialize();
     model_->SetModel("white_cube.gltf");
     model_->SetMaterialColor(Vector4(1.0f, 0.0f, 0.0f, 1.0f));
 
-    transform_.translate = Vector3(0.0f, 2.5f, 10.0f);
+    transform_.translate = Vector3(0.0f, kInitialY, kInitialZ);
     transform_.rotate = Vector3(0.0f, 0.0f, 0.0f);
     transform_.scale = Vector3(1.0f, 1.0f, 1.0f);
 
@@ -63,9 +70,10 @@ void Boss::Initialize()
         WinApp::clientHeight * 0.05f));
 
     // Colliderの初期化
+    float bodySize = gv->GetValueFloat("Boss", "BodyColliderSize");
     bodyCollider_ = std::make_unique<OBBCollider>();
     bodyCollider_->SetTransform(&transform_);
-    bodyCollider_->SetSize(Vector3(3.2f, 3.2f, 3.2f));
+    bodyCollider_->SetSize(Vector3(bodySize, bodySize, bodySize));
     bodyCollider_->SetOffset(Vector3(0.0f, 0.0f, 0.0f));
     bodyCollider_->SetTypeID(static_cast<uint32_t>(CollisionTypeId::BOSS));
     bodyCollider_->SetOwner(this);
@@ -143,7 +151,8 @@ void Boss::Update(float deltaTime)
     }
 
     // ヒットエフェクトの更新
-    UpdateHitEffect(Vector4(1.0f, 1.0f, 1.0f, 1.0f), 0.1f);
+    float hitEffectDuration = GlobalVariables::GetInstance()->GetValueFloat("Boss", "HitEffectDuration");
+    UpdateHitEffect(Vector4(1.0f, 1.0f, 1.0f, 1.0f), hitEffectDuration);
 
     // モデルの更新
     model_->SetTransform(transform_);

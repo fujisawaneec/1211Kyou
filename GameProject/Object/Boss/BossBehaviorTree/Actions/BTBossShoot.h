@@ -9,6 +9,13 @@ class Boss;
 /// ボスの射撃アクションノード
 /// </summary>
 class BTBossShoot : public BTNode {
+    //=========================================================================================
+    // 定数
+    //=========================================================================================
+private:
+    static constexpr float kDirectionEpsilon = 0.01f;  ///< 方向判定の閾値
+    static constexpr float kAngleEpsilon = 0.001f;     ///< 角度判定の閾値
+
 public:
     /// <summary>
     /// コンストラクタ
@@ -124,4 +131,7 @@ private:
 
     // 初回実行フラグ
     bool isFirstExecute_ = true;
+
+    // 弾数（ImGui調整用）
+    int bulletCount_ = 3;  ///< 発射する弾数
 };
