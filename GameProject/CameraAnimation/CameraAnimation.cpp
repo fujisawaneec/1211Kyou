@@ -22,7 +22,7 @@ CameraAnimation::CameraAnimation() {
     keyframes_.reserve(GameConst::Camera::kKeyframeReserve); // 予め領域を確保
 
     // FOV復元用変数の初期化
-    originalFov_ = defaultFov_;
+    originalFov_ = kDefaultFov;
     hasOriginalFov_ = false;
 }
 
