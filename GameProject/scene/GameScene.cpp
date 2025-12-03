@@ -43,6 +43,10 @@ void GameScene::Initialize()
 {
     // CollisionManagerを取得
     CollisionManager* collisionManager = CollisionManager::GetInstance();
+    collisionManager->Initialize();
+
+    // GlobalVariablesを取得
+    GlobalVariables* gvScene = GlobalVariables::GetInstance();
 
     // EmitterManagerの生成
     emitterManager_ = std::make_unique<EmitterManager>(GPUParticle::GetInstance());
@@ -84,12 +88,20 @@ void GameScene::Initialize()
     ///              初期化処理             ///
     /// ================================== ///
 
-    // GlobalVariables登録（描画品質設定）
-    GlobalVariables* gvScene = GlobalVariables::GetInstance();
+    // Input Handlerの初期化
+    inputHandler_ = std::make_unique<InputHandler>();
+    inputHandler_->Initialize();
+
+    /// ----------------------GlobalVariables設定----------------------------------------------------///
+    // GlobalVariables登録（描画品質設定
     gvScene->CreateGroup("GameScene");
     gvScene->AddItem("GameScene", "ShadowMaxDistance", 100.0f);
     gvScene->AddItem("GameScene", "DirectionalLightZ", -0.05f);
+    // ダッシュエフェクトパラメータの登録
+    gvScene->CreateGroup("DashEffect");
+    gvScene->AddItem("DashEffect", "LerpSpeed", 35.0f);
 
+    /// ----------------------シーンの描画設定---------------------------------------------------------///
     // シャドウマッピンの最大描画距離の設定
     float shadowMaxDist = gvScene->GetValueFloat("GameScene", "ShadowMaxDistance");
     ShadowRenderer::GetInstance()->SetMaxShadowDistance(shadowMaxDist);
@@ -97,16 +109,16 @@ void GameScene::Initialize()
     float lightZ = gvScene->GetValueFloat("GameScene", "DirectionalLightZ");
     Object3dBasic::GetInstance()->SetDirectionalLightDirection(Vector3(0.0f, -1.0f, lightZ));
 
+    /// ----------------------スプライトの初期化------------------------------------------------------ ///
     // タイトルボタンテキストの初期化
     toTitleSprite_ = std::make_unique<Sprite>();
     toTitleSprite_->Initialize("game_button_text.png");
     toTitleSprite_->SetPos(Vector2(WinApp::clientWidth / 2.f - toTitleSprite_->GetSize().x / 2.f, 200.f));
 
+    /// ----------------------3Dオブジェクトの初期化--------------------------------------------------- ///
     // SkyBoxの初期化
     skyBox_ = std::make_unique<SkyBox>();
     skyBox_->Initialize("my_skybox.dds");
-
-    collisionManager->Initialize();
 
     // 床モデルのUV変換設定
     groundUvTransform_.translate = Vector3(0.0f, 0.0f, 0.0f);
@@ -118,10 +130,6 @@ void GameScene::Initialize()
     ground_->SetModel("ground_black.gltf");
     ground_->SetUvTransform(groundUvTransform_);
     ground_->SetEnableHighlight(false);
-
-    // Input Handlerの初期化
-    inputHandler_ = std::make_unique<InputHandler>();
-    inputHandler_->Initialize();
 
     //-----------Playerの初期化----------------//
     player_ = std::make_unique<Player>();
@@ -140,6 +148,7 @@ void GameScene::Initialize()
     // プレイヤーにボスの参照を設定
     player_->SetBoss(boss_.get());
 
+    /// ----------------------カメラシステムの初期化------------------------------------------------- ///
     // カメラマネージャーの初期化
     cameraManager_ = CameraManager::GetInstance();
     cameraManager_->Initialize((*Object3dBasic::GetInstance()->GetCamera()));
@@ -166,20 +175,7 @@ void GameScene::Initialize()
     animationController_ = animController.get();
     cameraManager_->RegisterController("Animation", std::move(animController));
 
-    // ゲーム開始アニメーションを再生
-    animationController_->LoadAnimationFromFile("game_start");
-    cameraManager_->ActivateController("Animation");
-    animationController_->SwitchAnimation("game_start");
-    animationController_->Play();
-
-    // オーバー演出アニメーションの読み込みと設定
-    animationController_->LoadAnimationFromFile("over_anim");
-    animationController_->SetAnimationTargetByName("over_anim", player_->GetTransformPtr());
-
-    // クリア演出アニメーションの読み込みと設定
-    animationController_->LoadAnimationFromFile("clear_anim");
-    animationController_->SetAnimationTargetByName("clear_anim", boss_->GetTransformPtr());
-
+    /// ----------------------衝突判定の初期化--------------------------------------------------- ///
     // 衝突マスクの設定（どのタイプ同士が衝突判定を行うか）
     collisionManager->SetCollisionMask(
         static_cast<uint32_t>(CollisionTypeId::PLAYER_MELEE_ATTACK),
@@ -193,6 +189,7 @@ void GameScene::Initialize()
         true
     );
 
+    /// ----------------------エミッターマネージャーの初期化--------------------------------------------- ///
     // シーンのエミッターをまとめて読み込む
     emitterManager_->LoadScenePreset("gamescene_preset");
 
@@ -202,13 +199,23 @@ void GameScene::Initialize()
     emitterManager_->SetEmitterActive("boss_border_front", false);
     emitterManager_->SetEmitterActive("boss_border_back", false);
 
-    // ダッシュエフェクトパラメータの登録
-    GlobalVariables* gv = GlobalVariables::GetInstance();
-    gv->CreateGroup("DashEffect");
-    gv->AddItem("DashEffect", "LerpSpeed", 35.0f);
-
     // ダッシュエミッター位置を初期化
     dashEmitterPosition_ = player_->GetTranslate();
+
+
+    // ゲーム開始アニメーションを再生
+    animationController_->LoadAnimationFromFile("game_start");
+    cameraManager_->ActivateController("Animation");
+    animationController_->SwitchAnimation("game_start");
+    animationController_->Play();
+
+    // オーバー演出アニメーションの読み込みと設定
+    animationController_->LoadAnimationFromFile("over_anim");
+    animationController_->SetAnimationTargetByName("over_anim", player_->GetTransformPtr());
+
+    // クリア演出アニメーションの読み込みと設定
+    animationController_->LoadAnimationFromFile("clear_anim");
+    animationController_->SetAnimationTargetByName("clear_anim", boss_->GetTransformPtr());
 }
 
 void GameScene::Finalize()
@@ -251,13 +258,6 @@ void GameScene::Update()
         cameraMode_ = !cameraMode_;
     }
 
-    //if (Input::GetInstance()->TriggerKey(DIK_O)) {
-    //    StartOverAnim();
-    //}
-
-    //if (Input::GetInstance()->TriggerKey(DIK_P)) {
-    //    StartClearAnim();
-    //}
 #endif
 
     // ゲーム開始演出終了後、ボスの一時停止を解除
@@ -269,7 +269,6 @@ void GameScene::Update()
     // ゲームクリア判定
     if (boss_->IsDead()) {
         StartClearAnim();
-        //SceneManager::GetInstance()->ChangeScene("clear", "Fade", 0.3f);
     }
 
     // ゲームオーバー判定
@@ -338,14 +337,6 @@ void GameScene::Draw()
         ground_->Draw();
         player_->Draw();
         boss_->Draw();
-
-        // ボスの弾のシャドウ
-        //for (const auto& bullet : bossBullets_) {
-        //    if (bullet && bullet->IsActive()) {
-        //        bullet->Draw();
-        //    }
-        //}
-
         ShadowRenderer::GetInstance()->EndShadowPass();
     }
 
@@ -362,13 +353,6 @@ void GameScene::Draw()
     ground_->Draw();
     player_->Draw();
     boss_->Draw();
-
-    // ボスの弾を描画
-    for (const auto& bullet : bossBullets_) {
-        if (bullet && bullet->IsActive()) {
-            bullet->Draw();
-        }
-    }
 
     //------------------前景Spriteの描画------------------//
     // スプライト共通描画設定
@@ -568,18 +552,15 @@ void GameScene::UpdateProjectiles(float deltaTime)
     }
 
     // 非アクティブなボスの弾を削除
-    bossBullets_.erase(
-        std::remove_if(bossBullets_.begin(), bossBullets_.end(),
-            [](const std::unique_ptr<BossBullet>& bullet) {
-                if (bullet && !bullet->IsActive()) {
-                    // Finalize()で自動的にコライダーが削除される
-                    bullet->Finalize();
-                    return true;
-                }
-                return false;
-            }),
-        bossBullets_.end()
-    );
+    std::erase_if(bossBullets_,
+        [](const std::unique_ptr<BossBullet>& bullet) {
+            if (bullet && !bullet->IsActive()) {
+                // Finalize()で自動的にコライダーが削除される
+                bullet->Finalize();
+                return true;
+            }
+            return false;
+        });
 }
 
 void GameScene::UpdateBossBorder()
