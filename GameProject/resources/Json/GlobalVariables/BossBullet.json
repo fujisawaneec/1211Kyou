@@ -1,7 +1,7 @@
 {
     "BossBullet": {
         "ColliderRadius": 1.0,
-        "Damage": 10.0,
+        "Damage": 5.0,
         "Lifetime": 5.0
     }
 }
