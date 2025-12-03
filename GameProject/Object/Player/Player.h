@@ -124,19 +124,19 @@ public: // メンバ関数
     /// 平行移動情報を設定
     /// </summary>
     /// <param name="translate">新しい位置情報</param>
-    void SetTranslate(Vector3 translate) { transform_.translate = translate; }
+    void SetTranslate(const Vector3& translate) { transform_.translate = translate; }
 
     /// <summary>
     /// 回転情報を設定
     /// </summary>
     /// <param name="rotate">新しい回転情報（ラジアン）</param>
-    void SetRotate(Vector3 rotate) { transform_.rotate = rotate; }
+    void SetRotate(const Vector3& rotate) { transform_.rotate = rotate; }
 
     /// <summary>
     /// スケール情報を設定
     /// </summary>
     /// <param name="scale">新しいスケール情報</param>
-    void SetScale(Vector3 scale) { transform_.scale = scale; }
+    void SetScale(const Vector3& scale) { transform_.scale = scale; }
 
     /// <summary>
     /// HPを設定

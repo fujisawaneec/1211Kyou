@@ -182,7 +182,7 @@ void Boss::OnHit(float damage)
     isPlayHitEffect_ = true;
 }
 
-void Boss::UpdateHitEffect(Vector4 color, float duration)
+void Boss::UpdateHitEffect(const Vector4& color, float duration)
 {
     if (!isPlayHitEffect_)  return;
 
