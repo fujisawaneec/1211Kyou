@@ -5,7 +5,6 @@
 #include "SpriteBasic.h"
 #include "Sprite.h"
 #include "Input.h"
-#include "DebugCamera.h"
 #include "Draw2D.h"
 #include "FrameTimer.h"
 #include "GPUParticle.h"
@@ -15,6 +14,8 @@
 #include "Model.h"
 #include "ShadowRenderer.h"
 #include "CollisionManager.h"
+#include "GlobalVariables.h"
+#include "Vec3Func.h"
 
 // Game includes
 #include "../Collision/CollisionTypeIdDef.h"
@@ -23,13 +24,11 @@
 #include "CameraSystem/Controller/TopDownController.h"
 #include "CameraSystem/Controller/CameraAnimationController.h"
 #include "../Object/Projectile/BossBullet.h"
-#include "GlobalVariables.h"
-#include "Vec3Func.h"
-#include <algorithm>
-#include <cmath>
-
 #include "Object/Player/State/PlayerState.h"
 #include "Object/Player/State/PlayerStateMachine.h"
+
+#include <algorithm>
+#include <cmath>
 
 // Debug includes
 #ifdef _DEBUG
