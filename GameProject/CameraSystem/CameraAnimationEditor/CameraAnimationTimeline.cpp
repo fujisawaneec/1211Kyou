@@ -192,7 +192,7 @@ void CameraAnimationTimeline::DrawPlayhead() {
   ImVec2 canvasPos = ImGui::GetCursorScreenPos();
   ImVec2 canvasSize = ImGui::GetContentRegionAvail();
 
-  float currentTime = animation_->GetCurrentTime();
+  float currentTime = animation_->GetPlaybackTime();
   float x = TimeToScreenX(currentTime);
 
   if (x >= trackLabelWidth_ && x <= canvasSize.x) {

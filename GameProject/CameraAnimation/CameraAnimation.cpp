@@ -19,7 +19,7 @@
 /// コンストラクタ
 /// </summary>
 CameraAnimation::CameraAnimation() {
-    keyframes_.reserve(GameConst::Camera::kKeyframeReserve); // 予め領域を確保
+    keyframes_.reserve(CameraConfig::Animation::KEYFRAME_RESERVE_COUNT); // 予め領域を確保
 
     // FOV復元用変数の初期化
     originalFov_ = kDefaultFov;

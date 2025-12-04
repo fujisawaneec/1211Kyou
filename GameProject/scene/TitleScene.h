@@ -2,12 +2,12 @@
 #include "BaseScene.h"
 #include"Sprite.h"
 #include"Object3d.h"
-#include <vector>
-#include <memory>
 #include "AABB.h"
 #include "EmitterManager.h"
 #include "PostEffectManager.h"
-#include "../Common/GameConst.h"
+#include "CameraSystem/CameraConfig.h"
+#include <vector>
+#include <memory>
 
 /// <summary>
 /// タイトルシーンクラス
@@ -145,7 +145,7 @@ private: // メンバ変数
 	RGBSplitParam rgbSplitParam_{};  ///< RGBSplitポストエフェクトのパラメータ
 	VignetteParam vignetteParam_{};  ///< Vignetteポストエフェクトのパラメータ
 
-	float offsetY = GameConst::Camera::kHiddenY;  ///< カメラ非表示用Y方向オフセット
+	float offsetY = CameraConfig::HIDDEN_Y;  ///< カメラ非表示用Y方向オフセット
 
 	// === カメラ位置用変数 === //
 	float cameraY_ = 9.0f;  ///< カメラY座標

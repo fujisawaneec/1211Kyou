@@ -7,8 +7,7 @@
 #include "../CameraManager.h"
 #include "../Controller/CameraAnimationController.h"
 #include "Vec3Func.h"
-#include <imgui.h>
-// #include <imgui_internal.h> // 不要な場合はコメントアウト
+#include "ImGuiManager.h"
 #include <algorithm>
 #include <sstream>
 
@@ -127,15 +126,6 @@ void CameraAnimationEditor::Draw() {
     DrawStatusBar();
 
     ImGui::End();
-
-    // プレビューウィンドウ（別ウィンドウ）- 無効化
-    // if (previewMode_ != PreviewMode::NONE) {
-    //     ImGui::SetNextWindowSize(ImVec2(400, 300), ImGuiCond_FirstUseEver);
-    //     if (ImGui::Begin("Camera Preview", nullptr)) {
-    //         DrawPreviewPanel();
-    //     }
-    //     ImGui::End();
-    // }
 }
 
 void CameraAnimationEditor::Update(float deltaTime) {
@@ -289,7 +279,7 @@ void CameraAnimationEditor::DrawMenuBar() {
         // キーフレーム操作
         if (ImGui::MenuItem("Add Keyframe", "A", false, camera_ && animation_)) {
             if (camera_ && animation_) {
-                float currentTime = animation_->GetCurrentTime();
+                float currentTime = animation_->GetPlaybackTime();
                 CameraKeyframe newKf;
                 newKf.time = currentTime;
                 newKf.position = camera_->GetTranslate();
@@ -428,7 +418,7 @@ void CameraAnimationEditor::DrawPlaybackControls() {
 
     // タイムディスプレイ
     ImGui::SameLine();
-    ImGui::Text("Time: %.2f / %.2f", animation_->GetCurrentTime(), animation_->GetDuration());
+    ImGui::Text("Time: %.2f / %.2f", animation_->GetPlaybackTime(), animation_->GetDuration());
 
     // ループトグル
     ImGui::SameLine();
@@ -448,7 +438,7 @@ void CameraAnimationEditor::DrawPlaybackControls() {
     ImGui::PopStyleVar();
 
     // タイムラインスライダー（スクラブプレビュー機能付き）
-    float displayTime = animation_->GetCurrentTime();
+    float displayTime = animation_->GetPlaybackTime();
     float duration = animation_->GetDuration();
     if (duration > 0.0f) {
         // プレビューモード中は背景色を変更
@@ -842,25 +832,6 @@ void CameraAnimationEditor::DrawCurveEditorPanel() {
     }
 }
 
-void CameraAnimationEditor::DrawPreviewPanel() {
-    // プレビューのレンダリングをここに実装
-    // 実際の3Dビューポートの描画は複雑なため、簡略化
-    ImGui::Text("Camera Preview");
-    ImGui::Separator();
-
-
-    // カメラ位置情報
-    if (camera_) {
-        Vector3 pos = camera_->GetTranslate();
-        Vector3 rot = camera_->GetRotate();
-        ImGui::Text("Position: (%.2f, %.2f, %.2f)", pos.x, pos.y, pos.z);
-        ImGui::Text("Rotation: (%.1f, %.1f, %.1f)",
-            rot.x * 180.0f / 3.14159265f,
-            rot.y * 180.0f / 3.14159265f,
-            rot.z * 180.0f / 3.14159265f);
-    }
-}
-
 void CameraAnimationEditor::DrawStatusBar() {
     ImGui::Separator();
 
@@ -918,7 +889,7 @@ void CameraAnimationEditor::PasteKeyframes() {
         return;
     }
 
-    float currentTime = animation_->GetCurrentTime();
+    float currentTime = animation_->GetPlaybackTime();
     float minTime = clipboard_[0].time;
 
     // クリップボード内の最小時間を基準にペースト

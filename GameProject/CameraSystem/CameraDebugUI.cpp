@@ -266,7 +266,7 @@ void CameraDebugUI::DrawAnimationInfo(CameraAnimation* animation) {
     // アニメーション情報
     ImGui::Text("Animation: %s", animation->GetAnimationName().c_str());
     ImGui::Text("Duration: %.2f seconds", animation->GetDuration());
-    ImGui::Text("Current Time: %.2f", animation->GetCurrentTime());
+    ImGui::Text("Current Time: %.2f", animation->GetPlaybackTime());
     ImGui::Text("Keyframes: %zu", animation->GetKeyframeCount());
 
     // 再生状態
@@ -329,7 +329,7 @@ void CameraDebugUI::DrawAnimationInfo(CameraAnimation* animation) {
     }
 
     // タイムラインスライダー
-    float currentTime = animation->GetCurrentTime();
+    float currentTime = animation->GetPlaybackTime();
     if (ImGui::SliderFloat("Timeline", &currentTime, 0.0f,
                           animation->GetDuration(), "%.2f")) {
         animation->SetCurrentTime(currentTime);

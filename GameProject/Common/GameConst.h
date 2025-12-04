@@ -21,21 +21,4 @@ namespace GameConst {
     /// </summary>
     constexpr float kDirectionEpsilon = 0.01f;
 
-    /// <summary>
-    /// カメラ関連の定数
-    /// </summary>
-    namespace Camera {
-        /// <summary>
-        /// ゲームシーンまだ消えないパーティクルが別のシーンでも表示されるのを防ぐため、
-        /// カメラを画面外に移動させる際のY座標
-        /// シーン遷移時などで使用
-        /// </summary>
-        constexpr float kHiddenY = -1000.0f;
-
-        /// <summary>
-        /// キーフレームアニメーションの予約数
-        /// </summary>
-        constexpr int kKeyframeReserve = 32;
-    }
-
 }

@@ -1,11 +1,12 @@
 #pragma once
+
+#ifdef _DEBUG
+
 #include "CameraAnimation/CameraAnimation.h"
 #include "CameraAnimation/CameraKeyframe.h"
 #include "Camera.h"
 #include <memory>
 #include <vector>
-
-#ifdef _DEBUG
 
 // Forward declarations
 class CameraAnimationTimeline;
@@ -112,11 +113,6 @@ private:
     void DrawCurveEditorPanel();
 
     /// <summary>
-    /// プレビューパネルの描画
-    /// </summary>
-    void DrawPreviewPanel();
-
-    /// <summary>
     /// ステータスバーの描画
     /// </summary>
     void DrawStatusBar();
@@ -126,24 +122,12 @@ private:
     /// </summary>
     void DrawPlaybackControls();
 
-
-
     /// <summary>
     /// グリッドスナップの処理
     /// </summary>
     /// <param name="time">入力時間</param>
     /// <returns>スナップ後の時間</returns>
     float SnapToGrid(float time) const;
-
-    /// <summary>
-    /// キーフレームの選択処理
-    /// </summary>
-    void HandleKeyframeSelection();
-
-    /// <summary>
-    /// ドラッグ＆ドロップ処理
-    /// </summary>
-    void HandleDragAndDrop();
 
     /// <summary>
     /// コピー処理

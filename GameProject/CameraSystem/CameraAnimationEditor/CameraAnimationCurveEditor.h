@@ -1,10 +1,11 @@
 #pragma once
+
+#ifdef _DEBUG
+
 #include "CameraAnimation/CameraAnimation.h"
 #include "CameraAnimation/CameraKeyframe.h"
 #include <vector>
-#include <imgui.h>
-
-#ifdef _DEBUG
+#include "ImGuiManager.h"
 
 /// <summary>
 /// カメラアニメーションのカーブエディター

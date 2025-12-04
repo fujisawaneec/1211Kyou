@@ -3,7 +3,6 @@
 #include "Camera.h"
 #include "Quaternion.h"
 #include "Transform.h"
-#include "../Common/GameConst.h"
 #include <vector>
 #include <string>
 #include <memory>
@@ -159,7 +158,7 @@ public:
     /// <summary>
     /// 現在の再生時間を取得
     /// </summary>
-    [[nodiscard]] float GetCurrentTime() const { return currentTime_; }
+    [[nodiscard]] float GetPlaybackTime() const { return currentTime_; }
 
     /// <summary>
     /// 再生状態を取得

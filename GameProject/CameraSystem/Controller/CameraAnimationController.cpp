@@ -224,7 +224,7 @@ float CameraAnimationController::GetDuration() const {
 float CameraAnimationController::GetCurrentTime() const {
     auto* animation = const_cast<CameraAnimationController*>(this)->GetCurrentAnimation();
     if (animation) {
-        return animation->GetCurrentTime();
+        return animation->GetPlaybackTime();
     }
     return 0.0f;
 }

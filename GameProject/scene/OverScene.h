@@ -3,7 +3,7 @@
 
 #include "BaseScene.h"
 #include "vector2.h"
-#include "../Common/GameConst.h"
+#include "CameraSystem/CameraConfig.h"
 
 class Sprite;
 
@@ -49,7 +49,7 @@ private: // メンバ変数
     std::unique_ptr<Sprite> pressButtonText_ = nullptr;
 
     // カメラ非表示Y座標
-    float cameraHiddenY_ = GameConst::Camera::kHiddenY;
+    float cameraHiddenY_ = CameraConfig::HIDDEN_Y;
 
     // UI位置・サイズ用変数
     float titleTextHalfWidth_ = 250.0f;  ///< タイトルテキスト半幅（センタリング用）

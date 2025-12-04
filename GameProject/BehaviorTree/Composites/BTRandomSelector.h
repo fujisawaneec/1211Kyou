@@ -31,6 +31,12 @@ public:
     /// </summary>
     void Reset() override;
 
+private: // プライベートメンバー関数
+    /// <summary>
+    /// 子ノードのインデックスをシャッフル
+    /// </summary>
+    void ShuffleIndices();
+
 private:
     // シャッフルされたインデックス
     std::vector<size_t> shuffledIndices_;
@@ -41,8 +47,5 @@ private:
     // シャッフルが必要かどうか（新しい選択サイクル開始時にtrue）
     bool needsShuffle_ = true;
 
-    /// <summary>
-    /// 子ノードのインデックスをシャッフル
-    /// </summary>
-    void ShuffleIndices();
+
 };

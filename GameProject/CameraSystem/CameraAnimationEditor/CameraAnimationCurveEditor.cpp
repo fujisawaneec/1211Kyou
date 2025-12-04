@@ -68,7 +68,7 @@ void CameraAnimationCurveEditor::DrawGraphArea() {
     if (canvasSize.x < 100 || canvasSize.y < 100) {
         canvasSize = ImVec2(600, 300);
     }
-    graphSize_ = ImVec2(canvasSize.x - 20, std::min(300.0f, canvasSize.y - 100));
+    graphSize_ = ImVec2(canvasSize.x - 20, std::min<float>(300.0f, canvasSize.y - 100.0f));
 
     ImGui::BeginChild("GraphArea", graphSize_, true, ImGuiWindowFlags_NoScrollbar);
 
@@ -311,8 +311,8 @@ void CameraAnimationCurveEditor::HandleMouseInput() {
             }
 
             // 時間と値の制限
-            time = std::max(0.0f, std::min(time, animation_->GetDuration()));
-            value = std::max(valueRangeMin_, std::min(value, valueRangeMax_));
+            time = std::max<float>(0.0f, std::min<float>(time, animation_->GetDuration()));
+            value = std::max<float>(valueRangeMin_, std::min<float>(value, valueRangeMax_));
 
             // キーフレームを更新
             CameraKeyframe kf = animation_->GetKeyframe(selectedKeyPoint_);
@@ -330,8 +330,8 @@ void CameraAnimationCurveEditor::HandleMouseInput() {
     // ホイール（ズーム）
     if (ImGui::GetIO().MouseWheel != 0) {
         float zoomDelta = ImGui::GetIO().MouseWheel * 0.1f;
-        zoomX_ = std::max(0.1f, std::min(10.0f, zoomX_ + zoomDelta));
-        zoomY_ = std::max(0.1f, std::min(10.0f, zoomY_ + zoomDelta));
+        zoomX_ = std::max<float>(0.1f, std::min<float>(10.0f, zoomX_ + zoomDelta));
+        zoomY_ = std::max<float>(0.1f, std::min<float>(10.0f, zoomY_ + zoomDelta));
     }
 }
 
