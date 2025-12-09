@@ -20,6 +20,8 @@
 #include "FrameTimer.h"
 #include "Sprite.h"
 #include "../../CameraSystem/CameraManager.h"
+#include "PostEffectManager.h"
+#include "PostEffectStruct.h"
 
 #include <cmath>
 #include <algorithm>
@@ -158,6 +160,24 @@ void Player::Update()
     // 攻撃ブロックの更新（表示中のみ）
     if (attackBlockVisible_ && attackBlock_) {
         attackBlock_->Update();
+    }
+
+    // 被弾Vignetteのフェードアウト
+    if (damageVignetteTimer_ > 0.0f) {
+        float deltaTime = FrameTimer::GetInstance()->GetDeltaTime();
+        damageVignetteTimer_ -= deltaTime;
+
+        float t = damageVignetteTimer_ / kDamageVignetteDuration_;
+        VignetteParam vignetteParam{};
+        vignetteParam.power = kDamageVignettePower_ * t;
+        vignetteParam.range = kDamageVignetteRange_;
+        vignetteParam.color = Vector3{1.0f, 0.0f, 0.0f};
+        PostEffectManager::GetInstance()->SetEffectParam("Vignette", vignetteParam);
+
+        if (damageVignetteTimer_ <= 0.0f) {
+            damageVignetteTimer_ = 0.0f;
+            PostEffectManager::GetInstance()->RemoveEffectFromChain("Vignette");
+        }
     }
 
     // 攻撃範囲Colliderの更新
@@ -356,6 +376,17 @@ void Player::OnHit(float damage)
 
     // ゲームパット振動
     Input::GetInstance()->SetVibration(0.2f, 0.3f, 0.25f);
+
+    // 被弾Vignetteエフェクト開始
+    damageVignetteTimer_ = kDamageVignetteDuration_;
+    if (!PostEffectManager::GetInstance()->IsEffectInChain("Vignette")) {
+        PostEffectManager::GetInstance()->AddEffectToChain("Vignette");
+    }
+    VignetteParam vignetteParam{};
+    vignetteParam.power = kDamageVignettePower_;
+    vignetteParam.range = kDamageVignetteRange_;
+    vignetteParam.color = Vector3{1.0f, 0.0f, 0.0f};  // 赤
+    PostEffectManager::GetInstance()->SetEffectParam("Vignette", vignetteParam);
 }
 
 void Player::DrawImGui()

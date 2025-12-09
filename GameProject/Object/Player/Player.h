@@ -398,6 +398,12 @@ private: // メンバ変数
     // 弾生成リクエスト
     std::vector<BulletSpawnRequest> pendingBullets_;
 
+    // 被弾Vignetteエフェクト
+    float damageVignetteTimer_ = 0.0f;                       ///< Vignetteフェードアウトタイマー
+    static constexpr float kDamageVignetteDuration_ = 0.25f; ///< フェードアウト時間
+    static constexpr float kDamageVignettePower_ = 0.2f;     ///< 初期Vignette強度
+    static constexpr float kDamageVignetteRange_ = 45.0f;    ///< Vignette範囲
+
     // 調整可能パラメータ（ImGui編集用）
     float initialY_ = 2.5f;                   ///< 初期Y座標
     float initialZ_ = -120.0f;                ///< 初期Z座標
