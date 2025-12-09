@@ -663,30 +663,30 @@
         1.0
       ],
       "frequency": 0.0010000000474974513,
-      "frequencyTime": 0.0009278432698920369,
+      "frequencyTime": 6.04486558586359e-05,
       "isActive": false,
       "isEmitting": true,
       "isNormalize": false,
-      "isRandomRotateZ": true,
+      "isRandomRotateZ": false,
       "isTemporary": false,
       "lifeTimeRange": [
-        0.20000000298023224,
-        0.3499999940395355
+        0.15000000596046448,
+        0.20000000298023224
       ],
-      "particleCount": 50,
+      "particleCount": 2,
       "position": [
-        36.07918167114258,
+        44.756717681884766,
         2.5,
-        -68.49388885498047
+        -78.571044921875
       ],
       "radius": 1.0,
       "scaleRangeX": [
-        3.0,
-        3.0
+        4.5,
+        4.5
       ],
       "scaleRangeY": [
-        0.20000000298023224,
-        0.20000000298023224
+        4.5,
+        4.5
       ],
       "startColor": [
         1.0,
