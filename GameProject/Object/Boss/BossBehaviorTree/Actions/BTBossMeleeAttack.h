@@ -204,6 +204,5 @@ private:
     Vector3 startPosition_;         ///< 突進開始位置
     Vector3 targetPosition_;        ///< 突進目標位置（Execute開始時に固定）
     Vector3 rushDirection_;         ///< 突進方向
-    float areaMargin_ = 5.0f;       ///< エリア境界マージン
     bool rushInitialized_ = false;  ///< 突進初期化済みフラグ
 };

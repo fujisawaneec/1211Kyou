@@ -110,5 +110,4 @@ private:
     float elapsedTime_ = 0.0f;         ///< 経過時間
     float approachDuration_ = 0.0f;    ///< 接近所要時間（距離から動的計算）
     bool isFirstExecute_ = true;       ///< 初回実行フラグ
-    float areaMargin_ = 5.0f;          ///< エリア境界からのマージン
 };

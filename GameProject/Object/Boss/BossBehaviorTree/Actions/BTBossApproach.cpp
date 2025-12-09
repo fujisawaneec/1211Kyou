@@ -147,10 +147,10 @@ Vector3 BTBossApproach::ClampToArea(const Vector3& position) {
 
     // GameConstantsのステージ境界を使用
     // X座標の制限
-    clampedPos.x = std::clamp(clampedPos.x, GameConst::kStageXMin + areaMargin_, GameConst::kStageXMax - areaMargin_);
+    clampedPos.x = std::clamp(clampedPos.x, GameConst::kStageXMin + GameConst::kAreaMargin, GameConst::kStageXMax - GameConst::kAreaMargin);
 
     // Z座標の制限
-    clampedPos.z = std::clamp(clampedPos.z, GameConst::kStageZMin + areaMargin_, GameConst::kStageZMax - areaMargin_);
+    clampedPos.z = std::clamp(clampedPos.z, GameConst::kStageZMin + GameConst::kAreaMargin, GameConst::kStageZMax - GameConst::kAreaMargin);
 
     // Y座標は元の値を保持
     clampedPos.y = position.y;
@@ -173,9 +173,6 @@ bool BTBossApproach::DrawImGui() {
         changed = true;
     }
     if (ImGui::DragFloat("Target Distance##approach", &targetDistance_, 0.5f, 1.0f, 50.0f)) {
-        changed = true;
-    }
-    if (ImGui::DragFloat("Area Margin##approach", &areaMargin_, 0.5f, 0.0f, 20.0f)) {
         changed = true;
     }
 

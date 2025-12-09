@@ -21,4 +21,10 @@ namespace GameConst {
     /// </summary>
     constexpr float kDirectionEpsilon = 0.01f;
 
+    /// <summary>
+    /// エリア境界からのマージン
+    /// ボスがステージ端に近づきすぎないための距離
+    /// </summary>
+    inline constexpr float kAreaMargin = 5.0f;
+
 }

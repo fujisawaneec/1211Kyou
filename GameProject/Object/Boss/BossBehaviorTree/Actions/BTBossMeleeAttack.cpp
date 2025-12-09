@@ -224,11 +224,11 @@ void BTBossMeleeAttack::ProcessRecoveryPhase(Boss* boss) {
 Vector3 BTBossMeleeAttack::ClampToArea(const Vector3& position) {
     Vector3 clampedPos = position;
     clampedPos.x = std::clamp(clampedPos.x,
-        GameConst::kStageXMin + areaMargin_,
-        GameConst::kStageXMax - areaMargin_);
+        GameConst::kStageXMin + GameConst::kAreaMargin,
+        GameConst::kStageXMax - GameConst::kAreaMargin);
     clampedPos.z = std::clamp(clampedPos.z,
-        GameConst::kStageZMin + areaMargin_,
-        GameConst::kStageZMax - areaMargin_);
+        GameConst::kStageZMin + GameConst::kAreaMargin,
+        GameConst::kStageZMax - GameConst::kAreaMargin);
     clampedPos.y = position.y;
     return clampedPos;
 }

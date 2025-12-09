@@ -120,5 +120,4 @@ private:
     // 調整可能パラメータ（ImGui編集用）
     float vibrationFreq_ = 50.0f;  ///< 振動周波数
     float vibrationAmp_ = 0.05f;   ///< 振動振幅
-    float areaMargin_ = 5.0f;      ///< エリア境界からのマージン
 };
