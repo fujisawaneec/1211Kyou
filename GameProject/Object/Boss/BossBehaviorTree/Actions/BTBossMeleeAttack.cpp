@@ -51,6 +51,8 @@ BTNodeStatus BTBossMeleeAttack::Execute(BTBlackboard* blackboard) {
                 boss->GetMeleeAttackCollider()->Reset();
                 colliderActivated_ = true;
             }
+            // ★突進の初期化（Execute開始時にプレイヤー位置を確定）
+            InitializeRush(boss);
         }
         break;
 
@@ -98,6 +100,7 @@ void BTBossMeleeAttack::Reset() {
     isFirstExecute_ = true;
     currentPhase_ = MeleePhase::Prepare;
     colliderActivated_ = false;
+    rushInitialized_ = false;
 }
 
 void BTBossMeleeAttack::InitializeMeleeAttack(Boss* boss) {
@@ -120,27 +123,8 @@ void BTBossMeleeAttack::InitializeMeleeAttack(Boss* boss) {
     // 初期位置を設定
     UpdateBlockPosition(boss);
 
-    // ★突進の初期化（Prepare開始時にプレイヤー位置を固定）
-    startPosition_ = boss->GetTransform().translate;
-
-    Player* player = boss->GetPlayer();
-    if (player) {
-        Vector3 playerPos = player->GetTransform().translate;
-        Vector3 toPlayer = playerPos - startPosition_;
-        toPlayer.y = 0.0f;
-
-        if (toPlayer.Length() > kDirectionEpsilon) {
-            Vector3 direction = toPlayer.Normalize();
-
-            // 目標位置 = 開始位置 + 方向 * 突進距離
-            targetPosition_ = startPosition_ + direction * rushDistance_;
-            targetPosition_ = ClampToArea(targetPosition_);
-        } else {
-            targetPosition_ = startPosition_;
-        }
-    } else {
-        targetPosition_ = startPosition_;
-    }
+    // 突進フラグをリセット（Execute開始時に初期化する）
+    rushInitialized_ = false;
 }
 
 void BTBossMeleeAttack::AimAtPlayer(Boss* boss, float deltaTime) {
@@ -191,15 +175,40 @@ void BTBossMeleeAttack::ProcessPreparePhase(Boss* boss, float deltaTime) {
 }
 
 void BTBossMeleeAttack::ProcessExecutePhase(Boss* boss, float deltaTime) {
-    // ★突進移動（attackDuration_中にSmoothstepで移動）
-    float t = phaseTimer_ / attackDuration_;
-    t = std::clamp(t, 0.0f, 1.0f);
-    t = t * t * (3.0f - 2.0f * t);  // Smoothstep
+    // ヒット判定をチェック
+    BossMeleeAttackCollider* collider = boss->GetMeleeAttackCollider();
+    bool hasHit = collider && collider->HasHitPlayer();
 
-    Vector3 newPosition = Vector3::Lerp(startPosition_, targetPosition_, t);
-    boss->SetTranslate(newPosition);
+    if (hasHit) {
+        // ヒット時: プレイヤーと一定距離を保って停止
+        Player* player = boss->GetPlayer();
+        if (player) {
+            Vector3 playerPos = player->GetTransform().translate;
+            Vector3 bossPos = boss->GetTransform().translate;
+            Vector3 toPlayer = playerPos - bossPos;
+            toPlayer.y = 0.0f;
+            float currentDistance = toPlayer.Length();
 
-    // ブロックを回転させる（常に同じ方向：右から左へ）
+            // 現在の距離がstopDistance_より近い場合は、stopDistance_まで後退
+            if (currentDistance < stopDistance_ && currentDistance > kDirectionEpsilon) {
+                Vector3 direction = toPlayer.Normalize();
+                Vector3 stopPos = playerPos - direction * stopDistance_;
+                stopPos = ClampToArea(stopPos);
+                boss->SetTranslate(stopPos);
+            }
+            // そうでなければ現在位置を維持（移動しない）
+        }
+    } else {
+        // ミス時: 通常通り突進
+        float t = phaseTimer_ / attackDuration_;
+        t = std::clamp(t, 0.0f, 1.0f);
+        t = t * t * (3.0f - 2.0f * t);  // Smoothstep
+
+        Vector3 newPosition = Vector3::Lerp(startPosition_, targetPosition_, t);
+        boss->SetTranslate(newPosition);
+    }
+
+    // ブロックを回転させる（右から左へ）
     float rotationSpeed = swingAngle_ / attackDuration_;
     blockAngle_ += rotationSpeed * deltaTime;
 
@@ -222,6 +231,32 @@ Vector3 BTBossMeleeAttack::ClampToArea(const Vector3& position) {
         GameConst::kStageZMax - areaMargin_);
     clampedPos.y = position.y;
     return clampedPos;
+}
+
+void BTBossMeleeAttack::InitializeRush(Boss* boss) {
+    rushInitialized_ = true;
+    startPosition_ = boss->GetTransform().translate;
+
+    Player* player = boss->GetPlayer();
+    if (player) {
+        Vector3 playerPos = player->GetTransform().translate;
+        Vector3 toPlayer = playerPos - startPosition_;
+        toPlayer.y = 0.0f;
+
+        if (toPlayer.Length() > kDirectionEpsilon) {
+            rushDirection_ = toPlayer.Normalize();
+
+            // 目標位置 = 開始位置 + 方向 * 突進距離
+            targetPosition_ = startPosition_ + rushDirection_ * rushDistance_;
+            targetPosition_ = ClampToArea(targetPosition_);
+        } else {
+            rushDirection_ = Vector3(0.0f, 0.0f, 1.0f);
+            targetPosition_ = startPosition_;
+        }
+    } else {
+        rushDirection_ = Vector3(0.0f, 0.0f, 1.0f);
+        targetPosition_ = startPosition_;
+    }
 }
 
 void BTBossMeleeAttack::UpdateBlockPosition(Boss* boss) {
@@ -268,7 +303,8 @@ nlohmann::json BTBossMeleeAttack::ExtractParameters() const {
         {"blockRadius", blockRadius_},
         {"blockScale", blockScale_},
         {"swingAngle", swingAngle_},
-        {"rushDistance", rushDistance_}
+        {"rushDistance", rushDistance_},
+        {"stopDistance", stopDistance_}
     };
 }
 
@@ -295,6 +331,9 @@ bool BTBossMeleeAttack::DrawImGui() {
         changed = true;
     }
     if (ImGui::DragFloat("Rush Distance##melee", &rushDistance_, 1.0f, 0.0f, 50.0f)) {
+        changed = true;
+    }
+    if (ImGui::DragFloat("Stop Distance##melee", &stopDistance_, 0.5f, 1.0f, 20.0f)) {
         changed = true;
     }
 

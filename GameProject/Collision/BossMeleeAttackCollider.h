@@ -52,6 +52,12 @@ public:
 	/// <returns>現在のダメージ量</returns>
 	float GetDamage() const { return damage_; }
 
+	/// <summary>
+	/// プレイヤーにヒットしたかどうかを取得
+	/// </summary>
+	/// <returns>ヒット済みならtrue</returns>
+	bool HasHitPlayer() const { return hasHitPlayer_; }
+
 private:
 	Boss* boss_ = nullptr;           ///< このコライダーを所有するボス
 	float damage_ = 10.0f;           ///< 攻撃ダメージ量

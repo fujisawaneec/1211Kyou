@@ -71,6 +71,8 @@ public:
     void SetSwingAngle(float angle) { swingAngle_ = angle; }
     float GetRushDistance() const { return rushDistance_; }
     void SetRushDistance(float distance) { rushDistance_ = distance; }
+    float GetStopDistance() const { return stopDistance_; }
+    void SetStopDistance(float distance) { stopDistance_ = distance; }
 
     /// <summary>
     /// JSONからパラメータを適用
@@ -97,6 +99,9 @@ public:
         }
         if (params.contains("rushDistance")) {
             rushDistance_ = params["rushDistance"];
+        }
+        if (params.contains("stopDistance")) {
+            stopDistance_ = params["stopDistance"];
         }
     }
 
@@ -159,6 +164,12 @@ private:
     /// <returns>エリア内に収まる位置</returns>
     Vector3 ClampToArea(const Vector3& position);
 
+    /// <summary>
+    /// 突進の初期化（Execute開始時に呼ぶ）
+    /// </summary>
+    /// <param name="boss">ボス</param>
+    void InitializeRush(Boss* boss);
+
     //=========================================================================================
     // メンバ変数
     //=========================================================================================
@@ -186,10 +197,13 @@ private:
     bool colliderActivated_ = false;///< コライダー有効化済みフラグ
 
     // 突進パラメータ
-    float rushDistance_ = 20.0f;    ///< 突進距離
+    float rushDistance_ = 20.0f;    ///< 突進距離（ミス時）
+    float stopDistance_ = 5.0f;     ///< ヒット時の停止距離（プレイヤーからの距離）
 
     // 突進状態管理
     Vector3 startPosition_;         ///< 突進開始位置
-    Vector3 targetPosition_;        ///< 突進目標位置（Prepare開始時に固定）
+    Vector3 targetPosition_;        ///< 突進目標位置（Execute開始時に固定）
+    Vector3 rushDirection_;         ///< 突進方向
     float areaMargin_ = 5.0f;       ///< エリア境界マージン
+    bool rushInitialized_ = false;  ///< 突進初期化済みフラグ
 };
