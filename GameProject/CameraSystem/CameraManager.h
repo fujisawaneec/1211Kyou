@@ -1,6 +1,7 @@
 #pragma once
 #include "Controller/ICameraController.h"
 #include "Camera.h"
+#include "Vector3.h"
 #include <vector>
 #include <memory>
 #include <string>
@@ -105,6 +106,14 @@ public:
     /// <returns>管理対象のカメラ</returns>
     Camera* GetCamera() const { return camera_; }
 
+    //==================== カメラシェイク ====================
+
+    /// <summary>
+    /// カメラシェイクを開始
+    /// </summary>
+    /// <param name="intensity">シェイク強度（0以下でデフォルト値使用）</param>
+    void StartShake(float intensity = 0.0f);
+
     //==================== デバッグ ====================
 
     /// <summary>
@@ -141,6 +150,22 @@ private:
     /// <returns>見つかったコントローラーのインデックス（-1 = 見つからない）</returns>
     int FindHighestPriorityActiveController() const;
 
+    /// <summary>
+    /// シェイクエフェクトの更新
+    /// </summary>
+    /// <param name="deltaTime">フレーム間隔（秒）</param>
+    void UpdateShake(float deltaTime);
+
+    /// <summary>
+    /// シェイクオフセットをカメラに適用
+    /// </summary>
+    void ApplyShakeOffset();
+
+    /// <summary>
+    /// GlobalVariablesからシェイクパラメータを読み込み
+    /// </summary>
+    void LoadShakeParameters();
+
 private:
     /// <summary>
     /// コントローラー管理エントリ
@@ -172,4 +197,18 @@ private:
 
     // ソートが必要かのフラグ
     bool needsSort_ = false;
+
+    //==================== カメラシェイク ====================
+    /// シェイク中フラグ
+    bool isShaking_ = false;
+    /// シェイクタイマー（経過時間）
+    float shakeTimer_ = 0.0f;
+    /// シェイク持続時間
+    float shakeDuration_ = 0.3f;
+    /// シェイク強度（デフォルト）
+    float shakeIntensity_ = 0.5f;
+    /// 現在のシェイク強度（実行時）
+    float currentShakeIntensity_ = 0.0f;
+    /// 描画用シェイクオフセット
+    Vector3 shakeOffset_ = { 0.0f, 0.0f, 0.0f };
 };

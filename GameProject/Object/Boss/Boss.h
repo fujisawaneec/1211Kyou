@@ -83,7 +83,8 @@ public:
     /// ダメージ処理
     /// </summary>
     /// <param name="damage">受けるダメージ量</param>
-    void OnHit(float damage);
+    /// <param name="shakeIntensityOverride">シェイク強度（0以下でデフォルト値使用）</param>
+    void OnHit(float damage, float shakeIntensityOverride = 0.0f);
 
     /// <summary>
     /// ダメージされるとき色変わる演出の更新処理
@@ -91,6 +92,18 @@ public:
     /// <param name="color">変化後の色</param>
     /// <param name="duration">変化時間</param>
     void UpdateHitEffect(const Vector4& color, float duration);
+
+    /// <summary>
+    /// シェイクエフェクトの更新
+    /// </summary>
+    /// <param name="deltaTime">フレーム間隔（秒）</param>
+    void UpdateShake(float deltaTime);
+
+    /// <summary>
+    /// シェイクエフェクトを開始
+    /// </summary>
+    /// <param name="intensity">シェイク強度（0以下でデフォルト値使用）</param>
+    void StartShake(float intensity = 0.0f);
 
     /// <summary>
     /// フェーズとlifeの更新処理
@@ -313,7 +326,7 @@ private:
     // 一時行動停止フラグ
     bool isPause_ = false;
 
-    // ボス本体の衝突判定用AABBコライダー（矩形境界ボックス）
+    // ボス本体の衝突判定用AABBコライダー
     std::unique_ptr<OBBCollider> bodyCollider_;
 
     //-----------------------------近接攻撃関連------------------------------//
@@ -338,6 +351,20 @@ private:
     // ヒットエフェクトのタイマー
     float hitEffectTimer_ = 0.0f;
 
+    // ===== シェイクエフェクト関連 =====
+    // シェイク再生中フラグ
+    bool isShaking_ = false;
+    // シェイクタイマー（経過時間）
+    float shakeTimer_ = 0.0f;
+    // シェイク持続時間
+    float shakeDuration_ = 0.3f;
+    // シェイク強度（デフォルト）
+    float shakeIntensity_ = 0.2f;
+    // 現在のシェイク強度（実行時）
+    float currentShakeIntensity_ = 0.0f;
+    // 描画用シェイクオフセット
+    Vector3 shakeOffset_ = { 0.0f, 0.0f, 0.0f };
+
     // 弾生成リクエストのキュー（GameSceneが処理）
     std::vector<BulletSpawnRequest> pendingBullets_;
 
@@ -348,11 +375,11 @@ private:
     Vector2 hpBarSize2_{};
     std::unique_ptr<Sprite> hpBarBGSprite_;
 
-    // 調整可能パラメータ（ImGui編集用）
+    // 初期座標
     float initialY_ = 2.5f;   ///< 初期Y座標
     float initialZ_ = 10.0f;  ///< 初期Z座標
 
-    // HPバー画面位置（メンバー変数）
+    // HPバー画面位置
     float hpBarScreenXRatio_ = 0.65f;   ///< HPバーX座標（画面幅に対する比率）
     float hpBarScreenYRatio_ = 0.05f;   ///< HPバーY座標（画面高さに対する比率）
 };

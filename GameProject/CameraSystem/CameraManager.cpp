@@ -1,6 +1,8 @@
 #include "CameraManager.h"
 #include <algorithm>
 #include <sstream>
+#include "RandomEngine.h"
+#include "GlobalVariables.h"
 
 // シングルトンインスタンス
 CameraManager* CameraManager::instance_ = nullptr;
@@ -17,6 +19,9 @@ void CameraManager::Initialize(Camera* camera) {
     controllers_.clear();
     nameToIndex_.clear();
     needsSort_ = false;
+
+    // シェイクパラメータの読み込み
+    LoadShakeParameters();
 }
 
 void CameraManager::Finalize() {
@@ -47,6 +52,12 @@ void CameraManager::Update(float deltaTime) {
     if (activeController) {
         activeController->Update(deltaTime);
     }
+
+    // シェイクエフェクトの更新
+    UpdateShake(deltaTime);
+
+    // シェイクオフセットをカメラ位置に適用
+    ApplyShakeOffset();
 }
 
 void CameraManager::RegisterController(const std::string& name,
@@ -184,4 +195,48 @@ int CameraManager::FindHighestPriorityActiveController() const {
         }
     }
     return -1;
+}
+
+void CameraManager::StartShake(float intensity) {
+    isShaking_ = true;
+    shakeTimer_ = 0.0f;
+    currentShakeIntensity_ = (intensity > 0.0f) ? intensity : shakeIntensity_;
+}
+
+void CameraManager::UpdateShake(float deltaTime) {
+    if (!isShaking_) {
+        shakeOffset_ = { 0.0f, 0.0f, 0.0f };
+        return;
+    }
+
+    shakeTimer_ += deltaTime;
+
+    if (shakeTimer_ >= shakeDuration_) {
+        isShaking_ = false;
+        shakeTimer_ = 0.0f;
+        shakeOffset_ = { 0.0f, 0.0f, 0.0f };
+        return;
+    }
+
+    // 減衰係数（1.0→0.0へ線形減衰）
+    float decay = 1.0f - (shakeTimer_ / shakeDuration_);
+
+    // ランダムオフセット生成
+    RandomEngine* rng = RandomEngine::GetInstance();
+    shakeOffset_.x = rng->GetFloat(-currentShakeIntensity_, currentShakeIntensity_) * decay;
+    shakeOffset_.y = rng->GetFloat(-currentShakeIntensity_, currentShakeIntensity_) * decay;
+    shakeOffset_.z = rng->GetFloat(-currentShakeIntensity_, currentShakeIntensity_) * decay;
+}
+
+void CameraManager::ApplyShakeOffset() {
+    if (!camera_) return;
+
+    Vector3 currentPos = camera_->GetTranslate();
+    camera_->SetTranslate(currentPos + shakeOffset_);
+}
+
+void CameraManager::LoadShakeParameters() {
+    GlobalVariables* gv = GlobalVariables::GetInstance();
+    shakeDuration_ = gv->GetValueFloat("CameraShake", "Duration");
+    shakeIntensity_ = gv->GetValueFloat("CameraShake", "Intensity");
 }

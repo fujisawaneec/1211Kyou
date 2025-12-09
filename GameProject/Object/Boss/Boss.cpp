@@ -12,6 +12,7 @@
 #include "BossBehaviorTree/BossBehaviorTree.h"
 #include "GlobalVariables.h"
 #include "EmitterManager.h"
+#include "RandomEngine.h"
 
 #ifdef _DEBUG
 #include "ImGuiManager.h"
@@ -101,6 +102,10 @@ void Boss::Initialize()
     // 近接攻撃コライダーをCollisionManagerに登録
     CollisionManager::GetInstance()->AddCollider(meleeAttackCollider_.get());
 
+    // シェイクエフェクトパラメータの読み込み
+    shakeDuration_ = gv->GetValueFloat("Boss", "ShakeDuration");
+    shakeIntensity_ = gv->GetValueFloat("Boss", "ShakeIntensity");
+
     // ビヘイビアツリーの初期化
     behaviorTree_ = std::make_unique<BossBehaviorTree>(this, player_);
 
@@ -177,8 +182,13 @@ void Boss::Update(float deltaTime)
     float hitEffectDuration = GlobalVariables::GetInstance()->GetValueFloat("Boss", "HitEffectDuration");
     UpdateHitEffect(Vector4(1.0f, 1.0f, 1.0f, 1.0f), hitEffectDuration);
 
-    // モデルの更新
-    model_->SetTransform(transform_);
+    // シェイクエフェクトの更新
+    UpdateShake(deltaTime);
+
+    // モデルの更新（シェイクオフセットを適用）
+    Transform renderTransform = transform_;
+    renderTransform.translate += shakeOffset_;
+    model_->SetTransform(renderTransform);
     model_->Update();
 }
 
@@ -199,7 +209,7 @@ void Boss::DrawSprite()
     hpBarSprite1_->Draw();
 }
 
-void Boss::OnHit(float damage)
+void Boss::OnHit(float damage, float shakeIntensityOverride)
 {
     if (isReadyToChangePhase_) {
         phase_ = 2;
@@ -211,6 +221,9 @@ void Boss::OnHit(float damage)
 
     hitEffectTimer_ = 0.f;
     isPlayHitEffect_ = true;
+
+    // シェイクエフェクト開始
+    StartShake(shakeIntensityOverride);
 }
 
 void Boss::UpdateHitEffect(const Vector4& color, float duration)
@@ -226,6 +239,40 @@ void Boss::UpdateHitEffect(const Vector4& color, float duration)
         isPlayHitEffect_ = false;
         model_->SetMaterialColor(Vector4(1.0f, 0.0f, 0.0f, 1.0f));
     }
+}
+
+void Boss::UpdateShake(float deltaTime)
+{
+    if (!isShaking_) {
+        shakeOffset_ = { 0.0f, 0.0f, 0.0f };
+        return;
+    }
+
+    shakeTimer_ += deltaTime;
+
+    if (shakeTimer_ >= shakeDuration_) {
+        isShaking_ = false;
+        shakeTimer_ = 0.0f;
+        shakeOffset_ = { 0.0f, 0.0f, 0.0f };
+        return;
+    }
+
+    // 減衰係数（1.0→0.0へ線形減衰）
+    float decay = 1.0f - (shakeTimer_ / shakeDuration_);
+
+    // ランダムオフセット生成
+    RandomEngine* rng = RandomEngine::GetInstance();
+    shakeOffset_.x = rng->GetFloat(-currentShakeIntensity_, currentShakeIntensity_) * decay;
+    shakeOffset_.y = rng->GetFloat(-currentShakeIntensity_, currentShakeIntensity_) * decay;
+    shakeOffset_.z = rng->GetFloat(-currentShakeIntensity_, currentShakeIntensity_) * decay;
+}
+
+void Boss::StartShake(float intensity)
+{
+    isShaking_ = true;
+    shakeTimer_ = 0.0f;
+    // 0以下の場合はデフォルト値を使用
+    currentShakeIntensity_ = (intensity > 0.0f) ? intensity : shakeIntensity_;
 }
 
 void Boss::UpdatePhaseAndLive()
@@ -294,6 +341,26 @@ void Boss::DrawImGui()
         ImGui::Text("Initial Position (for respawn):");
         ImGui::DragFloat("Initial Y", &initialY_, 0.1f, 0.0f, 10.0f);
         ImGui::DragFloat("Initial Z", &initialZ_, 1.0f, -50.0f, 50.0f);
+    }
+
+    // ===== シェイクエフェクト（折りたたみ可能） =====
+    if (ImGui::CollapsingHeader("Shake Effect")) {
+        ImGui::Text("Is Shaking: %s", isShaking_ ? "YES" : "NO");
+        ImGui::Text("Timer: %.3f / %.3f", shakeTimer_, shakeDuration_);
+        ImGui::Text("Offset: (%.3f, %.3f, %.3f)",
+            shakeOffset_.x, shakeOffset_.y, shakeOffset_.z);
+
+        ImGui::Separator();
+        if (ImGui::DragFloat("Duration", &shakeDuration_, 0.01f, 0.0f, 2.0f)) {
+            GlobalVariables::GetInstance()->SetValue("Boss", "ShakeDuration", shakeDuration_);
+        }
+        if (ImGui::DragFloat("Intensity", &shakeIntensity_, 0.01f, 0.0f, 1.0f)) {
+            GlobalVariables::GetInstance()->SetValue("Boss", "ShakeIntensity", shakeIntensity_);
+        }
+
+        if (ImGui::Button("Test Shake")) {
+            StartShake();
+        }
     }
 
     // ===== セクション6: コライダー（折りたたみ可能） =====

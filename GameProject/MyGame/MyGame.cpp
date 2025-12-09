@@ -217,12 +217,19 @@ void MyGame::RegisterGlobalVariables()
     gv->CreateGroup("Boss");
     gv->AddItem("Boss", "BodyColliderSize", 3.2f);
     gv->AddItem("Boss", "HitEffectDuration", 0.1f);
+    gv->AddItem("Boss", "ShakeDuration", 0.3f);
+    gv->AddItem("Boss", "ShakeIntensity", 0.2f);
 
     // === BossBullet === //
     gv->CreateGroup("BossBullet");
     gv->AddItem("BossBullet", "ColliderRadius", 1.0f);
     gv->AddItem("BossBullet", "Damage", 10.0f);
     gv->AddItem("BossBullet", "Lifetime", 5.0f);
+
+    // === CameraShake === //
+    gv->CreateGroup("CameraShake");
+    gv->AddItem("CameraShake", "Duration", 0.3f);
+    gv->AddItem("CameraShake", "Intensity", 0.5f);
 
     // === PlayerBullet === //
     gv->CreateGroup("PlayerBullet");

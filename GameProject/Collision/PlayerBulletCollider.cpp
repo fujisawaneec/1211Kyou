@@ -28,7 +28,7 @@ void PlayerBulletCollider::OnCollisionEnter(Collider* other) {
             hitTargets_.insert(targetPtr);
 
             // ボスにダメージを与える
-            boss->OnHit(owner_->GetDamage());
+            boss->OnHit(owner_->GetDamage(), 0.5f);
             hasDealtDamage_ = true;
 
             // 弾を非アクティブ化

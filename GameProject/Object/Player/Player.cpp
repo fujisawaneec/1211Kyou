@@ -19,6 +19,7 @@
 #include "../../Common/GameConst.h"
 #include "FrameTimer.h"
 #include "Sprite.h"
+#include "../../CameraSystem/CameraManager.h"
 
 #include <cmath>
 #include <algorithm>
@@ -349,6 +350,9 @@ void Player::OnHit(float damage)
 
     hp_ -= damage;
     hp_ = std::max<float>(hp_, 0.0f);
+
+    // カメラシェイク発動（被弾時は強めに）
+    CameraManager::GetInstance()->StartShake(0.8f);
 }
 
 void Player::DrawImGui()

@@ -3,6 +3,7 @@
 #include "../Object/Boss/Boss.h"
 #include "CollisionTypeIdDef.h"
 #include "GlobalVariables.h"
+#include "../CameraSystem/CameraManager.h"
 
 MeleeAttackCollider::MeleeAttackCollider(Player* player)
     : player_(player) {
@@ -23,7 +24,10 @@ void MeleeAttackCollider::OnCollisionEnter(Collider* other) {
         Boss* enemy = static_cast<Boss*>(other->GetOwner());
         if (enemy) {
 
-            enemy->OnHit(attackDamage_);
+            enemy->OnHit(attackDamage_, 1.0f);
+
+            // カメラシェイク発動（攻撃ヒット時は軽めに）
+            CameraManager::GetInstance()->StartShake(0.3f);
 
             if (!detectedEnemy_) {
                 detectedEnemy_ = enemy;
@@ -47,7 +51,11 @@ void MeleeAttackCollider::OnCollisionStay(Collider* other) {
             detectedEnemy_ = enemy;
             if (canDamage)
             {
-                enemy->OnHit(attackDamage_);
+                enemy->OnHit(attackDamage_, 1.0f);
+
+                // カメラシェイク発動（攻撃ヒット時は軽めに）
+                CameraManager::GetInstance()->StartShake(0.3f);
+
                 canDamage = false;
             }
         }
