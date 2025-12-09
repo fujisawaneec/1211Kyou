@@ -119,10 +119,18 @@ void ShootState::CalculateAimDirection(Player* player)
 	aimDirection_ = Mat4x4::TransformNormal(rotationMatrix, localDirection);
 
 	// 正規化
-	float len = aimDirection_.Length();
-	if (len > 0.0f) {
-		aimDirection_ = aimDirection_ / len;
-	}
+    aimDirection_ = aimDirection_.Normalize();
+
+    // 発射方向にプレイヤーを向ける
+    if (aimDirection_.Length() > 0.01f) {
+        float targetAngle = std::atan2(aimDirection_.x, aimDirection_.z);
+        float aimRotationLerp = GlobalVariables::GetInstance()->GetValueFloat("ShootState", "AimRotationLerp");
+        if (aimRotationLerp <= 0.0f) {
+            aimRotationLerp = 0.3f;  // デフォルト値
+        }
+        Transform* transform = player->GetTransformPtr();
+        transform->rotate.y = Vec3::LerpShortAngle(transform->rotate.y, targetAngle, aimRotationLerp);
+    }
 }
 
 void ShootState::Fire(Player* player)
@@ -140,17 +148,6 @@ void ShootState::Fire(Player* player)
 
 	// 弾生成リクエストを追加
 	player->RequestBulletSpawn(position, velocity);
-
-	// 発射方向にプレイヤーを向ける
-	if (aimDirection_.Length() > 0.01f) {
-		float targetAngle = std::atan2(aimDirection_.x, aimDirection_.z);
-		float aimRotationLerp = gv->GetValueFloat("ShootState", "AimRotationLerp");
-		if (aimRotationLerp <= 0.0f) {
-			aimRotationLerp = 0.3f;  // デフォルト値
-		}
-		Transform* transform = player->GetTransformPtr();
-		transform->rotate.y = Vec3::LerpShortAngle(transform->rotate.y, targetAngle, aimRotationLerp);
-	}
 }
 
 void ShootState::DrawImGui(Player* player)

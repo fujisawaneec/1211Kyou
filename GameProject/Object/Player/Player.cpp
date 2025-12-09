@@ -178,7 +178,7 @@ void Player::DrawSprite()
     hpBarSprite_->Draw();
 }
 
-void Player::Move(float speedMultiplier)
+void Player::Move(float speedMultiplier, bool isApplyDirCalulate)
 {
     if (!inputHandlerPtr_) return;
 
@@ -204,7 +204,7 @@ void Player::Move(float speedMultiplier)
     transform_.translate += velocity_;
 
     // 移動方向を向く
-    if (velocity_.Length() > kVelocityEpsilon)
+    if (velocity_.Length() > kVelocityEpsilon && isApplyDirCalulate)
     {
         targetAngle_ = std::atan2(velocity_.x, velocity_.z);
         transform_.rotate.y = Vec3::LerpShortAngle(transform_.rotate.y, targetAngle_, rotationLerpSpeed);
