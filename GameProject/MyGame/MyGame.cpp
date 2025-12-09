@@ -207,6 +207,7 @@ void MyGame::RegisterGlobalVariables()
     gv->AddItem("Player", "AttackStartDistance", 5.0f);
     gv->AddItem("Player", "AttackMoveRotationLerp", 0.3f);
     gv->AddItem("Player", "BossLookatLerp", 1.15f);
+    gv->AddItem("Player", "AttackMoveSpeed", 50.0f);
 
     // === MeleeAttack === //
     gv->CreateGroup("MeleeAttack");

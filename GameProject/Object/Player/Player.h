@@ -28,6 +28,11 @@ class Player
 private:
 	static constexpr float kVelocityEpsilon = 0.01f;   ///< 速度判定の閾値
 	static constexpr float kBoundaryDisabled = 9999.0f; ///< 境界無効化マーカー
+    // イージング用定数
+    static constexpr float kMoveArrivalThreshold = 0.5f;
+    static constexpr float kMoveEasingCoeffA = 3.0f;
+    static constexpr float kMoveEasingCoeffB = 2.0f;
+    static constexpr float kDirectionEpsilon = 0.01f;
 
 public: // メンバ関数
     Player();
@@ -66,11 +71,22 @@ public: // メンバ関数
     void Move(float speedMultiplier = 1.0f, bool isApplyDirCalulate = true);
 
     /// <summary>
-    /// ターゲットへ移動
+    /// ターゲットへ移動（イージング移動）
     /// </summary>
     /// <param name="target">移動先のボスエネミー</param>
     /// <param name="deltaTime">前フレームからの経過時間</param>
     void MoveToTarget(Boss* target, float deltaTime);
+
+    /// <summary>
+    /// MoveToTargetの状態をリセット
+    /// </summary>
+    void ResetMoveToTarget();
+
+    /// <summary>
+    /// 目標位置に到達したか判定
+    /// </summary>
+    /// <returns>true: 到達, false: 未到達</returns>
+    bool HasReachedTarget() const;
 
     /// <summary>
     /// ImGuiの描画
@@ -371,6 +387,13 @@ private: // メンバ変数
     Boss* targetEnemy_ = nullptr;
     bool isAttackHit_ = false;
     float attackMoveSpeed_ = 2.0f;
+
+    // MoveToTarget用の状態管理
+    Vector3 moveStartPosition_;           ///< 移動開始位置
+    Vector3 moveTargetPosition_;          ///< 移動目標位置
+    float moveElapsedTime_ = 0.0f;        ///< 移動経過時間
+    float moveDuration_ = 0.0f;           ///< 移動所要時間
+    bool isMoveInitialized_ = false;      ///< 移動初期化済みフラグ
 
     // 弾生成リクエスト
     std::vector<BulletSpawnRequest> pendingBullets_;

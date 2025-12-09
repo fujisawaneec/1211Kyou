@@ -21,6 +21,7 @@
 #include "Sprite.h"
 
 #include <cmath>
+#include <algorithm>
 
 #ifdef _DEBUG
 #include "ImGuiManager.h"
@@ -112,6 +113,7 @@ void Player::Update()
     attackMinDist_ = gv->GetValueFloat("Player", "AttackStartDistance");
     attackMoveRotationLerp_ = gv->GetValueFloat("Player", "AttackMoveRotationLerp");
     bossLookatLerp_ = gv->GetValueFloat("Player", "BossLookatLerp");
+    attackMoveSpeed_ = gv->GetValueFloat("Player", "AttackMoveSpeed");
 
     // 死亡判定
     if (hp_ <= 0.0f) isDead_ = true;
@@ -211,25 +213,74 @@ void Player::Move(float speedMultiplier, bool isApplyDirCalulate)
 void Player::MoveToTarget(Boss* target, float deltaTime)
 {
     if (!target) return;
-    deltaTime;
 
-    // ターゲットの位置取得
-    Vector3 targetPos = target->GetTransform().translate;
-    Vector3 direction = targetPos - transform_.translate;
-    direction.y = 0.0f;
+    // 初回呼び出し時の初期化
+    if (!isMoveInitialized_) {
+        moveStartPosition_ = transform_.translate;
 
-    float distance = direction.Length();
-    if (distance > attackMinDist_) {
-        direction = direction.Normalize();
+        Vector3 targetPos = target->GetTransform().translate;
+        Vector3 toTarget = targetPos - moveStartPosition_;
+        toTarget.y = 0.0f;
+        float distance = toTarget.Length();
 
-        // ターゲットに向かって移動
-        velocity_ = direction * attackMoveSpeed_;
-        transform_.translate += velocity_;
+        if (distance > attackMinDist_ && distance > kDirectionEpsilon) {
+            Vector3 direction = toTarget.Normalize();
 
-        // ターゲットの方向を向く
-        targetAngle_ = std::atan2(direction.x, direction.z);
-        transform_.rotate.y = Vec3::LerpShortAngle(transform_.rotate.y, targetAngle_, attackMoveRotationLerp_);
+            // 目標位置 = ターゲット位置から attackMinDist_ 手前
+            float moveDistance = distance - attackMinDist_;
+            moveTargetPosition_ = moveStartPosition_ + direction * moveDistance;
+            moveTargetPosition_.y = moveStartPosition_.y;
+
+            // 所要時間を計算
+            moveDuration_ = moveDistance / attackMoveSpeed_;
+
+            // ターゲット方向を向く
+            targetAngle_ = std::atan2(direction.x, direction.z);
+        }
+        else {
+            // 既に攻撃範囲内
+            moveTargetPosition_ = moveStartPosition_;
+            moveDuration_ = 0.0f;
+        }
+
+        moveElapsedTime_ = 0.0f;
+        isMoveInitialized_ = true;
     }
+
+    // イージング移動
+    if (moveDuration_ > 0.0f) {
+        float t = moveElapsedTime_ / moveDuration_;
+        t = std::clamp(t, 0.0f, 1.0f);
+
+        // smoothstep イージング
+        t = t * t * (kMoveEasingCoeffA - kMoveEasingCoeffB * t);
+
+        Vector3 newPos = Vector3::Lerp(moveStartPosition_, moveTargetPosition_, t);
+        transform_.translate = newPos;
+    }
+
+    // 回転の補間
+    transform_.rotate.y = Vec3::LerpShortAngle(transform_.rotate.y, targetAngle_, attackMoveRotationLerp_);
+
+    moveElapsedTime_ += deltaTime;
+}
+
+void Player::ResetMoveToTarget()
+{
+    isMoveInitialized_ = false;
+    moveElapsedTime_ = 0.0f;
+    moveDuration_ = 0.0f;
+}
+
+bool Player::HasReachedTarget() const
+{
+    static constexpr float kMoveArrivalThreshold = 0.5f;
+
+    if (moveDuration_ <= 0.0f) return true;  // 移動不要
+
+    Vector3 diff = transform_.translate - moveTargetPosition_;
+    diff.y = 0.0f;
+    return diff.Length() < kMoveArrivalThreshold;
 }
 
 void Player::SetupColliders()

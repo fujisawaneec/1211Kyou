@@ -39,6 +39,9 @@ void AttackState::Enter(Player* player)
         UpdateBlockPosition(player);
     }
 
+    // MoveToTarget状態をリセット
+    player->ResetMoveToTarget();
+
     // SearchForTargetはUpdateのSearchTargetフェーズで呼ばれる
 }
 
@@ -139,13 +142,11 @@ void AttackState::ProcessMoveToTarget(Player* player, float deltaTime)
         return;
     }
 
-    moveTimer_ += deltaTime;
+    // 移動実行
+    player->MoveToTarget(targetEnemy_, deltaTime);
 
-    // 一定時間敵に近づく
-    if (moveTimer_ < maxMoveTime_) {
-        player->MoveToTarget(targetEnemy_, deltaTime);
-    }
-    else {
+    // 位置ベースの終了判定
+    if (player->HasReachedTarget()) {
         phase_ = ExecuteAttack;
     }
 }
