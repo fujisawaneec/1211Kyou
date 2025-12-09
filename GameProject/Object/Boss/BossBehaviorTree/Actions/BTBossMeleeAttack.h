@@ -1,4 +1,6 @@
 #pragma once
+#include <numbers>
+
 #include "../../../../BehaviorTree/Core/BTNode.h"
 #include "../../../../BehaviorTree/Core/BTBlackboard.h"
 #include "Vector3.h"
@@ -153,20 +155,21 @@ private:
     MeleePhase currentPhase_ = MeleePhase::Prepare;
 
     // 時間パラメータ
-    float prepareTime_ = 0.5f;      ///< 準備時間
+    float prepareTime_ = 1.0f;      ///< 準備時間
     float attackDuration_ = 0.3f;   ///< 攻撃持続時間
     float recoveryTime_ = 0.3f;     ///< 硬直時間
-    float totalDuration_ = 1.1f;    ///< 総時間
+    float totalDuration_ = 1.6f;    ///< 総時間
 
     // ブロックパラメータ
-    float blockRadius_ = 3.0f;      ///< ボスからの距離
-    float blockScale_ = 1.0f;       ///< ブロックスケール
-    float swingAngle_ = 3.14159f;   ///< 振り幅（π = 180度）
+    float blockRadius_ = 8.0f;      ///< ボスからの距離
+    float blockScale_ = 0.5f;       ///< ブロックスケール
+    float swingAngle_ =             ///< 振り幅（π = 180度）
+        static_cast<float>(std::numbers::pi);
     float blockAngle_ = 0.0f;       ///< 現在のブロック角度
 
     // 状態管理
     float elapsedTime_ = 0.0f;      ///< 経過時間
     float phaseTimer_ = 0.0f;       ///< 現在フェーズのタイマー
     bool isFirstExecute_ = true;    ///< 初回実行フラグ
-    bool colliderActivated_ = false; ///< コライダー有効化済みフラグ
+    bool colliderActivated_ = false;///< コライダー有効化済みフラグ
 };

@@ -2,7 +2,7 @@
     "BossMeleeAttackCollider": {
         "ColliderSizeX": 8.0,
         "ColliderSizeY": 3.5,
-        "ColliderSizeZ": 18.0,
+        "ColliderSizeZ": 8.0,
         "Damage": 10.0,
         "OffsetZ": 10.0
     }
