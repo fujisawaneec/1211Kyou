@@ -19,6 +19,7 @@ private:
     static constexpr float kArrivalThreshold = 0.5f;   ///< 到達判定の閾値
     static constexpr float kEasingCoeffA = 3.0f;       ///< イージング係数A
     static constexpr float kEasingCoeffB = 2.0f;       ///< イージング係数B
+    static constexpr float kMinRetreatDistance = 10.0f; ///< 代替方向を検討する最小移動距離
 
 public:
     /// <summary>
@@ -95,6 +96,22 @@ private:
     /// <param name="position">調整前の位置</param>
     /// <returns>エリア内に収まる位置</returns>
     Vector3 ClampToArea(const Vector3& position);
+
+    /// <summary>
+    /// 最適な離脱方向を探索（壁回避）
+    /// </summary>
+    /// <param name="primaryDirection">基本の離脱方向</param>
+    /// <param name="retreatDistance">離脱距離</param>
+    /// <returns>最適な離脱方向</returns>
+    Vector3 FindBestRetreatDirection(const Vector3& primaryDirection, float retreatDistance);
+
+    /// <summary>
+    /// 指定方向での移動距離を評価
+    /// </summary>
+    /// <param name="direction">評価する方向</param>
+    /// <param name="retreatDistance">離脱距離</param>
+    /// <returns>実際に移動できる距離</returns>
+    float EvaluateDirection(const Vector3& direction, float retreatDistance);
 
     //=========================================================================================
     // メンバ変数

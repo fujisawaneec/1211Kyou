@@ -2,9 +2,12 @@
 #include "../../Boss.h"
 #include "../../../Player/Player.h"
 #include "../../../../Common/GameConst.h"
+#include "Mat4x4Func.h"
 
 #include <algorithm>
+#include <array>
 #include <cmath>
+#include <numbers>
 
 #ifdef _DEBUG
 #include "ImGuiManager.h"
@@ -93,16 +96,19 @@ void BTBossRetreat::InitializeRetreat(Boss* boss, Player* player) {
     float currentDistance = toRetreat.Length();
 
     if (currentDistance > kDirectionEpsilon) {
-        Vector3 retreatDirection = toRetreat.Normalize();
-
-        // プレイヤーを向いたまま（retreatDirectionの逆方向を向く）
-        float angle = atan2f(-retreatDirection.x, -retreatDirection.z);
-        boss->SetRotate(Vector3(0.0f, angle, 0.0f));
+        Vector3 primaryDirection = toRetreat.Normalize();
 
         // 目標位置 = 現在位置から targetDistance_ まで離れた位置
         float retreatDistance = targetDistance_ - currentDistance;
         if (retreatDistance > 0.0f) {
-            targetPosition_ = startPosition_ + retreatDirection * retreatDistance;
+            // 壁回避: 最適な離脱方向を探索
+            Vector3 bestDirection = FindBestRetreatDirection(primaryDirection, retreatDistance);
+
+            // プレイヤーを向いたまま（bestDirectionの逆方向を向く）
+            float angle = atan2f(-bestDirection.x, -bestDirection.z);
+            boss->SetRotate(Vector3(0.0f, angle, 0.0f));
+
+            targetPosition_ = startPosition_ + bestDirection * retreatDistance;
             targetPosition_ = ClampToArea(targetPosition_);
 
             // 実際の移動距離から所要時間を計算
@@ -156,6 +162,58 @@ Vector3 BTBossRetreat::ClampToArea(const Vector3& position) {
     clampedPos.y = position.y;
 
     return clampedPos;
+}
+
+Vector3 BTBossRetreat::FindBestRetreatDirection(const Vector3& primaryDirection, float retreatDistance) {
+    // 元の方向での移動距離を評価
+    float primaryScore = EvaluateDirection(primaryDirection, retreatDistance);
+
+    // 閾値以上なら元の方向を使用
+    if (primaryScore >= kMinRetreatDistance) {
+        return primaryDirection;
+    }
+
+    // 代替方向を評価（Mat4x4::MakeRotateY + TransformNormalで回転）
+    constexpr float kHalfPi = std::numbers::pi_v<float> / 2.0f;  // 90度
+    constexpr float kPi = std::numbers::pi_v<float>;              // 180度
+
+    Matrix4x4 rotLeft90 = Mat4x4::MakeRotateY(kHalfPi);
+    Matrix4x4 rotRight90 = Mat4x4::MakeRotateY(-kHalfPi);
+    Matrix4x4 rot180 = Mat4x4::MakeRotateY(kPi);
+
+    struct DirectionCandidate {
+        Vector3 direction;
+        float score;
+    };
+
+    std::array<DirectionCandidate, 4> candidates = {{
+        { primaryDirection, primaryScore },
+        { Mat4x4::TransformNormal(rotLeft90, primaryDirection), 0.0f },   // 左90度
+        { Mat4x4::TransformNormal(rotRight90, primaryDirection), 0.0f },  // 右90度
+        { Mat4x4::TransformNormal(rot180, primaryDirection), 0.0f }       // 180度（逆方向）
+    }};
+
+    // 各方向のスコアを計算
+    for (size_t i = 1; i < candidates.size(); ++i) {
+        candidates[i].score = EvaluateDirection(candidates[i].direction, retreatDistance);
+    }
+
+    // 最高スコアの方向を選択
+    auto best = std::max_element(candidates.begin(), candidates.end(),
+        [](const DirectionCandidate& a, const DirectionCandidate& b) {
+            return a.score < b.score;
+        });
+
+    return best->direction;
+}
+
+float BTBossRetreat::EvaluateDirection(const Vector3& direction, float retreatDistance) {
+    Vector3 targetPos = startPosition_ + direction * retreatDistance;
+    targetPos = ClampToArea(targetPos);
+
+    Vector3 actualMove = targetPos - startPosition_;
+    actualMove.y = 0.0f;
+    return actualMove.Length();
 }
 
 nlohmann::json BTBossRetreat::ExtractParameters() const {
